@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Başlat (node index.js)",
+        "program": "${workspaceFolder}/index.js",
+        "runtimeArgs": [
+          "--trace-warnings"
+        ],
+        "envFile": "${workspaceFolder}/.env",
+        "console": "integratedTerminal"
+      }
+    ]
+  }
+  

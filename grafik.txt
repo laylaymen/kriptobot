@@ -1,0 +1,5437 @@
+🧠 GRAFİK BEYNİ – Nihai Modül Paketleme
+✅ 1. Nihai Modül Listesi (23 Adet)
+1.	collapseRiskDetector.js
+2.	falseBreakFilter.js
+3.	leaderCoinImpact.js
+4.	adaptiveScenarioBuilder.js
+5.	volumeConfirmBreakout.js
+6.	vapZoneDetector.js
+7.	fakeMoveCatcher.js
+8.	formPatternRecognizer.js
+9.	supportResistanceMapper.js
+10.	trendStageClassifier.js
+11.	patternPrecursorScanner.js
+12.	microManipulationDetector.js
+13.	latencyGapAnalyzer.js
+14.	frustrationDrivenOvertrader.js
+15.	macroRiskSentimentSync.js
+16.	garchVolatilityEstimator.js
+17.	shockAwareTrendMonitor.js
+18.	reflexivePatternTracker.js
+19.	sentimentDrivenDeviations.js
+20.	chainReactionRiskMap.js
+21.	teyitZinciriBiasGuard.js
+22.	delayedCorrectionSystem.js
+23.	structuralBehaviorMonitor.js (köprü modül olarak)
+________________________________________
+✅ 2. İşlev Grupları
+Grup	Modüller
+Likidite & Hacim Tabanlı	volumeConfirmBreakout, vapZoneDetector, fakeMoveCatcher, microManipulationDetector, latencyGapAnalyzer
+Formasyon & Yapı Tabanlı	formPatternRecognizer, patternPrecursorScanner, supportResistanceMapper, trendStageClassifier, teyitZinciriBiasGuard
+Volatilite & Makro Risk	collapseRiskDetector, garchVolatilityEstimator, macroRiskSentimentSync, shockAwareTrendMonitor, chainReactionRiskMap
+Duygusal Bozulma / FOMO / Overtrading	frustrationDrivenOvertrader, reflexivePatternTracker, sentimentDrivenDeviations
+BTC Bağlantılı & Makro Takip	leaderCoinImpact, macroRiskSentimentSync, chainReactionRiskMap
+Uyarlanabilir / Otomatik Senaryo	adaptiveScenarioBuilder, delayedCorrectionSystem, structuralBehaviorMonitor
+________________________________________
+✅ 3. Veri Alışverişi Haritası (özet)
+•	Otobilinç: teyitZinciriBiasGuard, reflexivePatternTracker, delayedCorrectionSystem
+•	VIVO: delayedCorrectionSystem, structuralBehaviorMonitor, patternPrecursorScanner
+•	LIVIA: macroRiskSentimentSync, frustrationDrivenOvertrader
+•	Denetim Asistanı: structuralBehaviorMonitor, shockAwareTrendMonitor, chainReactionRiskMap
+________________________________________
+✅ 4. Yeni Önerilen Modüller (Eksik alanları kapatmak için)
+Modül Adı	Amaç
+highImpactEventForecaster.js	FED, enflasyon, jeopolitik gibi ani olayların geçmiş etkisine bakarak yeni sinyal eşikleri oluşturur.
+comboBreakVerifier.js	RSI + EMA + Orderflow uyumu varken sinyalin başarısız olma oranını analiz eder.
+volumeReactivityMap.js	Fiyatın belirli hacim değişimlerine nasıl tepki verdiğini haritalandırır.
+timeBasedSignalSync.js	Hangi saat diliminde hangi sinyalin daha iyi çalıştığını öğrenir ve sinyal zamanlaması ayarlar.
+Sistem Adı: Grafik Beyni
+
+Amaç: Kullanıcının işlem yaptığı grafik ortamını çok katmanlı teknik analizle taramak, en uygun sinyal önerilerini üretmek, sinyalleri güven skoruna göre ağırlıklandırmak ve diğer sistemlerle (Otobilinç, VIVO, LIVIA, Denetim Asistanı) veri alışverişi yaparak sinyal doğruluğunu optimize etmek.
+
+Yapı:
+
+1. Çoklu veri katmanı: EMA, RSI, Orderbook, Hacim, Trend, Formasyon, Korelasyon
+2. Sinyal üretimi: Modül bazlı tetiklenir. Sinyallerin her biri doğruluk puanı (score) ile VIVO’ya iletilir.
+3. Varyant üretimi: Risk profiline göre (momentum, düşük volatilite, combo senaryoları)
+4. Psikolojik filtreleme: Otobilinç & LIVIA'dan gelen psikolojik uygunluk ile sinyallerin yoğunluğu düzenlenir.
+5. Denetim: Denetim Asistanı, modül başarımına göre sinyal modellerini değerlendirir.
+6. Uyarlayıcılık: Makro veri ve gün içi değişkenliğe göre otomatik senaryo güncellemesi (adaptiveScenarioBuilder, delayedCorrectionSystem)
+
+Gereksinimler:
+- Her sinyalin export’unda şu alanlar olmalı: {modül, sinyalTipi, skor, varyant, teyitZinciri, kullanıcıUyumu}
+- Modüller, saatlik cron ile kendi analizlerini günceller ve güncelleme sonrası son 3 sinyal için sonuç doğrulaması yapar.
+
+Kodlamaya geçildiğinde önce `signalCoordinator.js` gibi bir sinyal yönetim merkezi yazılmalı. Bu modül, tüm alt modülleri koordine eder, skorları toplar ve VIVO’ya iletir.
+
+🧠 GRAFİK BEYNİ – GÖREV → ALT GÖREV → MODÜL → STRATEJİK KARAR NOKTASI
+🔹 Görev: Teknik Analiz
+Alt Görev: Trend Tespiti
+• Modül: trendFilter.js
+• Karar Noktası: Uptrend/Downtrend kararına göre strateji yönü
+
+Alt Görev: Formasyon Tespiti
+• Modül: formPatternRecognizer.js
+• Karar Noktası: Formasyon aktifse işlem senaryosu başlatılır
+
+Alt Görev: Destek/Direnç Belirleme
+• Modül: supportResistanceMapper.js
+• Karar Noktası: Kritik seviyelere göre risk/ödül hesaplaması
+
+Alt Görev: EMA/RSI Uyum Testi
+• Modül: falseBreakFilter.js
+• Karar Noktası: Hacim desteği yoksa sinyal bastırılır
+
+Alt Görev: Fiyat-Hacim Senkronizasyonu
+• Modül: latencyGapAnalyzer.js
+• Karar Noktası: Likidite bozulmuşsa sinyal iptal
+
+🔹 Görev: Likidite ve Hacim Analizi
+Alt Görev: Volume Spike Tespiti
+• Modül: volumeConfirmBreakout.js
+• Karar Noktası: Yalancı kırılımların ayıklanması
+
+Alt Görev: VAP Alanı Çıkartımı
+• Modül: vapZoneDetector.js
+• Karar Noktası: Giriş-çıkış seviyesi hassasiyeti
+
+Alt Görev: Hacimsiz Yükseliş Tespiti
+• Modül: fakeMoveCatcher.js
+• Karar Noktası: Güvensiz sinyal ortamı oluşturur
+
+Alt Görev: Micro Manipülasyon Tespiti
+• Modül: microManipulationDetector.js
+• Karar Noktası: HFT etkisi varsa sistem uyarılır
+
+🔹 Görev: Senaryo Oluşturma
+Alt Görev: Ortam Bazlı Senaryo Seçimi
+• Modül: adaptiveScenarioBuilder.js
+• Karar Noktası: Ortam → trendbreak / rangebound / liquidity storm
+
+Alt Görev: Ön Sinyal Üretimi
+• Modül: patternPrecursorScanner.js
+• Karar Noktası: Tarihi eşleşmeyle sinyal hazırlığı yapılır
+
+Alt Görev: Refleksif Fiyat Hareketi Analizi
+• Modül: reflexivePatternTracker.js
+• Karar Noktası: Haber etkisiyle fiyat sıçraması analizi
+
+🔹 Görev: Karar Gücü ve Onay
+Alt Görev: Olgunluk Skoru Hesaplama
+• Modül: signalMaturityScorer.js
+• Karar Noktası: VIVO'ya sinyal geçip geçmeyeceği kararını etkiler
+
+Alt Görev: Combo Sinyal Algısı
+• Modül: comboBreakDetector.js
+• Karar Noktası: Birden fazla gösterge uyumu varsa sinyal önceliği yükseltilir
+
+-----------------------------------------------------------------------------------------------------------------
+MODÜLLER
+📦 tpOptimizer.js
+🎯 Amaç:
+Kademeli kâr alma stratejisi oluşturur. Trend, formasyon, geçmiş çıkış verileri ve haber etkisine göre TP seviyelerini belirler ve optimize eder.
+
+🔧 Gelişmiş Kodlama Promptu
+tpOptimizer.js adlı bir modül oluştur.
+Bu modül:
+
+Girdi olarak expectedProfit, trendStrength, formation, ATR, historicalExitPatterns, newsImpact, resistanceDistance alır
+
+2TP, 3TP veya tek TP gibi en uygun çıkış stilini belirler
+
+TP seviyelerini kademeli olarak hesaplar
+
+Trend, momentum ve volatiliteye göre dinamik ayarlamalar yapar
+
+TP seviyesi gerekirse çıkış stratejisini uzatabilir/kısaltabilir
+
+Çıktı olarak tpLevels, tpStrategy, aggressiveness, adjustments alanlarını döndürür
+
+Ayrıca notify.vivo.tpStrategy gibi sinyal uyumu sağlar
+
+getTPStrategy() fonksiyonu ile çalışır
+
+📦 exitTimingAdvisor.js
+🎯 Amaç:
+TP sonrası fiyat, haber ve momentum verilerini izleyerek pozisyondan ne zaman çıkılması gerektiğini belirler. Gecikme, direnç çakışması, zayıflayan trend gibi durumlarda çıkış önerisi üretir.
+
+🔧 Gelişmiş Kodlama Promptu
+exitTimingAdvisor.js adında bir modül oluştur.
+Bu modül:
+
+Girdi olarak TP1 sonrası fiyat hareketi, momentum, trend gücü, destek/direnç, haber etkisi ve psikolojik yorgunluk verilerini alır
+
+Gecikme varsa çıkış sinyali üretir
+
+Trend bozulduğunda veya ani haber etkisi oluştuğunda çıkış önerisi sunar
+
+recommendedExitType olarak “full-exit”, “partial-exit”, “hold-longer” döndürür
+
+notify.vivo ve grafikBeyni gibi modülleri yönlendirir
+
+getExitAdvice() fonksiyonu ile çalışır
+
+📦 trendConfidenceEvaluator.js
+🎯 Amaç:
+Teknik veriler, fiyat aksiyonu, momentum ve haber ile trendin sürdürülebilirliğini değerlendirir. Sonuç olarak pozisyonun devam edip etmeyeceğini belirleyen bir skor üretir.
+
+🔧 Gelişmiş Kodlama Promptu
+trendConfidenceEvaluator.js adlı bir modül oluştur.
+Bu modül:
+
+EMA, MACD, RSI, formasyon türü, destek/direnç, fiyat hareketi, trend açısı, haber etkisi ve momentum gibi verileri alır
+
+Ağırlıklı skorlama ile 0–1 arası trendConfidenceScore üretir
+
+shouldExtendPosition, strengthCategory, triggeredAlerts ve notify alanlarını JSON olarak üretir
+
+notify.vivo, exitTimingAdvisor ve grafikBeyni için çıktı verir
+
+getTrendConfidence() fonksiyonu ile çalışır
+
+
+📦 Modül: trendDetector.js
+🔧 Gelişmiş Kodlama Promptu
+Trendin Yönünü ve Başlangıcını Tanıyan Ana Motor
+
+🎯 Amaç:
+Bu modül, fiyatın yeni bir trende girip girmediğini tespit eder.
+Kısa vadeli EMA’lar, RSI, MACD ve fiyat hareketlerine bakarak "trend başladı mı?" sorusuna cevap verir.
+Yalancı çıkışları ayıklayıp net sinyallerin temelini oluşturur.
+
+🔄 Veri Kaynakları (Modül Girdileri):
+json
+Kopyala
+Düzenle
+{
+  "symbol": "BTCUSDT",
+  "timeframe": "5m",
+  "prices": [60450, 60510, 60640, 60810, 61050],
+  "indicators": {
+    "EMA21": 60500,
+    "EMA50": 60300,
+    "RSI": 66,
+    "MACD": {
+      "histogram": 1.2,
+      "signalCrossed": true
+    }
+  },
+  "volume": 1.7,
+  "volatility": 0.96,
+  "candlePatterns": ["bullish", "bullish", "marubozu"]
+}
+🧠 Veri İşleme Sistemi:
+EMA Kesişimleri Analizi
+
+EMA21 > EMA50 → yükseliş sinyali
+
+EMA21 < EMA50 → düşüş sinyali
+
+MACD Sinyal Çarprazı
+
+MACD histogram pozitif ve signalCrossed = true → trend başlatıcı onayı
+
+RSI Destekleyici Rol
+
+RSI 60–75 → güvenli yükseliş
+
+RSI > 80 → aşırı alım → teyitsiz trend
+
+Mum & Volatilite Teyidi
+
+Eğer 2+ bullish mum + vol > 1.5 → hareket ciddi
+
+📤 Üretilen Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "trendDetected": true,
+  "trendType": "uptrend",
+  "confidenceScore": 0.81,
+  "reason": [
+    "EMA21 > EMA50",
+    "MACD histogram pozitif ve kesişim var",
+    "Bullish candle + volüm artışı"
+  ],
+  "notify": {
+    "grafikBeyni": {
+      "trendType": "uptrend",
+      "confidenceScore": 0.81
+    },
+    "vivo": {
+      "trendReady": true
+    },
+    "trendConfidenceEvaluator": {
+      "rawTrendSignal": true
+    }
+  }
+}
+⚙️ Modül İçi Akıllı Kurallar:
+Koşul	Aksiyon
+EMA21 > EMA50 + MACD pozitife döndü	Trend başlat sinyali üret
+RSI > 80 ama hacim düşük	Sinyal baskılanır
+RSI > 60 + vol > 1.5 + bullish candle → onay	VIVO ve TCE tetiklenir
+MACD zayıf + RSI < 55	Çıkış sinyali → exitTimingAdvisor uyarılır
+
+🔁 Modül Veri Akışı ve Entegrasyonları
+Gelen Veri	Kimden Gelir?
+EMA, MACD, RSI	technicalIndicatorsEngine.js
+Fiyat verisi	priceFeed.js veya binanceKlineHandler.js
+Volatilite & mum	volatilitySpikeSensor.js, candlePatternMatcher.js
+
+Giden Veri	Kime Gider?
+trendConfidenceEvaluator.js → ilk ham sinyali iletir	
+vivo.js → sinyal üretimi için trend hazır bilgisi sağlar	
+grafikBeyni.js → trendin türünü ve skorunu iletir	
+exitTimingAdvisor.js → düşüş trendi başlıyorsa pozisyon kapanabilir	
+
+📌 KODLAMA PROMPTU
+trendDetector.js adlı bir modül oluştur.
+Bu modül:
+
+EMA21, EMA50, MACD, RSI, fiyat dizisi, hacim, mum ve volatilite verilerini analiz eder
+
+Trendin başlama anını trendDetected boolean ile tespit eder
+
+Trendin yönünü (trendType) ve güven skorunu (confidenceScore) verir
+
+Çıktıyı notify içinde vivo, grafikBeyni, trendConfidenceEvaluator gibi modüllere iletir
+
+getTrendDetection() fonksiyonu ile çalışır
+
+Yalancı sinyalleri RSI + hacim + volatilite ile filtreler
+
+💡 Bu modül artık sistemin ilk tepki refleksi gibi çalışır:
+“Trend geliyor, dikkat!” der ve süreci zincirleme başlatır.
+-----------------------------------------------------------------------------------------------------------------
+📦 Modül: formationIdentifier.js
+🔧 Gelişmiş Kodlama Promptu
+Grafik formasyonlarını tespit eden temel yapı taşı
+
+🎯 Amaç:
+Bu modül, fiyat hareketlerini analiz ederek grafik formasyonlarını tanımlar.
+Kanal, üçgen, bayrak, kama, baş-omuz gibi yapıları tespit eder.
+Formasyon tamamlandı mı? Başlangıç evresinde mi? Bu bilgileri sistemde paylaşır.
+Hacim desteği, kırılım yönü ve geçmiş başarı oranı gibi parametrelerle güvenilirliği artırır.
+
+🔄 Giriş (Veri Kaynakları):
+json
+Kopyala
+Düzenle
+{
+  "symbol": "BTCUSDT",
+  "timeframe": "15m",
+  "pricePoints": [61200, 61050, 60880, 61020, 61210, 61450, 61320],
+  "volumePattern": ["up", "up", "down", "flat"],
+  "slopeAngle": 21,
+  "volatilityIndex": 1.2,
+  "trendLinePoints": {
+    "resistanceLine": [61450, 61200],
+    "supportLine": [60880, 61020]
+  },
+  "candleTypes": ["doji", "bullish", "hammer"]
+}
+🧠 Veri İşleme Yapısı:
+Geometrik Yapı Tespiti:
+
+Trend çizgileri üzerinden paralellik, daralma, genişleme kontrolü
+
+Destek / direnç hizalama
+
+Formasyon Kütüphanesi:
+
+ascendingTriangle, descendingTriangle, bullFlag, bearFlag, channel, wedge, h&s
+
+Formasyon Oluşum Durumu:
+
+Başlangıç, gelişme, kırılım öncesi, kırılım sonrası
+
+Momentum + Hacim Filtreleme:
+
+Oluşum sırasında azalan hacim → tipik üçgen oluşumu
+
+Kırılım anında hacim artışı → onay
+
+Karar Ağı:
+
+Formasyon bulunduysa → formationType, confidence hesaplanır
+
+Kırılım yönü trend verileriyle kıyaslanır
+
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "ascending-triangle",
+  "formationStage": "pre-breakout",
+  "confidenceScore": 0.87,
+  "breakoutPotential": "bullish",
+  "notify": {
+    "grafikBeyni": {
+      "formationType": "ascending-triangle",
+      "confidenceScore": 0.87
+    },
+    "trendConfidenceEvaluator": {
+      "formation": "ascending-triangle"
+    },
+    "tpOptimizer": {
+      "formation": "ascending-triangle"
+    }
+  }
+}
+⚙️ Modül Kuralları:
+Koşul	Aksiyon
+Paralel yapı + daralan volatilite + azalan hacim	→ Triangle adayı
+Slope angle < 10° + kanal yapısı + flat hacim	→ Horizontal channel
+Kırılım sonrası hacim artışı + bullish candle	→ formationStage = breakout-confirmed
+RSI > 70 + wedge → kırılımın zayıf olma ihtimali %50	
+Volatility > 1.5 + formasyon devam ediyorsa → kırılım ihtimali yükseltilir	
+
+🔁 Veri Akışı & Entegrasyonlar:
+Gelen Veri	Kaynak
+Fiyat dizisi, candle	priceFeed.js, candlePatternMatcher.js
+Trend çizgisi	trendLineConstructor.js
+Hacim verisi	volumeSurgeDetector.js
+RSI, MACD	technicalIndicatorsEngine.js
+
+Giden Veri	Hedef
+grafikBeyni: Formasyon bilgisi ve skor	
+trendConfidenceEvaluator: Formasyon türü (güven skoruyla birlikte)	
+tpOptimizer: Formasyona özel TP stratejisi üretir	
+formationCompletenessJudge: Gelişimini izlemek için veri alır	
+
+📌 KODLAMA PROMPTU
+formationIdentifier.js adında bir modül oluştur.
+Bu modül:
+
+Fiyat dizisini, trend çizgilerini, hacim modelini, volatiliteyi, candle yapılarını alır
+
+Bilinen formasyonlarla eşleştirme yapar
+
+formationType, formationStage, confidenceScore ve breakoutPotential üretir
+
+notify içinde grafikBeyni, tpOptimizer, trendConfidenceEvaluator gibi modüllere bilgi gönderir
+
+getFormationDetails() fonksiyonu ile çalışır
+
+Her çıkışı açıklayıcı ve JSON formatında döndürür
+
+{
+  "formationDetected": true,
+  "formationType": "head-and-shoulders",
+  "isInverse": false,
+  "formationStage": "pre-breakout",
+  "confidenceScore": 0.91,
+  "ruleMatchDetails": [
+    "Left shoulder: high = 61400",
+    "Head: high = 61780",
+    "Right shoulder: high = 61390",
+    "Neckline slope: -2.3%",
+    "Volume decreasing on right shoulder"
+  ]
+}
+
+-----------------------------------------------------------------------------------------------------------------
+buradak formasyonlar grafik görevi gören modüllerin altında giriş çıkışı formasyonlara göre belirlediğimiz özel yerler o yüzden verileri düzgün almalılar ve düzgünce iletmeliler bu formasyonlar çok deüerllidir düzgün ve kendi içlerinde tutarlı alıştığına emin olarak yap
+
+Her formasyonu tekil bir modül gibi ele alacağız ve o modülün altında:
+
+🔹 Tetikleyici alt modüller (hacim, RSI, trend)
+
+🔹 RuleSet kontrolü
+
+🔹 Kırılım kararları
+
+🔹 Modüller arası çıktı paylaşımı
+
+olacak şekilde çok katmanlı bir yapı kuracağız.
+
+🔧 Başlıyoruz: 1. Formasyon → Ascending Triangle
+Aşağıda bu formasyon için tüm yapıyı modüler olarak kurguluyorum:
+
+📦 Modül: ascendingTriangleDetector.js
+"Yatay direnç + yükselen dip" yapısını tanıyan, kırılımı ve güven skorunu hesaplayan ana modül
+
+🎯 Amaç:
+Bu formasyonun oluşumunu 7/24 takip eder
+
+Diplerin yükselip yükselmediğini kontrol eder
+
+Yatay direnç çizgisini sabit olarak tespit eder
+
+Kırılım hacmini ve momentum gücünü analiz eder
+
+Uygunsa sistemin diğer parçalarına “Ascending Triangle var” diye bildirir
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "supportLevels": [...],
+  "resistanceLevels": [...],
+  "volume": [...],
+  "rsi": [...],
+  "volatility": [...],
+  "trendStrength": 0.77
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "ascending-triangle",
+  "confidenceScore": 0.87,
+  "horizontalResistance": 62780,
+  "risingLows": [61400, 61550, 61630],
+  "volumePattern": "contracting",
+  "breakoutTrigger": false,
+  "breakoutRequirements": {
+    "minVolumeIncrease": 1.5,
+    "priceAboveResistance": 62795
+  },
+  "modularFlags": {
+    "passesVolumeCheck": true,
+    "passesRSICheck": true,
+    "passesTrendCheck": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+Direnç çizgisi son 3 zirvenin ±%0.2 içinde olmalı
+
+Dipler yükseliyorsa → formasyon adayı olur
+
+Volatilite son 3 dilimde %20 düşüyorsa → geçerli
+
+RSI 55–70 arasında → olumlu
+
+Hacim kırılım anında %150 artarsa → kırılım onaylanır
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+horizontalResistanceFinder.js	Son 3 zirveyi analiz edip yatay direnç bulur
+risingLowsTracker.js	Diplerin sıralı olarak yükselip yükselmediğini kontrol eder
+volumePatternChecker.js	Hacimde daralma var mı diye bakar
+volatilityDeclineDetector.js	Volatilite düşüşünü izler
+rsiValidator.js	RSI aralığını kontrol eder
+formationBreakoutWatcher.js	Kırılım gerçekleşti mi kontrol eder
+
+🔄 Modüller Arası Veri Akışı:
+🔸 trendConfidenceEvaluator.js → trendStrength gönderir
+
+🔸 volumeSurgeDetector.js → kırılım hacmini analiz eder
+
+🔸 formationIdentifier.js → bu modülün çıktısını alır ve genel yapıya dahil eder
+
+🔸 formationCompletenessJudge.js → oluşumun tamamlanma derecesini hesaplar
+
+🔸 VIVO → bu formasyonun sinyal gücüne göre pozisyon açma niyeti oluşturur
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+ascendingTriangleDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Yatay direnç çizgisini bulur (`horizontalResistanceFinder.js` alt modülü ile)
+- Diplerin yükselip yükselmediğini analiz eder (`risingLowsTracker.js`)
+- RSI, hacim ve volatiliteye göre geçerlilik kontrolü yapar
+- Hacim %150 artarsa ve fiyat direnç üstüne çıkarsa kırılımı onaylar
+- Formasyon oluşursa detaylı açıklamayla JSON çıktısı üretir
+- Diğer modüllerle uyumlu şekilde `confidenceScore`, `formationType`, `breakoutTrigger` gibi alanları döndürür
+
+Bu yapı `formationIdentifier.js` tarafından okunur ve formasyon verisini VIVO’ya iletir.
+✅ Şimdi bu yapıyı formationRuleSet.json içinde de ascending-triangle olarak sabitliyorum.
+🚀 Entegrasyon Planı:
+Bu yapıyı şu modüllere bağlayacağız:
+
+formationIdentifier.js
+
+formationCompletenessJudge.js
+
+liveFormationTracer.js
+
+💡 Böylece sistem artık:
+
+Uydurmadan formasyon tanıyacak
+
+Her eşleşmenin neden oluştuğunu açıklayacak
+
+Ters formasyonları da doğru tanıyacak
+
+“Sanki gözle bakıyormuş gibi” analiz yapacak
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Modül: descendingTriangleDetector.js
+"Yatay destek + alçalan tepeler" yapısını tanıyıp, düşüş yönlü kırılımı ve risk oranını analiz eden modül.
+
+🎯 Amaç:
+Düşüş eğilimi taşıyan “alçalan üçgen” formasyonunu tanır
+
+Tepelerin giderek alçaldığını kontrol eder
+
+Yatay destek çizgisini belirler
+
+RSI, hacim, momentum verilerini analiz ederek kırılım onayı verir
+
+Eğer tüm koşullar sağlanırsa sistemin diğer parçalarına "Descending Triangle → düşüş sinyali" gönderir
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "supportLevels": [...],
+  "resistanceLevels": [...],
+  "volume": [...],
+  "rsi": [...],
+  "momentum": 0.92,
+  "volatility": [...],
+  "trendStrength": 0.68
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "descending-triangle",
+  "confidenceScore": 0.81,
+  "horizontalSupport": 25250,
+  "lowerHighs": [25980, 25830, 25690],
+  "volumePattern": "declining",
+  "breakoutTrigger": false,
+  "breakoutRequirements": {
+    "minVolumeIncrease": 1.5,
+    "priceBelowSupport": 25190,
+    "momentumThreshold": 1.1
+  },
+  "modularFlags": {
+    "passesVolumeCheck": true,
+    "passesRSICheck": true,
+    "passesTrendCheck": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+Destek çizgisi son 3 dip noktanın ±%0.2 içinde olmalı
+
+Tepeler sıralı şekilde alçalıyorsa → formasyon adayı olur
+
+Volatilite düşüşü + daralan hacim varsa → onay için beklenir
+
+RSI < 45 + momentum > 1.1 → kırılım teyidi olur
+
+Hacim kırılım anında %150 artmalı → tam geçerlilik için
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+horizontalSupportFinder.js	Son 3 dipten yatay destek çıkarır
+fallingHighsTracker.js	Tepelerin alçalıp alçalmadığını kontrol eder
+volumeDeclineTracker.js	Hacimde düşüş var mı inceler
+rsiAndMomentumValidator.js	RSI < 45 mi? Momentum > 1.1 mi?
+formationBreakoutWatcher.js	Kırılım tetiklenip tetiklenmediğine bakar
+
+🔄 Modüller Arası Veri Akışı:
+🔸 trendConfidenceEvaluator.js → trendStrength verir
+
+🔸 volumeSurgeDetector.js → kırılımda hacim artışını kontrol eder
+
+🔸 formationIdentifier.js → bu modülün çıktısını kaydeder
+
+🔸 formationCompletenessJudge.js → “oluşum tamam mı?” analiz eder
+
+🔸 riskToRewardValidator.js → bu formasyona göre risk analizini yapar
+
+🔸 VIVO → düşüş formasyonu algılandığında sinyal değerlendirmesini yapar
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+descendingTriangleDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Yatay destek çizgisini `horizontalSupportFinder.js` ile belirler
+- Alçalan tepeleri `fallingHighsTracker.js` ile analiz eder
+- RSI ve momentum verilerini `rsiAndMomentumValidator.js` ile denetler
+- Hacim düşüşünü ve kırılım anında patlama olup olmadığını analiz eder
+- Kırılım gerçekleşirse sistemin ilgili modüllerine düşüş sinyali verir
+- `formationIdentifier.js` modülüyle uyumlu şekilde çıktı üretir
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Modül: symmetricalTriangleDetector.js
+Simetrik üçgen yapısını (yakınsayan tepe-dip çizgileri) tanıyan ve kırılım yönü ile güven skorunu analiz eden ana modül
+
+🎯 Amaç:
+Yakınsayan tepe ve dip çizgilerinden oluşan simetrik üçgeni tanımlar
+
+Kırılımın hangi yöne olabileceğini önceki trende göre tahmin eder
+
+Hacim daralmasını ve volatiliteyi analiz eder
+
+Kırılımda hacim artışı + yönlü momentuma göre sinyal üretir
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "supportLevels": [...],
+  "resistanceLevels": [...],
+  "volume": [...],
+  "rsi": [...],
+  "volatility": [...],
+  "trendHistory": ["uptrend", "sideways"],
+  "momentum": 0.85
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "symmetrical-triangle",
+  "confidenceScore": 0.79,
+  "upperLine": [64520, 64300, 64110],
+  "lowerLine": [63500, 63650, 63790],
+  "volumePattern": "contracting",
+  "volatilityDrop": true,
+  "expectedBreakoutDirection": "up",
+  "breakoutTrigger": false,
+  "breakoutRequirements": {
+    "volumeSpike": true,
+    "priceAboveLine": 64100
+  },
+  "modularFlags": {
+    "passesVolumeCheck": true,
+    "passesVolatilityCheck": true,
+    "respectsTrendBias": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+Yakınsayan tepe-dip trend çizgileri belirlenir
+
+Volatilite son 5 mumda en az %25 daralmalı
+
+Hacim sürekli düşmeli, kırılım anında hacim patlamalı
+
+Trend yönü yukarıysa → yukarı kırılım ihtimali daha yüksek
+
+RSI ortalama 50–60 arasında olmalı
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+trendLineConverger.js	Tepe ve dipleri yakınsayan çizgiler olarak tespit eder
+volatilityAnalyzer.js	Son 5 barlık volatiliteyi karşılaştırır
+volumeCompressionChecker.js	Hacimdeki sıkışmayı izler
+breakoutBiasEvaluator.js	Önceki trende göre kırılım yönü tahmini yapar
+formationBreakoutWatcher.js	Kırılım tetiklendi mi kontrol eder
+
+🔄 Modüller Arası Veri Akışı:
+🔸 trendConfidenceEvaluator.js → trend yönü ve gücü bilgisini verir
+
+🔸 formationIdentifier.js → tüm formasyonları tanır ve sistemle paylaşır
+
+🔸 exitTimingAdvisor.js → kırılımın zamanlamasına göre çıkış önerir
+
+🔸 riskToRewardValidator.js → formasyonun sağlayacağı risk-kâr yapısını denetler
+
+🔸 VIVO → kırılım yönüne göre alım/satım sinyali oluşturur
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+symmetricalTriangleDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Yakınsayan tepe ve dip noktalarını `trendLineConverger.js` ile tespit eder
+- Volatilitenin düşüşünü `volatilityAnalyzer.js` ile ölçer
+- Hacim sıkışmasını `volumeCompressionChecker.js` ile kontrol eder
+- Trend yönüne göre kırılım yönü tahmini yapar
+- Hacim patlaması ve fiyat çizgi kırılımı gerçekleştiğinde `breakoutTrigger`'ı aktif eder
+- Tüm verileri diğer sistem modüllerine uyumlu JSON çıktısı olarak üretir
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Modül: bullFlagDetector.js
+Güçlü bir yükselişten sonra gelen kısa süreli düzeltme kanalını tanır ve potansiyel yukarı kırılımı analiz eder
+
+🎯 Amaç:
+Bayrak formasyonunun oluşup oluşmadığını tespit eder
+
+Sert yükseliş sonrası başlayan dar yukarıdan aşağı eğimli mini kanalı tanımlar
+
+Hacim düşüşünü, RSI dengelenmesini ve trendin gücünü değerlendirir
+
+Kırılımda hacim artışı varsa formasyonu onaylar
+
+Yön: Yukarı
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "volume": [...],
+  "rsi": [...],
+  "trendStrength": 0.86,
+  "volatility": [...],
+  "channelSlope": -3.2,
+  "priorMomentum": 1.12
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "bull-flag",
+  "confidenceScore": 0.84,
+  "flagRange": [67350, 66890],
+  "flagSlope": -3.2,
+  "volumeTrend": "declining",
+  "breakoutTrigger": false,
+  "breakoutRequirements": {
+    "minVolumeSpike": 1.4,
+    "priceAboveFlagTop": 67420
+  },
+  "modularFlags": {
+    "passesVolumeDecline": true,
+    "priorMomentumValid": true,
+    "trendStrengthSufficient": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+Öncesinde sert yükseliş (momentum > 1.1) olmalı
+
+Sonraki kanalın eğimi -1 ila -5 arası olmalı
+
+RSI 55–70 arasında olmalı
+
+Hacim düşmeli, kırılım anında hacim artmalı
+
+Kanal üstü kırılırsa formasyon tetiklenmiş sayılır
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+strongImpulseDetector.js	Önceki sert yükselişin olup olmadığını tespit eder
+miniChannelIdentifier.js	Bayrak kanalının üst-alt çizgilerini belirler
+volumeDeclineValidator.js	Hacimde düşüş olup olmadığını kontrol eder
+flagBreakoutValidator.js	Kanal üstü kırılırsa tetikler
+rsiValidator.js	RSI'nın uygun aralıkta olup olmadığını onaylar
+
+🔄 Modüller Arası Veri Akışı:
+🔸 trendConfidenceEvaluator.js → trend gücünü iletir
+
+🔸 formationIdentifier.js → bu modülü genel sisteme tanıtır
+
+🔸 exitTimingAdvisor.js → kırılımın zamanlamasına göre pozisyon önerisi yapar
+
+🔸 tpOptimizer.js → yükselişin devamı için TP seviyelerini buna göre ayarlar
+
+🔸 VIVO → bu formasyona göre alım sinyali üretir
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+bullFlagDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Öncesinde sert yükseliş olup olmadığını kontrol eder (`strongImpulseDetector.js`)
+- Yukarıdan aşağı eğimli dar kanalı `miniChannelIdentifier.js` ile tespit eder
+- RSI ve hacimdeki düşüşü `rsiValidator.js` ve `volumeDeclineValidator.js` ile analiz eder
+- Fiyat kanal üstünü kırdığında + hacim artarsa kırılımı onaylar (`flagBreakoutValidator.js`)
+- `formationType`, `confidenceScore`, `breakoutTrigger` gibi verileri sistemle paylaşır
+- Çıktı `formationIdentifier.js`, `VIVO`, `tpOptimizer.js` ve `positionPathPlanner.js` ile uyumlu olmalıdır
+🔁 Bu modülle birlikte trend devam formasyonlarından biri daha sisteme entegre oldu.
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Modül: bearFlagDetector.js
+Sert düşüşten sonra gelen hafif yukarı yönlü kanal yapısını tanıyarak kırılım anını ve düşüş sinyalini analiz eder
+
+🎯 Amaç:
+Sert düşüş sonrası oluşan kısa süreli yukarı yönlü düzeltme kanalını (bear flag) tespit eder
+
+Bu kanalın zayıf olduğunu, sadece bir “nefes alma” hareketi olduğunu anlar
+
+Hacim düşüyorsa ve kırılımda hacim patlıyorsa sinyali onaylar
+
+Kırılımı aşağıya yönlendirerek potansiyel pozisyon sinyali verir
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "volume": [...],
+  "rsi": [...],
+  "trendStrength": 0.74,
+  "volatility": [...],
+  "channelSlope": 2.8,
+  "priorMomentum": -1.08
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "bear-flag",
+  "confidenceScore": 0.82,
+  "flagRange": [47250, 47790],
+  "flagSlope": 2.8,
+  "volumeTrend": "declining",
+  "breakoutTrigger": false,
+  "breakoutRequirements": {
+    "minVolumeSpike": 1.4,
+    "priceBelowFlagBottom": 47210
+  },
+  "modularFlags": {
+    "passesVolumeDecline": true,
+    "priorMomentumValid": true,
+    "trendStrengthSufficient": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+Öncesinde sert düşüş (momentum < -1.0) olmalı
+
+Yukarı yönlü kanal eğimi +1 ila +5 arası olmalı
+
+RSI 45–55 arasında kalmalı
+
+Hacim düşüş göstermeli, kırılım anında ani artış beklenir
+
+Kanal altı kırılırsa → düşüş sinyali oluşur
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+strongImpulseDetector.js	Önceki düşüş hareketini tanır
+miniChannelIdentifier.js	Kanal üst-alt sınırlarını çıkarır
+volumeDeclineValidator.js	Hacim trendini izler
+flagBreakoutValidator.js	Kırılımı tetikleyip sinyal verir
+rsiValidator.js	RSI’nın formasyona uygunluğunu onaylar
+
+🔄 Modüller Arası Veri Akışı:
+🔸 trendConfidenceEvaluator.js → düşüş gücü bilgisini verir
+
+🔸 formationIdentifier.js → bu formasyonu sistemle paylaşır
+
+🔸 exitTimingAdvisor.js → pozisyondan çıkış zamanlaması önerir
+
+🔸 riskToRewardValidator.js → potansiyel risk & kazanç oranını analiz eder
+
+🔸 VIVO → düşüş sinyali doğrultusunda pozisyon sinyali üretir
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+bearFlagDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Önceki sert düşüşü analiz eder (`strongImpulseDetector.js`)
+- Küçük yukarı yönlü kanal çizgisini `miniChannelIdentifier.js` ile çıkarır
+- RSI’nın uygun seviyede olup olmadığını `rsiValidator.js` ile denetler
+- Hacim düşüşünü `volumeDeclineValidator.js` ile takip eder
+- Aşağı kırılım ve hacim artışıyla birlikte sinyali `flagBreakoutValidator.js` ile tetikler
+- Çıktılar: formationType, confidenceScore, breakoutRequirements, modularFlags
+- Bu çıktılar diğer sistem modülleriyle tam uyumlu JSON yapısında olmalı
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Modül: channelDetector.js
+Paralel destek ve direnç çizgileri arasında hareket eden fiyat kanalını tanır ve bu kanalın yönünü, genişliğini ve olası kırılım noktalarını belirler.
+
+🎯 Amaç:
+Fiyatın belirli bir paralel aralıkta yukarı veya aşağı yönlü hareket ettiğini tespit eder
+
+Kanalın trend yönünü (up/down) belirler
+
+RSI, hacim ve trend verileriyle birlikte olası kırılım sinyallerini üretir
+
+Sisteme hem trend takibi hem de “çıkış zamanı yaklaşan kanal” uyarısı verir
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "volume": [...],
+  "rsi": [...],
+  "trendStrength": 0.65,
+  "volatility": [...],
+  "slopeAngle": 4.1,
+  "channelWidth": 2.4
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "channel",
+  "channelDirection": "up",
+  "confidenceScore": 0.78,
+  "channelTop": [63500, 63890, 64250],
+  "channelBottom": [62300, 62610, 62950],
+  "channelSlope": 4.1,
+  "channelWidth": 2.4,
+  "rsiRange": [47, 61],
+  "breakoutTrigger": false,
+  "breakoutConditions": {
+    "volumeSpike": true,
+    "rsiOutOfRange": true,
+    "trendStrengthShift": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+Yukarı kanal için: destek ve direnç çizgileri yaklaşık aynı eğime sahip (±%10) ve yukarı eğimli olmalı
+
+Aşağı kanal için: aynı yapı aşağı yönlü
+
+RSI 40–60 arasında dalgalanmalı → kanal içi kararsızlık sinyali
+
+Kırılım sinyali: RSI kanal dışına çıkarsa, hacim artışı ve trend yönü değişirse
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+parallelLineDetector.js	Kanal üst ve alt çizgilerini belirler
+channelSlopeAnalyzer.js	Yön ve eğim açısını hesaplar
+channelWidthCalculator.js	Kanal genişliğini ölçer
+rsiRangeTracker.js	RSI’nın kanal içi dalgalanmasını izler
+channelBreakoutWatcher.js	Kırılım durumunu ve yönünü tespit eder
+
+🔄 Modüller Arası Veri Akışı:
+🔸 trendConfidenceEvaluator.js → kanalın devam edip etmeyeceğini değerlendirir
+
+🔸 exitTimingAdvisor.js → kırılım sonrası çıkış zamanlamasını planlar
+
+🔸 riskToRewardValidator.js → kanal içinde işlem yapılacaksa risk/kâr oranını sunar
+
+🔸 tpOptimizer.js → kanal hedeflerine göre TP planlaması yapar
+
+🔸 VIVO → kanal içinde işlem yapılmasını mı yoksa kırılım beklenmesini mi önerir
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+channelDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Fiyat verisinden paralel kanal çizgilerini `parallelLineDetector.js` ile çıkarır
+- Eğim yönünü `channelSlopeAnalyzer.js` ile belirler
+- Kanal genişliğini `channelWidthCalculator.js` ile hesaplar
+- RSI’nın 40–60 arasında dalgalanmasını `rsiRangeTracker.js` ile takip eder
+- RSI dışına çıkış, trend değişimi ve hacim artışı gibi sinyallerle birlikte `channelBreakoutWatcher.js` modülü kırılım olup olmadığını belirler
+- Modül, diğer modüllerle uyumlu JSON çıktı üretir: formationType, direction, confidenceScore, breakoutConditions
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Modül: wedgeDetector.js
+Hem Falling Wedge hem Rising Wedge formasyonlarını tanır, daralan kanal yapısını analiz eder ve kırılım yönü ile güven skorunu hesaplar.
+
+🎯 Amaç:
+Daralan kanal yapısını yukarı veya aşağı eğimli şekilde tespit eder
+
+Hacim düşüyorsa ve kırılım ters yöndeyse sinyal üretir
+
+RSI ve momentum ile uyum kontrolü yaparak kırılımı onaylar
+
+Modül hem yükseliş (falling wedge) hem de düşüş (rising wedge) varyantlarını tanır
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "volume": [...],
+  "rsi": [...],
+  "trendStrength": 0.72,
+  "volatility": [...],
+  "channelLines": {
+    "upperSlope": -5.2,
+    "lowerSlope": -2.1
+  },
+  "momentum": 1.02
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "falling-wedge",
+  "confidenceScore": 0.83,
+  "convergingLines": true,
+  "volumePattern": "contracting",
+  "breakoutTrigger": false,
+  "expectedBreakoutDirection": "up",
+  "breakoutRequirements": {
+    "priceAboveUpperLine": true,
+    "momentumPositive": true,
+    "volumeSpike": true
+  },
+  "modularFlags": {
+    "passesLineConvergence": true,
+    "passesVolumeContracting": true,
+    "passesMomentumCheck": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+🎯 Falling Wedge (Yükseliş Beklentili):
+Hem üst hem alt çizgi aşağı eğimli, alt daha yatay
+
+RSI 45–55 arasında olmalı
+
+Momentum pozitife dönmeye başlamalı
+
+Hacim kırılım öncesi daralmalı, kırılımda patlamalı
+
+Kırılım yukarı
+
+🎯 Rising Wedge (Düşüş Beklentili):
+Her iki çizgi yukarı eğimli, üst daha yatay
+
+RSI 55–65 arası
+
+Momentum düşüyorsa kırılım beklenir
+
+Kırılım aşağı
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+convergingChannelAnalyzer.js	Üst-alt eğim farkını analiz eder
+volumeSqueezeDetector.js	Hacim daralması takibi
+momentumFlipTracker.js	Momentum negatiften pozitife / pozitiften negatife geçişi kontrol eder
+breakoutEvaluator.js	Gerekli tüm şartlar oluştuysa kırılımı işaretler
+wedgeDirectionClassifier.js	Formasyonun falling mi rising mi olduğunu belirler
+
+🔄 Modüller Arası Veri Akışı:
+🔸 trendConfidenceEvaluator.js → trendin devam edip etmeyeceğini iletir
+
+🔸 exitTimingAdvisor.js → wedge kırılımına göre zamanlama yapar
+
+🔸 tpOptimizer.js → wedge sonrası hedefleme yapar
+
+🔸 formationIdentifier.js → bu formasyonu sisteme bildirir
+
+🔸 VIVO → wedge yönüne göre pozisyon sinyali üretir
+
+🔸 riskToRewardValidator.js → wedge sonrası pozisyon açılabilir mi kontrol eder
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+wedgeDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Üst ve alt trend çizgilerini analiz ederek eğimlerin yakınlaşıp yakınlaşmadığını `convergingChannelAnalyzer.js` ile ölçer
+- Falling mi rising wedge mi olduğunu `wedgeDirectionClassifier.js` belirler
+- RSI, momentum, hacim daralması gibi verileri `momentumFlipTracker.js` ve `volumeSqueezeDetector.js` ile kontrol eder
+- Kırılım tetiklenince `breakoutEvaluator.js` ile sinyal oluşturur
+- Çıktı: formationType, confidenceScore, breakoutRequirements gibi JSON formatında olur
+- Bu yapı `formationIdentifier.js`, `VIVO`, `tpOptimizer.js` ile entegre çalışır
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Modül: headAndShouldersDetector.js
+Kullanıcının “trend dönüşünü” öngörebileceği en önemli formasyonlardan biri olan baş-omuz yapısını tanır. Tepe seviyelerini ve boyun çizgisini hesaplayarak, kırılımda düşüş sinyali verir.
+
+🎯 Amaç:
+Sol omuz, baş ve sağ omuzdan oluşan H&S formasyonunu tanır
+
+Boyun çizgisini oluşturur ve hacim ile birlikte kırılımı analiz eder
+
+Sağ omuz hacmi düşükse, kırılım teyidi verir
+
+Sistem diğer modülleri pozisyon kapamaya veya açığa satışa yönlendirebilir
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "volume": [...],
+  "rsi": [...],
+  "trendStrength": 0.71,
+  "volatility": [...],
+  "peakSequence": [64000, 65800, 64650],
+  "necklinePoints": [63100, 63450],
+  "rightShoulderVolume": 0.83
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "head-and-shoulders",
+  "confidenceScore": 0.86,
+  "leftShoulder": 64000,
+  "head": 65800,
+  "rightShoulder": 64650,
+  "neckline": [63100, 63450],
+  "volumeDropRightShoulder": true,
+  "breakoutTrigger": false,
+  "breakoutConditions": {
+    "priceBelowNeckline": true,
+    "volumeSpike": true,
+    "rsiDropBelow50": true
+  },
+  "modularFlags": {
+    "passesPeakPattern": true,
+    "passesVolumeStructure": true,
+    "passesRSI": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+Tepe yapısı: Sol omuz < baş > sağ omuz
+
+Boyun çizgisi: 2 dipten oluşur, kırılım bu çizginin altına fiyat inerse olur
+
+RSI kırılımda <50 olmalı
+
+Sağ omuz hacmi, baş hacminden daha düşük olmalı
+
+Kırılımda hacim %150 artmalı → gerçek düşüş başlar
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+peakPatternRecognizer.js	Tepe yapısını algılar (omuz-baş-omuz)
+necklineCalculator.js	Boyun çizgisini belirler
+volumeSymmetryChecker.js	Hacim farklarını analiz eder
+rsiTriggerWatcher.js	RSI < 50 olduğunda alarm verir
+breakoutValidator.js	Kırılım şartlarını değerlendirir
+
+🔄 Modüller Arası Veri Akışı:
+🔸 exitTimingAdvisor.js → kırılım öncesi pozisyonu kapatabilir
+
+🔸 riskToRewardValidator.js → açığa satış yapılacaksa risk hesaplaması yapar
+
+🔸 VIVO → bu formasyona göre sinyal üretimini sınırlar
+
+🔸 tpOptimizer.js → formasyonun hedef düşüş seviyesine göre TP belirler
+
+🔸 formationIdentifier.js → genel formasyon listesini günceller
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+headAndShouldersDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Fiyat verisinden 3 tepeyi `peakPatternRecognizer.js` ile algılar (sol omuz, baş, sağ omuz)
+- 2 dipten boyun çizgisini `necklineCalculator.js` ile hesaplar
+- Sağ omuzdaki hacim düşüşünü `volumeSymmetryChecker.js` ile tespit eder
+- RSI'nın düşüp düşmediğini `rsiTriggerWatcher.js` izler
+- Kırılım şartları oluşunca `breakoutValidator.js` ile tetik verir
+- Çıktılar: formationType, confidenceScore, neckline, breakoutConditions, modularFlags
+- Tüm veri çıktısı diğer modüllerle uyumlu ve formatlı olmalıdır
+----------------------------------------------------------------------------------------------------------------
+
+📦 Modül: inverseHeadAndShouldersDetector.js
+Aşağı trendin sonunda ortaya çıkan ters baş-omuz formasyonunu tanır, boyun çizgisini hesaplar ve yukarı kırılımda pozitif sinyal üretir.
+
+🎯 Amaç:
+Sol – dip – sağ şeklinde oluşan ters omuz baş yapısını tanır
+
+Boyun çizgisi kırılırsa yukarı yönlü dönüş formasyonu tetiklenir
+
+Hacim artışı, RSI > 50 ve momentum doğrulaması ile sinyal üretir
+
+Kullanıcıyı pozisyona yönlendirir
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "volume": [...],
+  "rsi": [...],
+  "trendStrength": 0.61,
+  "volatility": [...],
+  "bottomSequence": [42300, 41050, 41900],
+  "necklinePoints": [43300, 43550],
+  "rightShoulderVolume": 0.76
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "inverse-head-and-shoulders",
+  "confidenceScore": 0.88,
+  "leftShoulder": 42300,
+  "head": 41050,
+  "rightShoulder": 41900,
+  "neckline": [43300, 43550],
+  "volumeRiseOnRightShoulder": true,
+  "breakoutTrigger": false,
+  "breakoutConditions": {
+    "priceAboveNeckline": true,
+    "volumeSpike": true,
+    "rsiAbove50": true
+  },
+  "modularFlags": {
+    "passesBottomPattern": true,
+    "passesVolumeStructure": true,
+    "passesRSI": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+Dip yapısı: sol omuz > baş < sağ omuz
+
+Boyun çizgisi: üst direnç hattı
+
+RSI > 50 olmalı
+
+Sağ omuzda hacim artmalı
+
+Kırılımda hacim patlamalı (en az 1.5x)
+
+Fiyat boyun çizgisinin üstüne çıkarsa formasyon tetiklenir
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+bottomPatternRecognizer.js	Dip yapılarını tanır
+necklineCalculator.js	Boyun çizgisini belirler
+volumeAscentDetector.js	Hacim artışını kontrol eder
+rsiTriggerWatcher.js	RSI’nın > 50’ye geçişini takip eder
+breakoutValidator.js	Kırılım teyidini verir
+
+🔄 Modüller Arası Veri Akışı:
+🔸 tpOptimizer.js → hedef fiyatı yukarı yönlü ayarlar
+
+🔸 positionPathPlanner.js → pozisyon açma rotasını oluşturur
+
+🔸 VIVO → sinyali işleme alır ve tetikler
+
+🔸 exitTimingAdvisor.js → pozisyon devam/kapat zamanını verir
+
+🔸 riskToRewardValidator.js → giriş mantıklı mı kontrol eder
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+inverseHeadAndShouldersDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Fiyat verisinden 3 dip yapısını `bottomPatternRecognizer.js` ile tanır (sol omuz, baş, sağ omuz)
+- 2 tepe noktasından boyun çizgisini `necklineCalculator.js` ile çıkarır
+- Sağ omuzda hacim artışını `volumeAscentDetector.js` ile kontrol eder
+- RSI geçişini `rsiTriggerWatcher.js` izler
+- Tüm koşullar oluştuğunda `breakoutValidator.js` kırılım sinyali üretir
+- Çıktılar: formationType, confidenceScore, breakoutConditions, modularFlags
+- JSON çıktısı tüm sistemle uyumlu olmalıdır
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Modül: cupAndHandleDetector.js
+Simetrik dip ve sağ tarafında küçük bir kanal oluşturan bu formasyon, güçlü kırılım öncesi oluşan yükseliş devam sinyalidir.
+
+🎯 Amaç:
+Derin, geniş, U şeklinde bir çanak formasyonu tespit eder
+
+Sağ tarafta oluşan kısa vadeli küçük düşüş kanalını (handle) belirler
+
+Hacim, RSI ve fiyat davranışına göre kırılım sinyali üretir
+
+Kırılım gerçekleşirse pozisyon açma önerisi yapılır
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "volume": [...],
+  "rsi": [...],
+  "trendStrength": 0.83,
+  "volatility": [...],
+  "cupDepth": 7.2,
+  "cupWidth": 18,
+  "handleSlope": -2.3,
+  "handleVolumeDrop": true,
+  "rsiLevel": 58
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "cup-and-handle",
+  "confidenceScore": 0.87,
+  "cupShape": "symmetrical",
+  "handleRange": [64550, 64820],
+  "handleSlope": -2.3,
+  "volumePattern": "contracting",
+  "rsiZone": "50–65",
+  "breakoutTrigger": false,
+  "breakoutConditions": {
+    "priceAboveHandle": true,
+    "rsiAbove60": true,
+    "volumeSpike": true
+  },
+  "modularFlags": {
+    "passesShapeCriteria": true,
+    "passesVolumeCriteria": true,
+    "passesRSI": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+Çanak kısmı simetrik, geniş ve düzgün U şekilli olmalı
+
+Sağ taraftaki “handle” kısa süreli düşüş kanalı olmalı (slope -1 ila -4 arası)
+
+RSI: 50–65 arası ve kırılım anında >60
+
+Hacim handle’da düşer, kırılımda patlar
+
+Fiyat handle üstünü kırarsa → sinyal oluşur
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+cupShapeAnalyzer.js	Çanak formunun düzgünlüğünü ölçer
+handleDetector.js	Sağdaki mini düşüş kanalını bulur
+volumeTrendValidator.js	Hacim düşüşünü ve kırılım artışını kontrol eder
+rsiZoneValidator.js	RSI’nın ideal aralıkta olup olmadığını kontrol eder
+breakoutValidator.js	Kırılım tetikleyicisini değerlendirir
+
+🔄 Modüller Arası Veri Akışı:
+🔸 formationIdentifier.js → formasyonu sınıflandırır
+
+🔸 tpOptimizer.js → breakout sonrası hedefleme yapar
+
+🔸 VIVO → sinyal onayı verir
+
+🔸 exitTimingAdvisor.js → breakout sonrası zamanlamayı belirler
+
+🔸 riskToRewardValidator.js → pozisyon açmanın mantığını kontrol eder
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+cupAndHandleDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Geniş U şeklinde dip formasyonunu `cupShapeAnalyzer.js` ile tespit eder
+- Sağ taraftaki mini düşüş kanalını `handleDetector.js` ile bulur
+- Hacim azalması ve kırılım sırasındaki artışı `volumeTrendValidator.js` ile kontrol eder
+- RSI’nın 50–65 aralığında olmasını `rsiZoneValidator.js` ile izler
+- Fiyat handle’ı kırdığında `breakoutValidator.js` tetikleyici sinyali oluşturur
+- Çıktı: formationType, confidenceScore, breakoutConditions gibi JSON verisi
+- Tüm modüllerle tam uyumlu şekilde çalışmalıdır
+-----------------------------------------------------------------------------------------------------------------
+📦 Modül: doubleTopBottomDetector.js
+Fiyatın aynı seviyeyi ikinci kez test ettiği noktalarda oluşan double top (çift tepe) ve double bottom (çift dip) formasyonlarını tanır. Dönüş formasyonudur.
+
+🎯 Amaç:
+Aynı fiyat seviyesinde oluşan iki tepe veya iki dip tespit edilir
+
+Aradaki düzeltme hacimliyse ve RSI dönüş sinyali veriyorsa onay alınır
+
+İkinci tepe/dip hacimsizse zayıflık sinyali → kırılım sonrası pozisyon önerisi gelir
+
+Dönüş yönüne göre sinyal üretir: aşağı veya yukarı
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "priceData": [...],
+  "volume": [...],
+  "rsi": [...],
+  "trendStrength": 0.68,
+  "volatility": [...],
+  "peakOrDipPoints": [64700, 64710],
+  "intermediateMovementVolume": 1.25,
+  "secondPeakVolume": 0.76,
+  "rsiDivergence": true
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationDetected": true,
+  "formationType": "double-top",
+  "confidenceScore": 0.84,
+  "levelTestedTwice": 64700,
+  "volumeDivergence": true,
+  "rsiDivergence": true,
+  "breakoutDirection": "down",
+  "breakoutTrigger": false,
+  "breakoutRequirements": {
+    "volumeSpike": true,
+    "priceBreaksNeckline": true,
+    "rsiDrop": true
+  },
+  "modularFlags": {
+    "passesLevelMatch": true,
+    "passesVolumeDrop": true,
+    "passesRSI": true
+  }
+}
+🧠 İçsel Kurallar (formationRuleSet'ten alınır):
+Double Top:
+2 tepe arası en az %1–1.5 uzaklık
+
+RSI ikinci tepede düşüyorsa + hacim azalıyorsa → zayıflık
+
+Boyun çizgisi kırılırsa (arada oluşan dip) → düşüş sinyali
+
+RSI < 50 olmalı kırılımda
+
+Double Bottom:
+2 dip seviyesi benzer, arası yükseliş hacimli
+
+İkinci dipte hacim düşük, RSI yükseliyorsa → yükseliş sinyali
+
+Kırılım boyun çizgisi üstüne çıkışla olur
+
+RSI > 50 olmalı kırılımda
+
+⚙️ Alt Modüller:
+Alt Modül	Görevi
+peakDipMatcher.js	Benzer fiyat seviyelerinde ikinci testleri bulur
+volumeDivergenceAnalyzer.js	İkinci testteki hacim düşüşünü kontrol eder
+rsiDivergenceAnalyzer.js	RSI sapması tespit eder
+necklineBreaker.js	Kırılım olup olmadığını tespit eder
+breakoutValidator.js	Tüm şartları birleştirip tetikler
+
+🔄 Modüller Arası Veri Akışı:
+🔸 trendConfidenceEvaluator.js → dönüş eğilimi var mı kontrol eder
+
+🔸 exitTimingAdvisor.js → kırılım anı zamanlaması belirler
+
+🔸 tpOptimizer.js → yeni hedef belirler
+
+🔸 riskToRewardValidator.js → yeni pozisyonu değerlendirir
+
+🔸 VIVO → sinyal üretir ya da baskılar
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+doubleTopBottomDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Fiyat verisinde iki kez aynı seviyeye çıkış veya inişi `peakDipMatcher.js` ile tespit eder
+- Hacim farkını `volumeDivergenceAnalyzer.js`, RSI farkını `rsiDivergenceAnalyzer.js` ile kontrol eder
+- Boyun çizgisi kırılımını `necklineBreaker.js` analiz eder
+- Tüm şartlar oluşunca `breakoutValidator.js` sinyali tetikler
+- Çıktılar: formationType, breakoutDirection, confidenceScore, breakoutRequirements, modularFlags
+- Tüm çıktılar sistem modülleriyle uyumlu olmalıdır
+✅ Böylece teknik analizdeki tüm temel formasyon modülleri bitti:
+
+Formasyon	Modül
+Ascending Triangle	ascendingTriangleDetector.js
+Descending Triangle	descendingTriangleDetector.js
+Symmetrical Triangle	symmetricalTriangleDetector.js
+Bull Flag / Bear Flag	bullFlagDetector.js, bearFlagDetector.js
+Channel Up / Down	channelDetector.js
+Falling/Rising Wedge	wedgeDetector.js
+Head & Shoulders	headAndShouldersDetector.js
+Inverse H&S	inverseHeadAndShouldersDetector.js
+Cup & Handle	cupAndHandleDetector.js
+Double Top / Bottom	doubleTopBottomDetector.js
+-----------------------------------------------------------------------------------------------------------------
+📦 Modül: formationIdentifier.js
+Tüm formasyon dedektörlerinden gelen verileri toplayan, analiz eden ve en güvenilir formasyonu belirleyen merkezî formasyon yöneticisidir. Aynı anda birkaç formasyon tespit edilirse önceliklendirir.
+
+🎯 Amaç:
+Tüm ...Detector.js modüllerinden gelen çıktıları alır
+
+Hangi formasyonun en güçlü, güvenilir ve uygun olduğunu seçer
+
+Gereksiz/tutarsız formasyonları filtreler
+
+Sistemin geri kalanına net bir formasyon kimliği sunar
+
+🔄 Girdi (tüm dedektörlerin çıktıları):
+json
+Kopyala
+Düzenle
+{
+  "detectedFormations": [
+    {
+      "formationType": "ascending-triangle",
+      "confidenceScore": 0.81,
+      "breakoutTrigger": false,
+      "breakoutDirection": "up"
+    },
+    {
+      "formationType": "bull-flag",
+      "confidenceScore": 0.76,
+      "breakoutTrigger": true,
+      "breakoutDirection": "up"
+    },
+    {
+      "formationType": "cup-and-handle",
+      "confidenceScore": 0.71,
+      "breakoutTrigger": false
+    }
+  ],
+  "marketConditions": {
+    "trendStrength": 0.78,
+    "rsi": 61,
+    "volumeSpike": true
+  }
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "confirmedFormation": "bull-flag",
+  "confidenceScore": 0.76,
+  "breakoutDirection": "up",
+  "confirmationCriteria": [
+    "breakoutTrigger is true",
+    "volumeSpike is true",
+    "trendStrength > 0.75"
+  ],
+  "excludedFormations": [
+    {
+      "formationType": "cup-and-handle",
+      "reason": "breakoutTrigger false"
+    }
+  ],
+  "signalImpact": {
+    "tpOptimizer": {
+      "formationBias": "bullish"
+    },
+    "exitTimingAdvisor": {
+      "waitForBreakoutCandle": false
+    },
+    "VIVO": {
+      "formationConfidenceThreshold": 0.75
+    }
+  }
+}
+🧠 İşleme Mantığı:
+Tüm ...Detector.js modülleri paralel çalışır
+
+formationIdentifier.js gelen çıktılardan:
+
+breakoutTrigger = true olanları filtreler
+
+trendStrength, RSI, volume gibi genel koşullarla eşleştirir
+
+en yüksek güven skorlu formasyonu seçer
+
+Seçilen formasyon aşağıdaki modüllere bilgi gönderir:
+
+tpOptimizer.js: Kâr hedeflemesini buna göre yapar
+
+VIVO: Sinyal üretimini buna göre onaylar
+
+exitTimingAdvisor.js: Çıkış zamanlamasını buna göre belirler
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+formationIdentifier.js adında bir modül oluştur.
+
+Bu modül:
+- Tüm formasyon dedektörlerinden gelen JSON çıktıları paralel alır
+- breakTrigger, confidenceScore, breakoutDirection gibi alanlara göre en uygun formasyonu seçer
+- Uyumsuz formasyonları nedenleriyle birlikte dışlar
+- Seçilen formasyonun çıktısını tpOptimizer.js, VIVO, exitTimingAdvisor.js gibi modüllerle paylaşır
+- JSON çıktısı: confirmedFormation, confidenceScore, breakoutDirection, signalImpact, excludedFormations şeklinde yapılandırılır
+✅ Artık sistem tüm formasyonları tarayabiliyor ve en iyisini seçebiliyor.
+Bu modül, tüm teknik analiz kararlarının temeli oldu.
+-----------------------------------------------------------------------------------------------------------------
+📦 Modül: formationCompletenessJudge.js
+Tespit edilen formasyonun gerçekten olgunlaşmış ve işlem açmaya uygun olup olmadığını değerlendirir.
+Formasyon tamamlanmamışsa sistemin işlem açmasını engeller.
+
+🎯 Amaç:
+Algılanan formasyonun yapısı, hacmi, RSI’sı ve trendi gerçekten uyumlu mu?
+
+Formasyonun kırılım anı geldi mi? Yoksa hâlâ gelişim aşamasında mı?
+
+“Fake breakout” riskine karşı sistemde ikinci bir onay katmanı kurmak
+
+VIVO ve exit modüllerine geçici sinyal baskısı ya da bekleme emri iletmek
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "formationType": "ascending-triangle",
+  "breakoutTrigger": false,
+  "rsi": 64,
+  "volumeSpike": false,
+  "patternSymmetryScore": 0.91,
+  "structureCompletenessScore": 0.72,
+  "fakeoutRiskScore": 0.34,
+  "trendAlignment": true
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "formationReady": false,
+  "reason": "breakoutTrigger not active & volume spike missing",
+  "completenessScore": 0.72,
+  "waitTimeEstimate": "5–15 min",
+  "action": "wait-and-watch",
+  "implications": {
+    "VIVO": {
+      "suppressSignal": true
+    },
+    "exitTimingAdvisor": {
+      "deferCountdown": true
+    }
+  }
+}
+🧠 Karar Kriterleri:
+Ölçüm	Anlamı	Eşik
+structureCompletenessScore	Formasyon çizgileri, dip/tepe düzgünlüğü	≥ 0.80
+patternSymmetryScore	U/D simetrisi, omuz dengesi, kanal düzgünlüğü	≥ 0.85
+volumeSpike	Kırılımda patlama varsa	true
+rsi	RSI, formasyona uygun seviyede mi?	> 60 (bullish), < 45 (bearish)
+fakeoutRiskScore	Fake breakout olasılığı	< 0.3 olmalı
+
+🔄 Modüller Arası Veri Akışı:
+formationIdentifier.js çıktısını değerlendirir
+
+VIVO sinyalini baskılar (gerekiyorsa)
+
+exitTimingAdvisor.js zamanlamayı erteler
+
+tpOptimizer.js formasyon hazır değilse TP üretimini durdurur
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+formationCompletenessJudge.js adında bir modül oluştur.
+
+Bu modül:
+- formationIdentifier.js çıktısını alır
+- Formasyonun breakoutTrigger, symmetry, volumeSpike, rsi, trendAlignment gibi verilerini kontrol eder
+- Eşikleri karşılamıyorsa formationReady = false döner
+- VIVO ve exitTimingAdvisor’a baskı uygular
+- Çıktı: formationReady, reason, waitTimeEstimate, implications (VIVO, tpOptimizer, exitTimingAdvisor gibi modüllerle uyumlu JSON)
+✅ Artık sistem bir formasyonu tanımakla kalmıyor,
+aynı zamanda “hazır mı değil mi?” diye ikinci katman kontrol yapabiliyor.
+
+Bu sayede:
+
+Fake-out riskleri azalıyor
+
+Gereksiz pozisyonlar engelleniyor
+
+Sistem daha sabırlı, bilinçli ve tecrübeli gibi davranıyor (12 yıllık trader gibi 😉)
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Modül: priceActionBiasGenerator.js
+Fiyatın son davranışlarını (mum formasyonları, fitil boyları, hacim değişimi, kırılım agresifliği) analiz ederek sistemin boğa mı ayı mı eğiliminde olduğunu belirler.
+VIVO ve sinyal modülleri bu veriye göre yön kararını daha sağlam verir.
+
+🎯 Amaç:
+Fiyatın momentum, yapı ve volatilitesine göre yön tahmini üretir
+
+Tek başına sinyal üretmez ama tüm sinyallerin yön çerçevesini çizer
+
+Özellikle kararsız bölgelerde sistemin pusulası olur
+
+“Şu an alım mı daha güçlü, satış mı?” sorusuna yanıt verir
+
+🔄 Girdi:
+json
+Kopyala
+Düzenle
+{
+  "candlePatterns": ["bullish-engulfing", "long-lower-wick"],
+  "volumeChange": 1.38,
+  "rsi": 59,
+  "priceMomentum": 0.045,
+  "previousBreakoutStrength": 0.61,
+  "atr": 172,
+  "volatilitySpike": true
+}
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "biasDirection": "bullish",
+  "biasScore": 0.77,
+  "supportingSignals": [
+    "RSI > 55",
+    "Volume rising",
+    "Momentum > 0.03",
+    "Bullish candle pattern"
+  ],
+  "riskFactors": [
+    "volatilitySpike"
+  ],
+  "recommendedAction": "watch-for-confirmation",
+  "outputForModules": {
+    "VIVO": {
+      "direction": "buy-bias",
+      "biasScore": 0.77
+    },
+    "riskToRewardValidator": {
+      "favorLongEntry": true
+    },
+    "exitTimingAdvisor": {
+      "deferShortExit": true
+    }
+  }
+}
+🧠 İşleme Mantığı:
+Ölçüt	Karar
+RSI > 55	Boğa yönüne puan
+RSI < 45	Ayı yönüne puan
+Candle = Engulfing, Hammer, Pin bar	Yönü güçlendirici
+Momentum > 0.03	Devam sinyali
+Hacim > 1.3x artış	Güçlü fiyat baskısı
+ATR artışı + fitiller uzun	Risk unsuru
+
+🔄 Modüller Arası Veri Akışı:
+VIVO bu modülün yönüyle sinyal uyumuna bakar
+
+riskToRewardValidator hangi tarafın daha mantıklı olduğunu değerlendirirken kullanır
+
+exitTimingAdvisor → çıkışı acele etmeme ya da hızlandırma kararı alır
+
+formationCompletenessJudge → bias yönüyle tersse formasyonu geri çevirebilir
+
+🔧 KODLAMA PROMPTU
+prompt
+Kopyala
+Düzenle
+priceActionBiasGenerator.js adında bir modül oluştur.
+
+Bu modül:
+- RSI, hacim değişimi, momentum, candle pattern ve ATR gibi verilerle fiyat yön eğilimi (bias) üretir
+- Çıktı olarak: biasDirection, biasScore, supportingSignals, riskFactors, outputForModules döndürür
+- Diğer modüllere yönsel çıktı sağlar: VIVO, exitTimingAdvisor, riskToRewardValidator
+- Sistem, bu modülün ürettiği yön eğilimi ile işlemlerini daha bilinçli şekilde koordine eder
+✅ Bu modül sayesinde artık “trend var mı?” değil,
+“baskın yön hangisi?” sorusuna da cevap veriyoruz.
+
+Bu sayede sistem artık:
+
+Kararsızlıkta bile yön içgüdüsüyle hareket ediyor
+
+Tüm pozisyon açma modülleri daha sağlam temellere dayanıyor
+
+Duyguya değil, fiyat davranışına göre karar alıyor
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: trendConfidenceEvaluator.js
+Sistemin baktığı grafikte mevcut trendin gücünü, sürekliliğini ve işlem açmaya elverişli olup olmadığını değerlendirir.
+Trendin kalitesine göre sistemin “güven skoru” üretmesini sağlar.
+
+🎯 Amaç:
+Trend var mı? Varsa güçlü mü zayıf mı?
+
+Destek/direnç kırılımı trendle uyumlu mu?
+
+EMA, MA ve volume ilişkisine göre trendin güvenilirliğini hesaplar
+
+Diğer modüllerin (TP, çıkış, giriş) “trend temelli kararları” almasını sağlar
+
+🔄 GİRDİ (Örnek):
+json
+Kopyala
+Düzenle
+{
+  "emaShort": 20,
+  "emaLong": 50,
+  "price": 67420,
+  "volumeTrend": "rising",
+  "rsi": 62,
+  "trendSlope": 0.017,
+  "higherHighs": true,
+  "higherLows": true,
+  "formationSupport": "ascending-triangle"
+}
+📤 ÇIKTI (Örnek):
+json
+Kopyala
+Düzenle
+{
+  "trendExists": true,
+  "trendStrength": 0.82,
+  "trendDirection": "up",
+  "validityReasons": [
+    "Price > EMA50",
+    "EMA20 > EMA50",
+    "Volume trend: rising",
+    "RSI > 60",
+    "Formation: ascending-triangle"
+  ],
+  "modularRecommendations": {
+    "tpOptimizer": {
+      "allowExtendedTP": true
+    },
+    "exitTimingAdvisor": {
+      "deferExit": true
+    },
+    "riskToRewardValidator": {
+      "favorTrendEntry": true
+    },
+    "formationCompletenessJudge": {
+      "confirmBreakoutBias": true
+    }
+  }
+}
+🧠 Gelişmiş İşleme Mantığı:
+Kriter	Ağırlık	Açıklama
+EMA20 > EMA50	+0.25	Boğa trend sinyali
+Fiyat EMA’ların üstünde	+0.15	Güçlü momentum göstergesi
+RSI > 60 (ya da < 40)	+0.15	Sağlıklı güç bölgesi
+Hacim artışı	+0.2	Trendin desteklendiğini gösterir
+Trend eğimi pozitif	+0.1	Teknik olarak yükseliş
+HH / HL yapısı	+0.15	Yapısal trend teyidi
+
+Toplam skor: trendStrength ∈ [0.00 – 1.00]
+→ 0.70 ve üzeri: güçlü trend
+→ 0.50 – 0.70: nötr/izlemeye değer
+→ < 0.50: zayıf / işlem açılmaz
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+trendConfidenceEvaluator.js adında bir modül oluştur.
+
+Bu modül:
+- EMA, RSI, trend eğimi, volume, higherHigh/lows gibi verilerle trendin yönünü ve gücünü değerlendirir
+- trendStrength (0–1 arası) ve trendDirection (up/down/none) üretir
+- tpOptimizer, riskToRewardValidator, exitTimingAdvisor gibi modüllerle entegre çalışır
+- trendStrength ≥ 0.70 ise agresif TP uygulanmasına izin verir
+- trendStrength < 0.5 ise işlem açılması engellenir
+✅ Bu modül sayesinde sistem artık sadece “formasyon var mı?” değil,
+“trend güvenilir mi?” sorusuna da cevap verebiliyor.
+
+Ayrıca şu modüllere doğrudan veri üretir:
+
+tpOptimizer.js → trend güçlüyse TP3 öner
+
+exitTimingAdvisor.js → zayıf trend varsa erken çık
+
+riskToRewardValidator.js → trend zayıfsa sinyal baskıla
+
+VIVO → sinyalleri sadece güçlü trende aç
+
+-----------------------------------------------------------------------------------------------------------------
+
+Şimdi sırada sistemin en kritik “risk-fayda dengesi” aklı var:
+Risk kötü → sinyal baskılanır. Kâr potansiyeli yüksek → onay verilir.
+
+📦 Gelişmiş Modül: riskToRewardValidator.js
+Açılacak bir pozisyonun risk (stop-loss) ile potansiyel kazanç (take-profit) oranını analiz eder.
+Risk/fayda oranı yeterli değilse işlem açılmasını engeller veya sinyali baskılar.
+
+🎯 Amaç:
+Sistem bir işlem önerisi vermeden önce:
+“Bu işlem riske değer mi?” sorusuna net cevap vermek
+
+TP / SL oranı en az 1:1.7 olmalı (tercihen 1:2 veya daha iyi)
+
+Zayıf fırsatlara vakit ve kaynak harcanmaz
+
+Gerçekçi kar-zarar yapısına göre sinyal verilir
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "expectedProfit": 4.6,
+  "potentialStopLoss": 1.3,
+  "trendStrength": 0.81,
+  "formation": "ascending-triangle",
+  "tpLevels": [2.1, 3.7, 5.2],
+  "biasDirection": "bullish",
+  "marketVolatility": 0.22,
+  "supportDistance": 1.4,
+  "resistanceDistance": 3.5
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "riskRewardRatio": 3.54,
+  "isTradeValid": true,
+  "confidenceScore": 0.88,
+  "recommendation": "allow-trade",
+  "modularRecommendations": {
+    "VIVO": {
+      "confirmationThreshold": 2
+    },
+    "tpOptimizer": {
+      "aggressiveness": "moderate"
+    },
+    "entryZoneClassifier": {
+      "approve": true
+    }
+  },
+  "flags": []
+}
+🧠 Risk/Reward Hesaplama
+Hesaplama:
+
+Risk/Reward Ratio
+=
+En Yakın TP
+−
+Giri
+s
+¸
+Stop Loss
+Risk/Reward Ratio= 
+Stop Loss
+En Yakın TP−Giri 
+s
+¸
+​
+ 
+​
+ 
+Örnek:
+
+TP1 = %3.7
+
+SL = %1.3
+→ R/R = 3.7 / 1.3 = 2.85
+
+Karar Kuralları:
+R/R Oranı	Durum
+< 1.6	❌ İşlem onaylanmaz
+1.6–2.0	⚠️ Temkinli sinyal (VIVO onayı gerekir)
+2.0–3.0	✅ Güvenli işlem
+> 3.0	✅✅ Yüksek potansiyelli işlem (sinyal agresifleştirilebilir)
+
+🔁 Modüller Arası Veri Akışı:
+tpOptimizer.js → önerdiği TP’lere göre R/R hesaplar
+
+trendConfidenceEvaluator.js → güçlü trend varsa düşük R/R kabul edilebilir
+
+exitTimingAdvisor.js → R/R zayıfsa erken çıkış önerir
+
+VIVO → R/R düşükse sinyali baskılar
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+riskToRewardValidator.js adında bir modül oluştur.
+
+Bu modül:
+- expectedProfit, stopLoss, tpLevels, trendStrength gibi girdilerle risk/reward oranını hesaplar
+- R/R < 1.6 ise isTradeValid = false döner
+- R/R ≥ 2.0 ise confidenceScore ≥ 0.75 olur
+- Çıktı olarak: riskRewardRatio, isTradeValid, confidenceScore, recommendation, modularRecommendations
+- VIVO, tpOptimizer, entryZoneClassifier gibi modüllerle entegre olur
+✅ Artık sistem:
+
+Sadece “güzel görünüyor” diye işlem açmaz
+
+Gerçekten kar getirisi riske değer mi? sorusuna yanıt verir
+
+Bu modül sayesinde, sistem daha profesyonel davranır, daha az işlemle daha çok kazanmayı hedefler
+-----------------------------------------------------------------------------------------------------------------
+
+Şimdi sıra geldi teknik analiz mimarisinin bir diğer temel taşı olan modüle:
+
+📦 Gelişmiş Modül: entryZoneClassifier.js
+Fiyatın şu anki konumuna göre işleme girilip girilmeyeceğini,
+yani “burası iyi bir giriş bölgesi mi?” sorusunu cevaplar.
+Fiyat çok yukarıda ise FOMO’dan kaçınılır,
+çok dipte ise tuzaklardan korunulur.
+
+🎯 Amaç:
+Giriş sinyali verilse bile “şu an doğru konumda mıyız?” kontrolü
+
+Fiyat destekten uzakta mı? Dirence çok yakın mı?
+
+Fiyat, formasyonun içinde mi yoksa kırılım sonrasında mı?
+
+Risk/fayda oranıyla birlikte bölge kararı verir
+
+Giriş bölgesi kötü ise pozisyon açılmaz
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67420,
+  "entrySignal": true,
+  "supportLevel": 66750,
+  "resistanceLevel": 68000,
+  "formation": "bull-flag",
+  "breakoutTriggered": true,
+  "distanceFromSupport": 670,
+  "distanceFromResistance": 580,
+  "isPullback": false,
+  "rsi": 64,
+  "volume": 1.32
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "entryZoneValid": true,
+  "entryBias": "moderate-buy",
+  "zoneScore": 0.76,
+  "entryJustification": [
+    "Price near support",
+    "Breakout confirmed",
+    "Volume supporting",
+    "RSI in favorable zone"
+  ],
+  "recommendation": "proceed",
+  "implications": {
+    "VIVO": {
+      "signalApproval": true
+    },
+    "riskToRewardValidator": {
+      "validateEntry": true
+    },
+    "exitTimingAdvisor": {
+      "enableHoldDelay": true
+    }
+  }
+}
+🧠 İşleme Mantığı:
+Kriter	Etkisi
+Fiyat – destek mesafesi < %1.5	Güçlü giriş bölgesi puanı
+Dirence yakınlık < %1 → riskli	ZoneScore düşer
+RSI > 70	FOMO / aşırı alım riski
+Breakout sonrası pullback	Güvenli yeniden giriş puanı
+Volume artışı varsa	Giriş onaylanır
+
+ZoneScore (0–1.0) →
+0.00–0.49 → ❌ giriş yapılmaz
+0.50–0.69 → ⚠️ sadece uygun şartlarla
+0.70+ → ✅ güçlü giriş bölgesi
+
+🔁 Modüller Arası Veri Akışı:
+tpOptimizer.js → iyi giriş noktasıysa agresif TP uygulanabilir
+
+VIVO → sinyal vereceği pozisyonun konumunu bu modülden teyit alır
+
+riskToRewardValidator.js → zone uygunsa R/R’ye göre kararını onaylar
+
+exitTimingAdvisor.js → doğru yerde girildiyse çıkış zamanlamasını uzatabilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+entryZoneClassifier.js adında bir modül oluştur.
+
+Bu modül:
+- price, support, resistance, breakout, RSI, volume gibi verilerle fiyatın konumuna göre giriş bölgesini değerlendirir
+- entryZoneValid, zoneScore, recommendation, entryBias gibi çıktılar üretir
+- VIVO, riskToRewardValidator, exitTimingAdvisor gibi modüllerle uyumlu JSON çıktı verir
+- ZoneScore < 0.5 ise işlem baskılanır, > 0.7 ise agresif onay sağlanır
+✅ Bu modül sayesinde artık:
+
+Giriş noktası “ne zaman?” kadar “nerede?” sorusuna da cevap buluyor
+
+Sistem FOMO tuzağına düşmüyor, sabırlı ve doğru konumda işlem açıyor
+
+Yapay zeka gerçek bir trader gibi “şu an girmem mi mantıklı?” kararını analizle veriyor
+-----------------------------------------------------------------------------------------------------------------
+
+Geldik reis sistemin "çakılma" veya "fırlama" bölgelerine tepkisini yönetecek modüle 👇
+Bu modül, destek/direnç kırıldığında ne yapılması gerektiğine karar veriyor: bekle, gir, kaç.
+
+📦 Gelişmiş Modül: supportResistanceReactor.js
+Destek veya direnç seviyelerinde oluşan fiyat hareketlerine anlık tepki üretir.
+Formasyon + trend + hacim + kırılım gücüne göre
+“giriş”, “bekle” veya “kaç” kararı verir.
+
+🎯 Amaç:
+Destek kırıldığında “kaçmalı mıyız?”
+
+Direnç kırıldığında “girmeli miyiz?”
+
+Kırılım hacimli mi, boş mu?
+
+Kırılım formasyona uygun mu?
+
+RSI veya hacim yalan söylüyor mu?
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67420,
+  "supportLevel": 66750,
+  "resistanceLevel": 68000,
+  "breakoutDirection": "up",
+  "breakoutStrength": 0.83,
+  "volumeSpike": true,
+  "rsi": 66,
+  "momentum": 1.28,
+  "formation": "ascending-triangle",
+  "trendStrength": 0.76
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "action": "enter",
+  "breakoutConfirmationScore": 0.85,
+  "reliabilityTags": ["volume-confirmed", "RSI-confirmed", "formation-supportive"],
+  "modularRecommendations": {
+    "entryZoneClassifier": {
+      "forceConfirm": true
+    },
+    "tpOptimizer": {
+      "allowAggressiveTP": true
+    },
+    "exitTimingAdvisor": {
+      "extendHoldTime": true
+    }
+  },
+  "alert": "Breakout confirmed - long entry recommended"
+}
+🧠 Tepki Karar Matrisi:
+Durum	RSI	Hacim	Momentum	Tepki
+Direnç kırıldı	>60	Artıyor	>1.2	✅ GİR
+Direnç kırıldı	<50	Düşük	<1.0	⏳ BEKLE
+Destek kırıldı	RSI düşüyor	Hacim spike	<1.0	❌ ÇIK
+Fiyat destek üstünde tutunuyorsa	RSI +	Momentum ↑	✅ GİR (pullback sonrası)	
+
+🔁 Modüller Arası Veri Akışı:
+entryZoneClassifier → kırılım sonrası fiyat uygun mu?
+
+tpOptimizer.js → kırılım şiddetliyse geniş TP öner
+
+exitTimingAdvisor.js → hacimli kırılım varsa çıkış geciktir
+
+formationCompletenessJudge.js → kırılım varsa formasyonu “tamamlandı” olarak işaretle
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+supportResistanceReactor.js adında bir modül oluştur.
+
+Bu modül:
+- price, support/resistance seviyeleri, breakoutDirection, breakoutStrength, volume, RSI, momentum gibi verilerle kırılımlara anlık tepki verir
+- breakoutConfirmationScore, action (enter, wait, exit), reliabilityTags gibi çıktılar üretir
+- Diğer modüllerle birlikte çalışır: entryZoneClassifier, tpOptimizer, exitTimingAdvisor, formationCompletenessJudge
+✅ Artık sistem sadece "formasyon var mı?" değil,
+"formasyon kırılırken ne yapmalıyım?" sorusuna da güçlü yanıt verebiliyor.
+Önceden belirlenmiş ama statik kurallara değil, anlık veriye göre hareket ediyor.
+
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: momentumValidator.js
+Mevcut fiyat hareketinin momentum gücünü ölçer.
+Trend devam edebilir mi, yoksa gücü bitiyor mu?
+İşleme girmeye ya da çıkmaya değer mi, karar verir.
+
+🎯 Amaç:
+Fiyat hareketinin gücünü ölçerek “momentum onayı” sağlamak
+
+RSI, hacim, MACD gibi göstergelere göre yön teyidi almak
+
+Zayıf momentumda işlem açılmasını baskılamak
+
+Güçlü hareket varsa sistemin agresifleşmesini sağlamak
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67420,
+  "volume": 1.35,
+  "rsi": 68,
+  "macdHistogram": 1.12,
+  "momentum": 1.33,
+  "trendStrength": 0.79,
+  "breakoutStatus": "confirmed"
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "momentumScore": 0.87,
+  "isMomentumValid": true,
+  "momentumTrend": "bullish",
+  "recommendation": "continue-trend",
+  "modularRecommendations": {
+    "tpOptimizer": {
+      "allowExtendedTP": true
+    },
+    "riskToRewardValidator": {
+      "increaseConfidence": true
+    },
+    "VIVO": {
+      "momentumConfirm": true
+    }
+  },
+  "flags": []
+}
+🧠 Hesaplama Yöntemi
+Gösterge	Skor Katkısı
+RSI > 65	+0.25
+MACD Histogram pozitif ve artıyor	+0.30
+Volume artışı	+0.20
+TrendStrength > 0.70	+0.15
+Momentum > 1.2	+0.10
+
+Toplam puan: momentumScore ∈ [0.00 – 1.00]
+
+Yorum:
+
+score ≥ 0.75 → Trend devamı güçlü
+
+0.5–0.75 → İzlemeye değer
+
+< 0.5 → Düşen momentum, sinyal baskılanır
+
+🔁 Modüller Arası Veri Akışı:
+Hedef Modül	Etki
+tpOptimizer.js	Momentum güçlüyse daha ileri TP’ler serbest
+VIVO	Momentum zayıfsa sinyal baskılanır
+exitTimingAdvisor.js	Momentum düşüyorsa erken çık önerilir
+trendConfidenceEvaluator.js	Trend gücünü desteklemek için doğrulayıcı veri sağlar
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+momentumValidator.js adında bir modül oluştur.
+
+Bu modül:
+- RSI, MACD histogram, volume, momentum ve trendStrength verilerine göre momentumScore üretir
+- Momentum yeterince güçlü değilse isMomentumValid = false döner
+- Diğer modüllerle entegre olacak şekilde: tpOptimizer, VIVO, riskToRewardValidator ve exitTimingAdvisor’a çıktı üretir
+✅ Artık sistem “sadece yükseliyor mu?” değil
+“bu yükselişin gücü var mı?” sorusuna da profesyonelce yanıt veriyor.
+Aşırı heyecan ya da korkuya kapılmadan, matematiksel olarak değerlendirme yapıyor.
+-----------------------------------------------------------------------------------------------------------------📦 Gelişmiş Modül: momentumValidator.js
+Mevcut fiyat hareketinin momentum gücünü ölçer.
+Trend devam edebilir mi, yoksa gücü bitiyor mu?
+İşleme girmeye ya da çıkmaya değer mi, karar verir.
+
+🎯 Amaç:
+Fiyat hareketinin gücünü ölçerek “momentum onayı” sağlamak
+
+RSI, hacim, MACD gibi göstergelere göre yön teyidi almak
+
+Zayıf momentumda işlem açılmasını baskılamak
+
+Güçlü hareket varsa sistemin agresifleşmesini sağlamak
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67420,
+  "volume": 1.35,
+  "rsi": 68,
+  "macdHistogram": 1.12,
+  "momentum": 1.33,
+  "trendStrength": 0.79,
+  "breakoutStatus": "confirmed"
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "momentumScore": 0.87,
+  "isMomentumValid": true,
+  "momentumTrend": "bullish",
+  "recommendation": "continue-trend",
+  "modularRecommendations": {
+    "tpOptimizer": {
+      "allowExtendedTP": true
+    },
+    "riskToRewardValidator": {
+      "increaseConfidence": true
+    },
+    "VIVO": {
+      "momentumConfirm": true
+    }
+  },
+  "flags": []
+}
+🧠 Hesaplama Yöntemi
+Gösterge	Skor Katkısı
+RSI > 65	+0.25
+MACD Histogram pozitif ve artıyor	+0.30
+Volume artışı	+0.20
+TrendStrength > 0.70	+0.15
+Momentum > 1.2	+0.10
+
+Toplam puan: momentumScore ∈ [0.00 – 1.00]
+
+Yorum:
+
+score ≥ 0.75 → Trend devamı güçlü
+
+0.5–0.75 → İzlemeye değer
+
+< 0.5 → Düşen momentum, sinyal baskılanır
+
+🔁 Modüller Arası Veri Akışı:
+Hedef Modül	Etki
+tpOptimizer.js	Momentum güçlüyse daha ileri TP’ler serbest
+VIVO	Momentum zayıfsa sinyal baskılanır
+exitTimingAdvisor.js	Momentum düşüyorsa erken çık önerilir
+trendConfidenceEvaluator.js	Trend gücünü desteklemek için doğrulayıcı veri sağlar
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+momentumValidator.js adında bir modül oluştur.
+
+Bu modül:
+- RSI, MACD histogram, volume, momentum ve trendStrength verilerine göre momentumScore üretir
+- Momentum yeterince güçlü değilse isMomentumValid = false döner
+- Diğer modüllerle entegre olacak şekilde: tpOptimizer, VIVO, riskToRewardValidator ve exitTimingAdvisor’a çıktı üretir
+✅ Artık sistem “sadece yükseliyor mu?” değil
+“bu yükselişin gücü var mı?” sorusuna da profesyonelce yanıt veriyor.
+Aşırı heyecan ya da korkuya kapılmadan, matematiksel olarak değerlendirme yapıyor.
+
+-----------------------------------------------------------------------------------------------------------------
+Şimdi sırada sistemin "hacim bazlı baskıyı" ölçerek ne tarafa doğru patlama olacağını tahmin eden zekâsı var:
+
+📦 Gelişmiş Modül: volumePressureAnalyzer.js
+Hacim verileri üzerinden alıcının mı yoksa satıcının mı baskın olduğunu analiz eder.
+Fiyat hareketinin arkasındaki gerçek gücü ortaya çıkarır.
+Böylece “fiyat yukarı gidiyor ama hacim yok mu?” gibi tuzaklardan sistem korunur.
+
+🎯 Amaç:
+Fiyat hareketini destekleyen hacim var mı, yok mu?
+
+Alıcılar mı baskın, satıcılar mı?
+
+İşlem hacmi artıyor mu, azalıyorsa ne kadar kritik?
+
+Formasyon kırılımları hacimle mi oluyor?
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "currentVolume": 2.15,
+  "averageVolume": 1.32,
+  "volumeDelta": 0.83,
+  "buyVolume": 1.45,
+  "sellVolume": 0.70,
+  "breakoutStatus": "pending",
+  "priceChangePercent": 1.1
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "volumePressure": "bullish",
+  "pressureScore": 0.79,
+  "volumeReliability": true,
+  "recommendation": "support-long",
+  "modularRecommendations": {
+    "formationCompletenessJudge": {
+      "markConfirmed": true
+    },
+    "tpOptimizer": {
+      "allowAggressiveTP": true
+    },
+    "entryZoneClassifier": {
+      "allowFastEntry": true
+    },
+    "exitTimingAdvisor": {
+      "extendHoldTime": true
+    }
+  }
+}
+🧠 Hesaplama Yöntemi:
+Metod	Etki
+volumeDelta > %50 → +0.35	Hacim artışı
+buyVolume > sellVolume → +0.25	Alıcı baskısı
+currentVolume > avgVolume → +0.20	Piyasa hareketli
+priceChange% > 1.0 ve hacim yükseliyor → +0.20	Momentum teyidi
+
+Skor: pressureScore ∈ [0–1.0]
+→ > 0.7: Hacim güçlü, işlem destekleniyor
+→ < 0.5: Hacim zayıf, işlem baskılanmalı
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+formationCompletenessJudge	Formasyon kırılımı hacimle onaylanır
+tpOptimizer	Hacim güçlü → daha yüksek hedefler
+entryZoneClassifier	Giriş baskısı varsa hızlı tepki
+exitTimingAdvisor	Satış hacmi baskınsa erken çıkış önerilir
+VIVO	Hacim zayıfsa sinyal baskılanabilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+volumePressureAnalyzer.js adında bir modül oluştur.
+
+Bu modül:
+- currentVolume, averageVolume, buy/sell volume farkı ve priceChange verileriyle alım/satım baskısını ölçer
+- pressureScore üretir, bu skora göre bullish/bearish hacim baskısı belirler
+- tpOptimizer, entryZoneClassifier, exitTimingAdvisor gibi modüllere yönlendirici çıktı verir
+✅ Artık sistem sadece “grafik var mı?” diye bakmıyor,
+“arka planda parayı kim bastırıyor?” sorusuna da cevap veriyor.
+İşlem hacmi desteği olmadan açılacak işlemler artık engellenir. Sistem daha güvenli, daha mantıklı çalışır.
+
+-----------------------------------------------------------------------------------------------------------------
+ChatGPT:
+Aynen öyle reis, hepsini tek tek çatır çatır yapacağız.
+Şimdi sırada sistemin “kırılan mı, çakma mı?” çizgilerini analiz eden aklı var:
+
+📦 Gelişmiş Modül: trendLineIntegrityChecker.js
+Sistemde tanımlı destek/direnç ve trend çizgilerinin gerçekten kırılıp kırılmadığını teyit eder.
+Yani: “Bu bir breakout mu yoksa false breakout mu?”
+Bunu hacim, momentum ve fitil yapısıyla değerlendirir.
+
+🎯 Amaç:
+Çizgi kırılımı gerçekten geçerli mi?
+
+False breakout riski var mı?
+
+Hacim + momentum + kapanış seviyesi uyumlu mu?
+
+Formasyon çizgileriyle uyumlu mu?
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67550,
+  "breakoutCandidate": true,
+  "trendLineAngle": 37,
+  "lineSlope": 0.87,
+  "touchCount": 4,
+  "breakoutVolume": 1.44,
+  "avgVolume": 1.18,
+  "candleCloseAboveLine": true,
+  "rsi": 66,
+  "breakoutDirection": "up",
+  "shadowSize": 0.3,
+  "bodyToShadowRatio": 2.4
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "breakoutIntegrityScore": 0.82,
+  "isBreakoutValid": true,
+  "recommendation": "confirm",
+  "justifications": [
+    "Candle close above trendline",
+    "High breakout volume",
+    "Low shadow-to-body ratio",
+    "Multiple touches before breakout"
+  ],
+  "modularRecommendations": {
+    "formationCompletenessJudge": {
+      "markConfirmed": true
+    },
+    "entryZoneClassifier": {
+      "allowFastEntry": true
+    },
+    "supportResistanceReactor": {
+      "upgradeActionToEnter": true
+    }
+  }
+}
+🧠 Hesaplama Yöntemi:
+Kriter	Etki
+Candle kapanışı çizginin üstünde → +0.30	
+Hacim ortalamanın %20 üstünde → +0.25	
+RSI > 60 → +0.10	
+Shadow küçük, body büyük → +0.20	
+3+ temas sonrası kırılım → +0.15	
+
+Toplam: breakoutIntegrityScore ∈ [0.0 – 1.0]
+→ ≥ 0.75 → Kırılım geçerli
+→ 0.5–0.75 → Dikkatli yaklaş
+→ < 0.5 → False breakout ihtimali yüksek
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+formationCompletenessJudge	Kırılım teyitliyse formasyon tamam
+supportResistanceReactor	Kırılım geçerliyse işlem başlatılır
+entryZoneClassifier	Geçerli kırılım sonrası hızlı giriş önerilir
+tpOptimizer	Gerçek kırılımlarda TP daha ileri planlanabilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+trendLineIntegrityChecker.js adında bir modül oluştur.
+
+Bu modül:
+- trend çizgisi açısı, hacim, RSI, kapanış seviyesi ve mum boyutlarına göre kırılımın geçerliliğini değerlendirir
+- breakoutIntegrityScore üretir, isBreakoutValid ile geçerlilik döner
+- Diğer modüllere yönlendirici çıktı verir: formationCompletenessJudge, entryZoneClassifier, tpOptimizer
+✅ Bu modül sayesinde sistem artık:
+
+“çizgi kırıldı mı kırılmadı mı?” gibi tartışmalı konularda profesyonel karar alabiliyor
+
+Yanıltıcı fitiller, zayıf hacimle oluşan kırılımlar artık işlem başlatamıyor
+
+Sistem sadece görsellik değil, veriyle doğrulanmış yapılar üstünden işlem açıyor
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: confirmationSignalBridge.js
+Grafik Beyni, tpOptimizer, entryZoneClassifier, trendConfidenceEvaluator ve diğer modüllerden gelen onay skorlarını toplayarak
+VIVO’ya tek bir "sinyal bütünlüğü puanı" gönderir.
+
+🎯 Amaç:
+VIVO'ya gidecek sinyalleri merkezî olarak toplamak
+
+Her modül kendi "onayını" verir → bu modül sentezler
+
+Çakışma varsa sinyali baskılar
+
+Güçlü mutabakat varsa VIVO sinyal üretimine izin verir
+
+Gerektiğinde kullanıcıya sinyalin neden baskılandığını açıklar
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "entryZoneClassifier": {
+    "entryZoneValid": true,
+    "zoneScore": 0.76
+  },
+  "tpOptimizer": {
+    "tpStyle": "3TP",
+    "tpConfidence": 0.72
+  },
+  "trendConfidenceEvaluator": {
+    "trendScore": 0.81
+  },
+  "momentumValidator": {
+    "momentumScore": 0.78
+  },
+  "volumePressureAnalyzer": {
+    "pressureScore": 0.79
+  },
+  "riskToRewardValidator": {
+    "valid": true,
+    "r/r": 2.8
+  }
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "signalApproval": true,
+  "signalConfidence": 0.82,
+  "justifications": [
+    "Strong trendScore and momentumScore",
+    "Valid entry zone",
+    "TP confidence above threshold",
+    "Risk to reward favorable"
+  ],
+  "alert": "Signal validated and forwarded to VIVO",
+  "modularFlags": {
+    "VIVO": {
+      "confirmationThreshold": 4,
+      "signalPath": "normal"
+    }
+  }
+}
+🧠 İşleme Mantığı:
+Modül	Skor Eşiği	Ağırlık
+entryZoneClassifier	zoneScore ≥ 0.7	20%
+tpOptimizer	tpConfidence ≥ 0.7	15%
+trendConfidenceEvaluator	≥ 0.75	25%
+momentumValidator	≥ 0.75	20%
+volumePressureAnalyzer	≥ 0.70	10%
+riskToRewardValidator	R/R ≥ 2.5	10%
+
+Toplam skor ≥ 0.75 → sinyal verilir
+
+🔁 Modüller Arası Veri Akışı:
+Bağlantı	Görev
+VIVO → confirmationSignalBridge	Sinyal istiyor
+confirmationSignalBridge → VIVO	Sinyal onayı ya da reddi veriyor
+Tüm analiz modülleri → confirmationSignalBridge	Onay, skor ve bayrak iletiyor
+
+Bu modül sistemi "VIVO’nun körlemesine sinyal üretmesini" engeller.
+Her sinyal artık çoklu doğrulama sonucu üretilir.
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+confirmationSignalBridge.js adında bir modül oluştur.
+
+Bu modül:
+- Grafik Beyni'ndeki tüm analiz modüllerinin skorlarını ve onaylarını toplayarak tek bir sinyal bütünlüğü puanı hesaplar
+- signalApproval, signalConfidence, justifications gibi çıktılar üretir
+- VIVO’ya yönlendirme yapar
+- Skor 0.75’in altındaysa sinyali baskılar ve sebebini bildirir
+✅ Artık sistem şunu yapabiliyor:
+⛔ “Trend var ama giriş bölgesi kötü → sinyal iptal!”
+✅ “TP, Trend, RSI, Formasyon, Momentum → hepsi güçlü → sinyal onaylandı!”
+Yani sistemde artık "tek modül sinyal verir" dönemi bitti. Kurul onayı şart 🎓
+-----------------------------------------------------------------------------------------------------------------
+Bu sefer sistemin “fiyat tehlikeli bölgede mi dolanıyor?” sorusuna yanıt verecek kalkanını geliştiriyoruz:
+
+📦 Gelişmiş Modül: riskZoneDefender.js
+Fiyatın riskli bölgelerde dolaştığını algılar ve pozisyon açılmasını baskılar veya iptal eder.
+Daha açılmamış pozisyonları engelleyebilir, açık olanları ise hızlıca “çıkar” kararıyla uyarabilir.
+
+🎯 Amaç:
+RSI aşırı bölgede mi?
+
+Fiyat direnç/tepki bölgesine çok mu yakın?
+
+Bollinger dışına taştı mı?
+
+ATR’ye göre aşırı hareket yaptı mı?
+
+Ani spike var mı?
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67420,
+  "rsi": 79,
+  "bollingerUpper": 67310,
+  "atr": 210,
+  "priceDeviation": 1.6,
+  "resistanceDistance": 0.3,
+  "volatilitySpike": true
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "isRiskZone": true,
+  "riskScore": 0.88,
+  "recommendation": "do-not-enter",
+  "modularRecommendations": {
+    "confirmationSignalBridge": {
+      "forceReject": true
+    },
+    "VIVO": {
+      "muteSignal": true
+    },
+    "tpOptimizer": {
+      "adjustTPDown": true
+    },
+    "exitTimingAdvisor": {
+      "prepareForEarlyExit": true
+    }
+  },
+  "alert": "Risk zone detected — signal suppressed"
+}
+🧠 Hesaplama Kuralları:
+Girdi	Etki
+RSI > 75 → +0.25	
+Bollinger dışına çıkış → +0.20	
+ATR’ye göre sapma %1.5 üstü → +0.20	
+Direnç mesafesi < %0.5 → +0.20	
+Volatility spike varsa → +0.15	
+
+Toplam riskScore ≥ 0.75 → “RISK ZONE” ilan edilir
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etkisi
+confirmationSignalBridge	Sinyal geçici olarak iptal edilir
+VIVO	Sinyal gönderimi baskılanır
+tpOptimizer	Daha temkinli TP seviyeleri önerilir
+exitTimingAdvisor	Açık pozisyon varsa hızlı çıkış sinyali verilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+riskZoneDefender.js adında bir modül oluştur.
+
+Bu modül:
+- RSI, Bollinger bandı, ATR, direnç mesafesi ve volatility spike gibi verileri kullanarak riskScore üretir
+- Risk çok yüksekse işlem açılmasını baskılar ve tüm sistemleri uyarır
+- VIVO’ya sinyal gönderilmesini engeller, tpOptimizer ve exitTimingAdvisor’a uyarılar yollar
+✅ Artık sistem "ne kadar güzel formasyon olursa olsun"
+eğer piyasa “çok riskli” diyorsa, işlemi keser.
+Kör işlem açmaz. “Fırsat” değil “tuzak” varsa uzak durur.
+
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: priceDeviationScanner.js
+Fiyatın olağan dışı sapmalarını tespit eder.
+Bu sapmalar hacimsiz pump, balina hareketi veya anormal likidite çekişi olabilir.
+Modül bu durumda: ya “bekle” diyecek ya da “baskıla” diyecek.
+
+🎯 Amaç:
+Fiyat son X dakikada çok mu hızlı yükseldi/düştü?
+
+Hacim buna eşlik etti mi?
+
+ATR’ye göre aşırı sapma var mı?
+
+RSI + momentum bu hareketi destekliyor mu?
+
+Eğer desteklemiyorsa: false move → işlem engellenir.
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67600,
+  "priceChange5m": 2.8,
+  "volumeSpike": false,
+  "atr": 170,
+  "rsi": 73,
+  "momentum": 0.92,
+  "trendStrength": 0.48
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "isDeviationSuspicious": true,
+  "deviationScore": 0.81,
+  "recommendation": "suppress-signal",
+  "reasons": [
+    "Price moved >2% in 5 minutes",
+    "No volume spike detected",
+    "RSI is elevated but momentum weak",
+    "ATR baseline exceeded"
+  ],
+  "modularRecommendations": {
+    "confirmationSignalBridge": {
+      "forceReject": true
+    },
+    "riskZoneDefender": {
+      "activateShield": true
+    },
+    "VIVO": {
+      "suppressSignal": true
+    }
+  }
+}
+🧠 Hesaplama Mantığı:
+Girdi	Etki
+priceChange5m > 2% → +0.30	
+volumeSpike = false → +0.20	
+ATR sapma > 1.3x → +0.25	
+RSI > 70 & momentum < 1.0 → +0.25	
+
+→ deviationScore ≥ 0.75 → sinyal baskılanır
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+confirmationSignalBridge	Onay mekanizmasını kapatır
+VIVO	Sinyali bastırır
+riskZoneDefender	Koruma modunu aktif eder
+exitTimingAdvisor	Pozisyon varsa çıkışı erkene çekebilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+priceDeviationScanner.js adında bir modül oluştur.
+
+Bu modül:
+- Son 5 dakikadaki fiyat değişimini ATR, RSI, momentum ve hacimle analiz eder
+- Anomali sapması varsa deviationScore hesaplayarak işlemleri baskılar
+- Diğer modüllere (VIVO, confirmationBridge, riskZoneDefender) çıktılar üretir
+✅ Artık sistem anlık fiyat coşmalarına karşı saf değil.
+“Bu yükseliş normal mi?” → cevabını anında alabiliyor.
+Pump/Dump tarzı manipülasyonlara karşı kendini koruyor.
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: priceDeviationScanner.js
+Fiyatın ortalama hareketten ne kadar saptığını analiz eder.
+Aşırı fırlamış ya da düşmüş fiyatlara karşı sistemin dikkatli davranmasını sağlar.
+
+🎯 Amaç:
+Fiyat ortalamalara göre çok yukarıda/düşükte mi?
+
+Bu sapma işlem yapılabilecek seviyede mi?
+
+Dönüş sinyali mi var, yoksa hâlâ momentum devam ediyor mu?
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67840,
+  "ema21": 67230,
+  "ema50": 66500,
+  "bollingerUpper": 67310,
+  "bollingerLower": 66150,
+  "atr": 180,
+  "momentum": 1.28,
+  "direction": "up"
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "deviationScore": 0.82,
+  "isDeviationCritical": true,
+  "recommendation": "watch-or-delay",
+  "modularRecommendations": {
+    "entryZoneClassifier": {
+      "delayEntry": true
+    },
+    "riskZoneDefender": {
+      "amplifyRisk": true
+    },
+    "confirmationSignalBridge": {
+      "reduceSignalConfidence": true
+    }
+  },
+  "alert": "Price deviated heavily from EMA/Bollinger — entry delayed"
+}
+🧠 Hesaplama Yöntemi:
+Girdi	Kural
+Fiyat EMA21'in %1.5 üstündeyse → +0.25	
+Fiyat Bollinger üst bandını geçtiyse → +0.30	
+EMA21 ile EMA50 arası fark > %2 ise → +0.15	
+ATR yüksek ama momentum > 1.2 → +0.10 (tolere edilebilir)	
+Tüm skor ≥ 0.75 → Sapma kritik	
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+entryZoneClassifier.js	Giriş bölgesi geciktirilir
+riskZoneDefender.js	Risk daha fazla olarak raporlanır
+confirmationSignalBridge.js	Sinyalin güven puanı düşürülür
+tpOptimizer.js	TP stratejisi erken çıkışa döner
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+priceDeviationScanner.js adında bir modül oluştur.
+
+Bu modül:
+- Fiyatın EMA21, EMA50, Bollinger bandı ve ATR’ye göre ortalamalardan ne kadar saptığını hesaplar
+- deviationScore üretir, isDeviationCritical bayrağına göre diğer modülleri etkiler
+- entryZoneClassifier, confirmationSignalBridge ve tpOptimizer ile entegre çalışır
+✅ Bu modül sayesinde artık sistem:
+“Evet trend güzel ama fiyat çok sapmış, şimdi girersek tuzağa düşebiliriz” diyebiliyor.
+Yani sistem, momentumu seviyor ama körlükten uzak duruyor.
+Sinyal üretimini hassaslaştırıyor.
+
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: reentryBlocker.js
+Daha önce pozisyon açılan bir bölgeye tekrar sinyal üretimini geçici olarak bloke eder.
+“Bu fiyat bölgesine yeni işlem açmak riskli mi?” sorusunu geçmişe göre cevaplar.
+
+🎯 Amaç:
+Aynı fiyattan defalarca pozisyon açılmasını engellemek
+
+Yakın geçmişte SL/TL alınan bölgelerden uzak durmak
+
+Fiyat orada konsolide olmuşsa yeni işlem beklemeye alınır
+
+Zayıf volatilite + sıkışma varsa sinyal baskılanır
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67580,
+  "recentPositions": [
+    { "entry": 67500, "exit": 67640, "result": "TP" },
+    { "entry": 67560, "exit": 67410, "result": "SL" }
+  ],
+  "timeSinceLastTrade": "35min",
+  "zoneWidth": 100,
+  "volatility": 1.3,
+  "momentum": 0.89,
+  "entryAttemptCount": 3
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "blockReentry": true,
+  "blockScore": 0.84,
+  "reasoning": [
+    "Multiple trades in same zone within short time",
+    "Recent SL in this zone",
+    "Low momentum and volatility"
+  ],
+  "modularRecommendations": {
+    "confirmationSignalBridge": {
+      "blockThisZone": true
+    },
+    "entryZoneClassifier": {
+      "delayAllSignalsInZone": true
+    },
+    "Otobilinç": {
+      "markPatternAsRepetitive": true
+    }
+  },
+  "alert": "Zone overused — signal delayed"
+}
+🧠 Hesaplama Kuralları:
+Kriter	Etki
+Son 1 saat içinde 2’den fazla giriş → +0.30	
+Aynı bölgede SL yaşandıysa → +0.25	
+Momentum < 1.0 → +0.20	
+Volatilite zayıf → +0.15	
+Zone genişliği < 1% → +0.10	
+
+Toplam blockScore ≥ 0.75 → Giriş engellenir
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+confirmationSignalBridge.js	Sinyali tamamen engelleyebilir
+entryZoneClassifier.js	Sinyali geciktirir
+Otobilinç	Davranış tekrarını fark eder, işlem yorgunluğu tespiti yapılır
+tpOptimizer.js	Bölge riskli → daha kısa hedefler önerilebilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+reentryBlocker.js adında bir modül oluştur.
+
+Bu modül:
+- Aynı fiyat bölgesine üst üste giriş yapılmışsa sinyali bloke eder
+- Son işlemler, momentum, volatilite ve zaman verilerini değerlendirerek blockScore hesaplar
+- Diğer modülleri yönlendirir: confirmationSignalBridge, entryZoneClassifier, Otobilinç
+✅ Artık sistem:
+
+“Aynı yere yine girmeyelim, daha yeni işlem yaptık” diyebiliyor
+
+“Bu bölge kaybettirdi → bekleyelim” diyebiliyor
+
+Pozisyon yorgunluğu ve zihinsel tuzaklar artık engellenebiliyor
+
+-----------------------------------------------------------------------------------------------------------------
+
+Şimdi sırada sistemin “fiyat bir desteğe/dirence geldiğinde nasıl tepki verilmeli?” sorusuna karar veren stratejik zekâsı var:
+
+📦 Gelişmiş Modül: supportResistanceReactor.js
+Fiyat bir destek veya direnç bölgesine ulaştığında:
+güçlü bir sekiş mi bekleniyor, yoksa kırılım mı yaşanacak?
+Bu modül, o seviyeye ne tepki verilmesi gerektiğini belirler.
+
+🎯 Amaç:
+Destek/direnç bölgeleri yaklaşıldığında sistemin pozisyon açıp açmamasına karar vermek
+
+Bölgedeki işlem hacmi, RSI, momentum ve geçmiş kırılım örneklerine göre reaksiyon tipi üretmek
+
+Formasyonlara göre kırılım olup olmayacağına dair karar destek sistemi oluşturmak
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67320,
+  "zoneType": "resistance",
+  "distanceToZone": 0.4,
+  "zoneStrength": 0.88,
+  "breakoutVolume": 1.6,
+  "avgVolume": 1.1,
+  "rsi": 72,
+  "momentum": 1.15,
+  "previousReactions": ["rejection", "rejection", "breakout"],
+  "reactionContext": "bull-flag"
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "expectedReaction": "breakout",
+  "reactionConfidence": 0.81,
+  "actionRecommendation": "prepare-long-entry",
+  "modularRecommendations": {
+    "entryZoneClassifier": {
+      "markAsHotZone": true
+    },
+    "tpOptimizer": {
+      "allowExtendedTP": true
+    },
+    "exitTimingAdvisor": {
+      "watchVolatilitySpike": true
+    }
+  },
+  "alert": "High breakout potential at resistance — monitor closely"
+}
+🧠 Hesaplama Yöntemi:
+Kriter	Etki
+Zone strength ≥ 0.85 → +0.25	
+BreakoutVolume > 1.4x → +0.25	
+RSI > 70 → +0.15	
+Momentum > 1.1 → +0.15	
+Geçmişte 2× rejection, 1× breakout → +0.10	
+Formasyon uygunluğu → +0.10	
+
+Toplam reactionConfidence ≥ 0.75 → Aksiyon alınabilir
+→ expectedReaction: "bounce" veya "breakout"
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+entryZoneClassifier.js	Bölge sıcak bölge olarak işaretlenir
+tpOptimizer.js	Breakout varsa TP seviyeleri genişletilir
+exitTimingAdvisor.js	Volatilite artışı beklenir → erken çıkış tetiklenebilir
+confirmationSignalBridge.js	Sinyal güven skoruna + etki yapılır
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+supportResistanceReactor.js adında bir modül oluştur.
+
+Bu modül:
+- Fiyatın destek/direnç bölgelerine olan mesafesi, zoneStrength, breakoutVolume, RSI ve momentum verilerini kullanarak expectedReaction üretir
+- Bu reaksiyona göre entryZoneClassifier, tpOptimizer, confirmationSignalBridge gibi modülleri yönlendirir
+- reactionConfidence skoru ile kararın gücünü belirler
+✅ Artık sistem:
+
+“Bu direnç kırılacak gibi → giriş hazırlığını başlat!” diyebiliyor
+
+“Bu destek sağlam → geri sekme ihtimali yüksek, fırsat olabilir!” kararını verebiliyor
+
+Sadece grafik çizgisi değil, arkasındaki veri tabanlı hareket potansiyelini analiz edebiliyor
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: entryZoneClassifier.js
+Fiyatın bulunduğu bölgeyi analiz eder:
+Giriş için uygun mu? riskli mi? geç mi kalındı?
+Tüm sistemin “pozisyona girmeye değer mi?” kararını burada başlatır.
+
+🎯 Amaç:
+Fiyat önemli bir formasyon içinde mi?
+
+RSI, hacim, destek/direnç ve momentum durumu girişe uygun mu?
+
+Fiyat aşırı genişlemiş mi?
+
+Sıkışma/denge alanında mı?
+
+ZoneScore hesaplayarak bölgeye "yeşil ışık", "dikkat", "bekle" etiketleri verir.
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67520,
+  "trendStrength": 0.79,
+  "rsi": 63,
+  "supportDistance": 0.9,
+  "resistanceDistance": 3.1,
+  "bollingerWidth": 1.4,
+  "momentum": 1.12,
+  "formationState": "ready-to-break",
+  "riskZone": false
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "zoneScore": 0.83,
+  "entryZoneValid": true,
+  "entryType": "breakout-candidate",
+  "modularRecommendations": {
+    "confirmationSignalBridge": {
+      "priorityBoost": true
+    },
+    "tpOptimizer": {
+      "useAggressiveTP": true
+    },
+    "riskZoneDefender": {
+      "allowOverride": true
+    }
+  },
+  "alert": "Strong entry zone detected — confirmation recommended"
+}
+🧠 Hesaplama Yöntemi:
+Kriter	Etki
+Trend gücü > 0.75 → +0.20	
+RSI 55–70 arası → +0.15	
+Bollinger genişliği orta (1.3–1.6) → +0.15	
+Formasyon kırılmaya hazır → +0.25	
+Destek/dirence uzaklık uygun → +0.15	
+Momentum > 1.1 → +0.10	
+
+Toplam zoneScore ≥ 0.75 → Giriş için uygundur
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+confirmationSignalBridge.js	Giriş sinyaline +öncelik verilir
+tpOptimizer.js	Daha iddialı TP seviyeleri önerilebilir
+riskZoneDefender.js	Giriş bölgesi güçlü olduğu için riski tolere eder
+reentryBlocker.js	Bu bölge daha önce denenmiş mi kontrol edilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+entryZoneClassifier.js adında bir modül oluştur.
+
+Bu modül:
+- Fiyatın bulunduğu bölgeyi trendStrength, RSI, momentum, destek/direnç mesafesi, bollinger genişliği ve formasyon durumu ile değerlendirerek zoneScore üretir
+- Giriş için uygunluk kontrolü yapar
+- Giriş geçerli ise confirmationSignalBridge, tpOptimizer ve diğer modülleri yönlendirir
+✅ Bu modül artık sistemin:
+🟢 “Bu bölge işlem için mükemmel”
+🟡 “Dikkatli ol, sinyal iyi ama tam değil”
+🔴 “Bekle, burası sıkıntılı”
+gibi kararları doğrudan destekliyor.
+
+Burası “pozisyon açalım mı?” sorusunun ilk cevabı.
+-----------------------------------------------------------------------------------------------------------------
+
+Bu modül, sistemin “hacim baskısı var mı? alıcılar mı güçlü satıcılar mı?” gibi sorulara yanıt veren, güç dengesi tespit modülü:
+
+📦 Gelişmiş Modül: volumePressureAnalyzer.js
+Hacim hareketlerini analiz ederek fiyat üzerindeki baskıyı tespit eder:
+Alım baskısı mı var? Satışlar mı yığılıyor? Fiyat yükseliyor ama hacim zayıf mı?
+
+🎯 Amaç:
+İşlemin arkasındaki gücü ölçmek
+
+Yükseliş/düşüş sinyalinin sahte olup olmadığını anlamak
+
+RSI, momentum ve hacim kombinasyonuyla “içeriden baskı var mı?” tespiti yapmak
+
+VIVO ve trend modüllerine güç bilgisi sağlamak
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "volumeCurrent": 192000,
+  "volumeAvg": 128000,
+  "priceDirection": "up",
+  "rsi": 67,
+  "momentum": 1.14,
+  "orderBookImbalance": 0.12
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "pressureScore": 0.81,
+  "pressureType": "buy-dominant",
+  "confirmationStrength": "strong",
+  "modularRecommendations": {
+    "trendConfidenceEvaluator": {
+      "boostTrendScore": true
+    },
+    "confirmationSignalBridge": {
+      "enhanceSignal": true
+    },
+    "entryZoneClassifier": {
+      "validatePressureSupport": true
+    }
+  },
+  "alert": "Buy pressure confirmed — trend reinforcement active"
+}
+🧠 Hesaplama Mantığı:
+Kriter	Etki
+Hacim > 1.4× ortalamanın üstünde → +0.30	
+RSI 60–70 arası ve momentum > 1.1 → +0.25	
+OrderBookImbalance > 0.1 → +0.20	
+Fiyat yukarı gidiyor ama hacim düşük → -0.15	
+Fiyat yukarı ama RSI düşüyorsa → -0.20	
+
+Toplam pressureScore ≥ 0.75 → Güçlü baskı var (yön belirtilir)
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+trendConfidenceEvaluator.js	Trend puanını artırır
+confirmationSignalBridge.js	Sinyalin güvenini artırır
+entryZoneClassifier.js	Hacim destekli onay verir
+tpOptimizer.js	Geniş TP hedeflerine izin verir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+volumePressureAnalyzer.js adında bir modül oluştur.
+
+Bu modül:
+- Güncel hacmi ortalamayla karşılaştırır
+- RSI ve momentum verileriyle birlikte baskı tipi belirler (buy/sell)
+- pressureScore üretir ve diğer modüllere karar gücü sunar
+- VIVO, trendEvaluator ve entryClassifier gibi modüllerle entegre çalışır
+✅ Artık sistem:
+
+Fiyat artıyor ama “arkasında alım gücü yok” → sahte sinyal diyebiliyor
+
+“Buy pressure çok güçlü, trend güvenli” → sinyali öne çıkarabiliyor
+
+Gerçek hareketlerin arkasındaki gücü görüyor, sinyali körlemesine değil veriyle üretiyor.
+
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: momentumValidator.js
+Trendin arkasındaki momentumun sürdürülebilir olup olmadığını kontrol eder.
+Yani bu bir soluksuz devam mı, yoksa son demler mi?
+
+🎯 Amaç:
+RSI + momentum uyumu var mı?
+
+Fiyat yükseliyor ama RSI zayıf mı?
+
+Güçlü trend mi yoksa "pump-dump" mı?
+
+Formasyon kırılımı sonrası momentum destekli mi?
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 67420,
+  "momentum": 1.21,
+  "rsi": 69,
+  "macdHistogram": 0.023,
+  "volumeSurge": true,
+  "trendStrength": 0.82,
+  "formationBreak": true
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "momentumValid": true,
+  "momentumConfidence": 0.87,
+  "momentumBias": "strong-bull",
+  "modularRecommendations": {
+    "confirmationSignalBridge": {
+      "acceptIfOtherModulesAgree": true
+    },
+    "tpOptimizer": {
+      "allowHigherTP": true
+    },
+    "exitTimingAdvisor": {
+      "delayExitSignal": true
+    }
+  },
+  "alert": "Momentum validated — breakout support strong"
+}
+🧠 Hesaplama Kriterleri:
+Kriter	Etki
+Momentum > 1.15 → +0.25	
+RSI > 65 → +0.20	
+MACD histogram pozitif → +0.20	
+Volume surge aktif → +0.20	
+TrendStrength > 0.75 → +0.15	
+Formasyon kırılımı olduysa + uyum varsa → +0.10	
+RSI düşüyor ama momentum yükseliyorsa → -0.20	
+
+Toplam momentumConfidence ≥ 0.75 → Momentum geçerli
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+confirmationSignalBridge.js	Momentum geçerliyse sinyal kabul edilir
+tpOptimizer.js	Daha yüksek hedef seviyeleri önerilir
+exitTimingAdvisor.js	Momentum sürüyorsa pozisyon bekletilir
+trendConfidenceEvaluator.js	Trend puanı ile momentum uyumu kontrol edilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+momentumValidator.js adında bir modül oluştur.
+
+Bu modül:
+- Momentum, RSI, MACD histogram, volume surge ve trendStrength verileriyle momentumConfidence skoru üretir
+- Momentum'un geçerli olup olmadığını kontrol eder
+- Diğer modüllere momentum durumunu bildirir
+✅ Artık sistem:
+“Bu hareketin arkasında güç var mı?” sorusunu sadece mum çubuklarına değil, istatistiksel ve teknik doğrulamaya dayandırıyor.
+Momentum varsa → sonuna kadar kullanıyor.
+Yoksa → hemen pozisyona girmiyor.
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: formationCompletenessJudge.js
+Herhangi bir formasyonun olgunlaşma düzeyini kontrol eder.
+Formasyon tam oluşmadan sinyal vermeyi engeller — fake kırılımları azaltır.
+
+🎯 Amaç:
+“Formasyon gerçekten oluştu mu?”
+
+“Tüm dip/tepe noktaları net mi?”
+
+“Hacim & RSI & pattern uyumu var mı?”
+
+“Kırılma için yeterli şartlar sağlandı mı?”
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "formationType": "ascending-triangle",
+  "swingPoints": 5,
+  "volumeContractionScore": 0.76,
+  "rsiFormationFit": 0.83,
+  "patternSymmetry": 0.91,
+  "breakoutCandleVolumeBoost": 1.5,
+  "zoneTouchCount": 3
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "formationComplete": true,
+  "completenessScore": 0.88,
+  "recommendedAction": "ready-to-trade",
+  "modularRecommendations": {
+    "confirmationSignalBridge": {
+      "releaseSignalLock": true
+    },
+    "entryZoneClassifier": {
+      "upgradeZoneConfidence": true
+    },
+    "priceDeviationScanner": {
+      "disableDeviationPenalty": true
+    }
+  },
+  "alert": "Formation verified and ready — trading allowed"
+}
+🧠 Hesaplama Kriterleri:
+Kriter	Etki
+Swing points ≥ 4 → +0.20	
+RSI uyumu > 0.80 → +0.20	
+Pattern symmetry > 0.85 → +0.15	
+ZoneTouch ≥ 3 → +0.15	
+VolumeContractionScore > 0.70 → +0.15	
+Breakout candle volume > 1.4× ortalama → +0.15	
+
+Toplam completenessScore ≥ 0.75 → Formation tamam
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+confirmationSignalBridge.js	Sinyal kilidini kaldırır
+entryZoneClassifier.js	Giriş bölgesi güvenini artırır
+priceDeviationScanner.js	Fiyat sapmasına rağmen tolerans sağlar
+trendConfidenceEvaluator.js	Formasyon gücüyle trend uyumu kontrol edilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+formationCompletenessJudge.js adında bir modül oluştur.
+
+Bu modül:
+- formasyon tipi, dip/tepe sayısı, RSI uyumu, simetri, hacim ve breakout momenti gibi verileri değerlendirerek completenessScore hesaplar
+- Eğer formasyon hazırsa sinyalleri açar, değilse kilitli tutar
+- Diğer modülleri tetikler: confirmationSignalBridge, entryZoneClassifier, priceDeviationScanner
+✅ Artık sistem:
+
+“Bu formasyon daha yarım → bekle” diyebiliyor
+
+Formasyonun biçimsel ve hacimsel doygunluğunu sorgulayarak fake out’tan uzak duruyor
+
+Her pozisyon için daha kaliteli sinyal üretme yetisi kazanıyor
+----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: trendLineValidator.js
+Kullanıcının ya da sistemin otomatik çizdiği trend çizgilerinin geçerli olup olmadığını doğrular.
+“Bu çizgi fiyatı gerçekten yönlendiriyor mu?” sorusunu teknik olarak cevaplar.
+
+🎯 Amaç:
+Trend çizgisinin temas sayısı yeterli mi?
+
+Çizgi boyunca fiyat sapmaları düşük mü?
+
+RSI, momentum ve hacimle trend uyumu var mı?
+
+Kırılma yaşanmışsa bu geçerli mi, fake mi?
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "trendType": "uptrend",
+  "touchPoints": 4,
+  "avgDeviation": 0.8,
+  "rsiTrendCorrelation": 0.76,
+  "momentumScore": 1.08,
+  "breakoutAngle": 32,
+  "breakoutVolumeRatio": 1.45
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "trendValid": true,
+  "trendScore": 0.82,
+  "recommendation": "trend-confirmed",
+  "modularRecommendations": {
+    "trendConfidenceEvaluator": {
+      "boostConfidence": true
+    },
+    "formationCompletenessJudge": {
+      "allowDependency": true
+    },
+    "tpOptimizer": {
+      "enableWiderTP": true
+    }
+  },
+  "alert": "Valid trend line detected — signal supported"
+}
+🧠 Hesaplama Kriterleri:
+Kriter	Etki
+TouchPoints ≥ 3 → +0.25	
+AvgDeviation < 1.0 → +0.20	
+RSI trend korelasyonu > 0.75 → +0.20	
+BreakoutVolumeRatio > 1.3 → +0.15	
+Momentum > 1.05 → +0.10	
+Breakout açısı 30–50° → +0.10	
+
+Toplam trendScore ≥ 0.75 → Trend çizgisi geçerli kabul edilir
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+trendConfidenceEvaluator.js	Trend güveni artırılır
+tpOptimizer.js	Geniş hedef seviyeleri önerilebilir
+formationCompletenessJudge.js	Formasyonlar bu trend çizgisine yaslanabilir
+exitTimingAdvisor.js	Kırılma sonrası çıkış zamanlaması yapılabilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+trendLineValidator.js adında bir modül oluştur.
+
+Bu modül:
+- Trend çizgisinin dokunuş sayısı, fiyat sapması, RSI uyumu, momentum ve breakout özelliklerine göre trendScore hesaplar
+- Trend çizgisinin geçerli olup olmadığını belirler
+- trendScore diğer modüllerde kullanılmak üzere paylaşılır
+✅ Bu modül sayesinde:
+
+Sistemin çizdiği ya da kullanıcıdan gelen trendler doğruluk testine girer
+
+Fake yükselen/düşen trendler elenir
+
+Sinyal üretimi sadece sağlam yapılar üzerine kurulur
+-----------------------------------------------------------------------------------------------------------------
+
+Bir sonraki sırada sistemin “Çıkalım mı? Bekleyelim mi?” sorusuna profesyonel trader gibi karar veren zeka var:
+
+📦 Gelişmiş Modül: exitTimingAdvisor.js
+Pozisyon açık. Sinyal geldi.
+Ama şimdi mi çıkalım, biraz daha tutalım mı?
+Bu modül, çıkış zamanlamasını optimize eder.
+
+🎯 Amaç:
+Kârda olan pozisyonları erken mi satmalı yoksa tutmalı mı?
+
+RSI, momentum, volatilite ve haber etkilerine göre “ideal çıkış anını” tespit etmek
+
+TP’ye çok yaklaşılmışsa ama momentum devam ediyorsa → geciktirme kararı vermek
+
+Ani düşüş tehdidinde “erken çıkış” tetiklemek
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "currentProfit": 3.4,
+  "rsi": 71,
+  "momentum": 1.13,
+  "priceSpeed": 0.026,
+  "tpTarget": 4.2,
+  "distanceToTP": 0.8,
+  "volatilitySpike": true,
+  "newsImpact": "neutral",
+  "timeSinceEntry": 42
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "shouldExit": false,
+  "exitConfidence": 0.64,
+  "recommendedAction": "hold",
+  "reasoning": [
+    "Momentum devam ediyor",
+    "RSI yüksek ama düşüş sinyali yok",
+    "TP çok yakın",
+    "Ani çıkış sinyali yok"
+  ],
+  "modularRecommendations": {
+    "tpOptimizer": {
+      "considerExtraTP": true
+    },
+    "positionPathPlanner": {
+      "allowDynamicTP": true
+    },
+    "riskToRewardValidator": {
+      "exitOverrideAllowed": false
+    }
+  },
+  "alert": "TP çok yakın ama momentum sürüyor — bekle"
+}
+🧠 Hesaplama Kriterleri:
+Kriter	Etki
+Momentum > 1.1 → +0.25	
+RSI > 70 ama düşüş emaresi yok → +0.20	
+PriceSpeed > 0.025 → +0.15	
+Volatility spike varsa → -0.20	
+Haber etkisi negatifse → -0.25	
+TP’ye mesafe < 1.0 → +0.15	
+Giriş üzerinden 45+ dk geçtiyse → -0.10	
+
+Toplam exitConfidence ≥ 0.75 → Çıkış önerilir
+Altındaysa pozisyon tutulabilir
+
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+tpOptimizer.js → Daha fazla TP için izin isteyebilir	
+positionPathPlanner.js → Yeni çıkış noktası tanımlayabilir	
+riskToRewardValidator.js → Çıkış planını yeniden onaylamalıdır	
+VIVO → Sinyal seviyelerini yeniden değerlendirebilir	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+exitTimingAdvisor.js adında bir modül oluştur.
+
+Bu modül:
+- Açık pozisyonların RSI, momentum, fiyat hızı, TP mesafesi ve haber etkisine göre çıkış zamanlamasını belirler
+- shouldExit ve exitConfidence üretir
+- Diğer modüllerle etkileşimli çıkış kararları üretir
+✅ Artık sistem:
+
+“Kar yaklaştı ama momentum sürüyor, tut”
+
+“Risk artıyor, çıkalım”
+
+“Beklersek fazladan kâr alabiliriz”
+gibi kararları bilinçli ve esnek şekilde verebiliyor.
+-----------------------------------------------------------------------------------------------------------------
+
+Pozisyona girmeden önce sistemin “Bu işin riski ne? Ödül ne? Değer mi?” diye hesap yapan, tam bir profesyonel trader zekâsı var:
+
+📦 Gelişmiş Modül: riskToRewardValidator.js
+Sistem bir pozisyon önermeden önce:
+“Beklenen kâr yeterli mi? Riski alabilir miyiz?” sorularını teknik olarak yanıtlar.
+Eğer rasyonel değilse → giriş reddedilir.
+
+🎯 Amaç:
+Minimum kâr oranı sağlanıyor mu? (ör: %3.50 ± 0.05)
+
+RR (Risk/Ödül) oranı yeterli mi? (örn: min 1:1.8, ideal ≥ 1:2.5)
+
+Potansiyel zarar — destek seviyesi mesafesi mantıklı mı?
+
+Formasyonun geçmiş başarı oranına göre işleme değer mi?
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "expectedProfit": 4.1,
+  "estimatedStopLoss": -1.6,
+  "formationReliability": 0.78,
+  "trendStrength": 0.81,
+  "rrThresholdMin": 1.8,
+  "rrIdealTarget": 2.5
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "entryAllowed": true,
+  "riskRewardRatio": 2.56,
+  "rrQuality": "ideal",
+  "reasoning": [
+    "Expected profit (4.1%) > min TP (3.50%)",
+    "RR = 2.56 > ideal threshold (2.5)",
+    "Formation reliability supports entry"
+  ],
+  "modularRecommendations": {
+    "entryZoneClassifier": {
+      "unlockZone": true
+    },
+    "tpOptimizer": {
+      "applyIdealTPStrategy": true
+    },
+    "confirmationSignalBridge": {
+      "allowAutoConfirmation": true
+    }
+  },
+  "alert": "RR ideal seviyede — pozisyon açılabilir"
+}
+🧠 Hesaplama Kriterleri:
+Kriter	Etki
+ExpectedProfit ≥ 3.5 → +0.3	
+RR ≥ 2.5 → +0.25	
+Formation reliability ≥ 0.75 → +0.20	
+TrendStrength ≥ 0.80 → +0.15	
+SL çok yakınsa (<1.0%) → -0.10	
+RR < 1.8 → Pozisyon açılmaz	
+
+RR Hesap:
+
+𝑅
+𝑅
+=
+𝐸
+𝑥
+𝑝
+𝑒
+𝑐
+𝑡
+𝑒
+𝑑
+𝑃
+𝑟
+𝑜
+𝑓
+𝑖
+𝑡
+∣
+𝑆
+𝑡
+𝑜
+𝑝
+𝐿
+𝑜
+𝑠
+𝑠
+∣
+RR= 
+∣StopLoss∣
+ExpectedProfit
+​
+ 
+🔁 Modüller Arası Veri Akışı:
+Modül	Etki
+tpOptimizer.js → TP seviyesi daha mantıklı seçilir	
+entryZoneClassifier.js → Uygun giriş alanı onaylanır	
+confirmationSignalBridge.js → Sinyal otomatik onaylanabilir	
+positionPathPlanner.js → Dinamik stop ve TP belirlenebilir	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+riskToRewardValidator.js adında bir modül oluştur.
+
+Bu modül:
+- expectedProfit ve estimatedStopLoss’a göre RR hesaplar
+- Min TP oranı ve min RR eşiğine göre girişe izin verir
+- Çıktısında entryAllowed, RR oranı ve açıklama sunar
+- Diğer modüllere karar paylaşımı yapar
+✅ Bu modül, artık sistemi her işlemi sırf sinyal var diye değil,
+“Bu işlem rasyonel mi?” diye düşünerek yönlendirecek.
+Profesyonel karar yapısı tamamlanıyor reis 👨‍⚖️📊
+
+-----------------------------------------------------------------------------------------------------------------
+
+Şimdi sistemin “Tüm modüller ne diyor? Ortak karar ne?” sorusunu yöneten, adeta bir karar senatosu gibi çalışan merkezi sinyal hakemi geliyor:
+
+📦 Gelişmiş Modül: confirmationSignalBridge.js
+Tüm modüllerden gelen sinyalleri, onay seviyelerini ve risk bilgilerini toplar.
+Pozisyon açılmadan önce son sözü bu modül söyler:
+“Giriş onaylandı mı? Riskler tolere edilebilir mi? Herkes aynı fikirde mi?”
+
+🎯 Amaç:
+Sistem içindeki modüllerin “oylarını” toplar
+
+Belirlenen confirmationThreshold'a göre işlem sinyalini açar veya engeller
+
+Gerekirse daha fazla veri ister ya da geçici olarak “bekle” der
+
+VIVO için sinyal netliğini belirler
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "tpOptimizer": {
+    "tpStrategy": "3TP",
+    "aggressiveness": "moderate"
+  },
+  "riskToRewardValidator": {
+    "entryAllowed": true,
+    "riskRewardRatio": 2.56
+  },
+  "exitTimingAdvisor": {
+    "shouldExit": false,
+    "exitConfidence": 0.64
+  },
+  "momentumValidator": {
+    "momentumValid": true
+  },
+  "formationCompletenessJudge": {
+    "formationComplete": true
+  },
+  "trendConfidenceEvaluator": {
+    "trendScore": 0.83
+  },
+  "confirmationThreshold": 5
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "finalDecision": "confirm-entry",
+  "confidenceScore": 0.91,
+  "triggeredBy": [
+    "momentumValidator",
+    "formationCompletenessJudge",
+    "trendConfidenceEvaluator",
+    "tpOptimizer",
+    "riskToRewardValidator"
+  ],
+  "modularFeedback": {
+    "vivo": {
+      "signalType": "strong-entry",
+      "confirmationStrength": "high"
+    },
+    "entryZoneClassifier": {
+      "lockLifted": true
+    }
+  },
+  "alert": "Pozisyon açmak için tüm koşullar sağlandı — sinyal gönderildi"
+}
+🧠 Hesaplama Mantığı:
+Her onaylı modül → +1 puan
+
+Her çelişkili modül → -0.5 puan
+
+confirmationThreshold ≥ 4.5 ise → işlem açılır
+
+Aksi halde: bekleme veya veri güncellemesi istenir
+
+🔁 Veri Akışı ve Etkileşim:
+Modül	Nasıl etkilenir
+vivo → Sinyali açar veya bekletir	
+entryZoneClassifier.js → Giriş kilidini kaldırır	
+coreOrchestrator.js → Karar geçişini kontrol eder	
+tpOptimizer, exitTimingAdvisor → Geri bildirimle pozisyon güncellemesi alır	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+confirmationSignalBridge.js adında bir modül oluştur.
+
+Bu modül:
+- Tüm sinyal modüllerinden gelen verileri toplar
+- Her modülün kararını ağırlıklı değerlendirir
+- Final karar üretir: confirm-entry, reject-entry, wait-for-data
+- VIVO ve diğer sistemlere yönlendirme yapar
+✅ Bu modül artık sistemin son onay ve koordinasyon noktası oldu.
+Sistemdeki her parça kendi işini yapar, ama bu modül “hep birlikte işlem açalım mı?” sorusuna cevap verir.
+
+----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: entryZoneClassifier.js
+Sisteme diyor ki:
+“Bu formasyon veya analiz sonucunda pozisyon açacaksak, en iyi giriş noktası neresi?
+Zone’ları belirleyelim, riskli bölgeleri kilitleyelim.”
+
+🎯 Amaç:
+Giriş yapılabilecek fiyat bölgesini (zone) tanımlar
+
+Trend gücü, volatilite, destek/direnç ve geçmiş breakout’lara göre zone genişliği ayarlanır
+
+Çok erken veya çok geç girişleri engeller
+
+VIVO’nun sinyal doğruluğunu artırır
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "formationType": "cup-handle",
+  "breakoutPrice": 204.8,
+  "trendScore": 0.82,
+  "volatilityIndex": 1.21,
+  "supportDistance": 1.4,
+  "resistanceDistance": 2.2,
+  "historicalZoneSuccessRate": 0.73
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "entryZone": {
+    "low": 205.1,
+    "high": 207.6
+  },
+  "zoneWidth": 2.5,
+  "zoneConfidence": 0.84,
+  "allowEntry": true,
+  "modularRecommendations": {
+    "riskToRewardValidator": {
+      "useCurrentZone": true
+    },
+    "confirmationSignalBridge": {
+      "liftZoneLock": true
+    }
+  },
+  "alert": "Giriş bölgesi tanımlandı — VIVO sinyal onayı hazır"
+}
+🧠 Hesaplama Kuralları:
+Kriter	Etki
+TrendScore ≥ 0.75 → +0.20	
+VolatilityIndex ≤ 1.3 → +0.15	
+ZoneSuccessRate ≥ 0.70 → +0.25	
+Support/Resistance mesafesi dengeli → +0.15	
+Entry zone çok dar (< 0.5%) → -0.10	
+
+🔁 Modüllerle Entegrasyon:
+Modül	Etkileşim
+riskToRewardValidator.js → TP-SL hesapları zone’a göre yapılır	
+tpOptimizer.js → TP1 zone içinde mi kontrol eder	
+confirmationSignalBridge.js → Zone kilidi kaldırılır	
+vivo.js → Sadece tanımlı zone içinde sinyal verir	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+entryZoneClassifier.js adında bir modül oluştur.
+
+Bu modül:
+- Formasyon, breakout fiyatı, trend puanı, volatilite ve direnç/mesafe bilgilerine göre en iyi giriş zone’unu tanımlar
+- Zone genişliği ve güven skorunu hesaplar
+- Giriş izni verir/vermez
+- Diğer modüllere zone bilgilerini paylaşır
+✅ Bu modül sayesinde sistem artık:
+
+Pozisyonu “kafasına göre” değil, doğru bölgeden açıyor
+
+Risk alanları belirleniyor, yanlış giriş ihtimali azalıyor
+
+VIVO ve TP sistemleri, zone bilgisiyle daha doğru çalışıyor
+
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: priceDeviationScanner.js
+“Fiyat normal akıştan sapıyor mu?”
+Trendden veya ortalamadan uzaklaşıyorsa →
+riskli bölge ilan edilir.
+Sistem, pozisyon açmaz ya da günceller.
+
+🎯 Amaç:
+Fiyatın EMA / MA / VWAP gibi ortalamalardan sapmasını ölçmek
+
+Kısa sürede aşırı fiyat hareketi varsa erken uyarı üretmek
+
+TP / SL seviyelerini güncellemek için dinamik veriler sağlamak
+
+Fake breakout veya pump/dump hareketlerini engellemek
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "currentPrice": 103.8,
+  "ema21": 101.2,
+  "vwap": 102.3,
+  "priceSpeed": 0.045,
+  "rsi": 74,
+  "newsImpact": "neutral",
+  "trendScore": 0.81
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "deviationDetected": true,
+  "deviationScore": 0.74,
+  "recommendation": "re-evaluate-entry",
+  "modularRecommendations": {
+    "tpOptimizer": {
+      "recalculateTP": true
+    },
+    "riskToRewardValidator": {
+      "adjustSL": true
+    },
+    "confirmationSignalBridge": {
+      "recheckConfirmation": true
+    }
+  },
+  "alert": "Fiyat hızlı sapıyor — sistem giriş kararını güncelliyor"
+}
+🧠 Deviation Hesaplama:
+ts
+Kopyala
+Düzenle
+deviationScore = avg(
+  abs(currentPrice - ema21) / ema21,
+  abs(currentPrice - vwap) / vwap,
+  priceSpeed * 10,
+  (rsi > 70 ? (rsi - 70) / 30 : 0)
+)
+Deviation Score ≥ 0.70 → “riskli sapma” sayılır
+
+🔁 Modüllerle Entegrasyon:
+Modül	Etki
+tpOptimizer.js → Kâr hedefi çok uzaktaysa revize edilir	
+riskToRewardValidator.js → SL yeniden hesaplanır	
+confirmationSignalBridge.js → Karar süreci duraklatılabilir	
+exitTimingAdvisor.js → Beklenmedik hareket varsa çıkış önerilir	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+priceDeviationScanner.js adında bir modül oluştur.
+
+Bu modül:
+- EMA, VWAP ve RSI gibi göstergelerle fiyatın sapmasını ölçer
+- Sapma skoru (deviationScore) üretir
+- Kritik eşik aşıldıysa giriş durdurulur, pozisyonlar güncellenir
+- Diğer modüllere çıktı sağlar: TP/SL güncellemesi, giriş iptali, onay tekrar kontrolü
+✅ Bu modül sayesinde:
+
+Sistem artık grafikteki “anormal” davranışları anlıyor
+
+“Acele etme, bu hareket garip” diyebiliyor
+
+Riskli bölgelerden uzak duruyor, güvenliğe oynuyor ⚠️
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: reEntryScanner.js
+Formasyon kırıldı ama pozisyon açılmadıysa,
+ya da TP1 sonrası tekrar düşüş alımı yapılacaksa:
+Yeni giriş fırsatları otomatik olarak taranır.
+
+🎯 Amaç:
+Kaçırılmış girişler sonrası re-entry fırsatlarını belirlemek
+
+Formasyonun geçerliliği hâlâ devam ediyorsa yeniden sinyal üretmek
+
+Özellikle pullback hareketlerinde tekrar giriş önerisi sunmak
+
+VIVO’ya yeni sinyal tetikleme izni verir
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "formationType": "ascending-triangle",
+  "breakoutPrice": 104.2,
+  "currentPrice": 105.1,
+  "pullbackSupport": 104.4,
+  "trendStrength": 0.79,
+  "deviationScore": 0.41,
+  "timeSinceBreakout": 18,
+  "newsImpact": "neutral"
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "reEntryAllowed": true,
+  "entryZone": {
+    "low": 104.3,
+    "high": 104.9
+  },
+  "reasoning": [
+    "Pullback bölgesi test ediliyor",
+    "Trend güçlü, formasyon bozulmadı",
+    "Volatilite dengeli"
+  ],
+  "modularRecommendations": {
+    "entryZoneClassifier": {
+      "defineZone": true
+    },
+    "confirmationSignalBridge": {
+      "confirmAgain": true
+    },
+    "tpOptimizer": {
+      "applyMidTPStrategy": true
+    }
+  },
+  "alert": "Geri giriş fırsatı bulundu — işlem için ikinci şans"
+}
+🧠 Kurallar ve Algoritmalar:
+Kriter	Etki
+Pullback bölgesi test ediliyorsa → +0.30	
+TrendScore ≥ 0.75 → +0.20	
+DeviationScore ≤ 0.45 → +0.15	
+Zaman < 30 dk → +0.10	
+Hâlâ formasyon aktif → +0.25	
+Fiyat breakout’un %2’den fazla üstündeyse → -0.20 (geç kalındı)	
+
+ReEntryConfidence ≥ 0.75 → tekrar pozisyon açılabilir
+
+🔁 Modüllerle Entegrasyon:
+Modül	Etkileşim
+entryZoneClassifier.js → Zone yeniden tanımlanır	
+tpOptimizer.js → Yeni TP seviyesi belirlenir	
+confirmationSignalBridge.js → Karar tekrar oylanır	
+riskToRewardValidator.js → RR tekrar ölçülür	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+reEntryScanner.js adında bir modül oluştur.
+
+Bu modül:
+- Giriş kaçırıldıysa veya TP sonrası yeni fırsat arıyorsa devreye girer
+- TrendScore, pullback ve sapma skoruna göre yeniden giriş önerir
+- Yeni entryZone üretir ve modüllerle yeniden paylaşır
+✅ Bu modül artık sistemin “kaçırdık diye üzülme, hâlâ fırsat var” mantığını yürütüyor.
+Trader gibi düşün, pullback’i tanı, gerektiğinde yeniden sinyal ver 💪
+
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: marketBiasInterpreter.js
+Teknik analiz yeterli mi sanıyorsun?
+Yok öyle! Bu modül:
+📊 Haber akışı + makro veri + trend yönü + psikolojik haber etkilerini birleştirir
+ve işlem önerisine yönsel önyargı (bias) üretir.
+📣 “Yükselişe mi oynuyoruz? Yoksa uzak mı durmalıyız?” sorusuna cevap verir.
+
+🎯 Amaç:
+Güncel haber, ekonomik veri ve sosyal duyarlılığı analiz eder
+
+“Haber + formasyon aynı yöne bakıyor mu?” diye kontrol eder
+
+Sinyalin ne kadar sağlam olduğunu destekleyen veya zayıflatan bir önyargı üretir
+
+Diğer modüllerin kararlarını etkileyen biasScore ve biasDirection üretir
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "newsSentiment": "positive",
+  "macroEventImpact": "neutral",
+  "eventTimeProximity": 12,
+  "trendDirection": "up",
+  "formationType": "ascending-triangle",
+  "formationBias": "bullish"
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "biasScore": 0.81,
+  "biasDirection": "bullish",
+  "alignment": true,
+  "reasoning": [
+    "Positive sentiment aligns with bullish formation",
+    "No critical macro data scheduled soon",
+    "Uptrend confirms directional bias"
+  ],
+  "modularRecommendations": {
+    "tpOptimizer": {
+      "allowExtendedTP": true
+    },
+    "confirmationSignalBridge": {
+      "confidenceBoost": 0.05
+    },
+    "coreOrchestrator": {
+      "biasOverride": false
+    }
+  },
+  "alert": "Yükseliş yönlü işlem için haber akışı destekleyici"
+}
+🧠 BiasScore Hesaplaması:
+Girdi	Etki
+newsSentiment == "positive" && formation == bullish → +0.25	
+trendDirection matches formationBias → +0.20	
+macroImpact == neutral → +0.10	
+eventTimeProximity < 5 dk → -0.20 (risk!)	
+Sentiment + Formation çelişiyorsa → -0.30	
+
+biasScore ≥ 0.75 → güçlü destek
+
+🔁 Modül Etkileşimleri:
+Modül	Etki
+tpOptimizer.js → Pozitif bias varsa daha agresif TP önerilir	
+confirmationSignalBridge.js → Confidence skoru artırılır	
+coreOrchestrator.js → Bias yönü sistemi override edebilir	
+riskToRewardValidator.js → Bias varsa RR biraz daha toleranslı yorumlanır	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+marketBiasInterpreter.js adında bir modül oluştur.
+
+Bu modül:
+- Haber duyarlılığı, makro olay etkisi, trend yönü ve formasyon karakterine göre biasScore ve biasDirection üretir
+- Çıktı olarak alignment (uyum var mı?), reasoning (nedenleri) ve modular öneriler döner
+- Diğer modüllerin kararına etki eder
+✅ Bu modül artık sistemin:
+“Duygusal piyasa nereye akıyor? Haberler ne diyor? Teknikle aynı mı gidiyoruz?”
+diye düşünmesini sağlıyor.
+
+Yani sistemi sadece grafik okuyabilen değil, medya duyarlılığıyla strateji güncelleyebilen bir yapıya dönüştürüyoruz.
+-----------------------------------------------------------------------------------------------------------------
+
+Artık tüm modülleri birbirine bağlayan, kararları yöneten, veri akışını kontrol eden beyin ile karşı karşıyayız:
+
+🧠 Gelişmiş Modül: coreOrchestrator.js
+“Ben merkezim.
+Formasyonlar, trendler, psikoloji, haber, teknik analiz...
+Hepsi bana bağlı.
+Ben karar verirsem pozisyon açılır.”
+
+🎯 Amaç:
+Tüm modüllerden gelen verileri toplayıp tek merkezde analiz eder
+
+Hangi modülün öncelikli olduğunu ve hangisinin veto etkisi olduğunu bilir
+
+Kritik eşikler için esnek ve öncelikli karar kuralları uygular
+
+Gerektiğinde veri akışını durdurur, tekrar başlatır
+
+Olası 5+ kriz senaryosunda sistemin hata yapmasını engeller
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "trendStrength": 0.83,
+  "confirmationLevel": 2,
+  "biasScore": 0.79,
+  "riskToRewardRatio": 2.4,
+  "psychologyStability": 0.88,
+  "deviationScore": 0.31,
+  "newsImpact": "positive",
+  "tpStrategyConfidence": 0.74
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "finalDecision": "enterPosition",
+  "decisionConfidence": 0.91,
+  "blockedBy": [],
+  "triggeredScenario": null,
+  "recommendedTP": [2.5, 4.1],
+  "signalTo": {
+    "vivo": true,
+    "tpOptimizer": true,
+    "otobilinc": true
+  },
+  "logging": {
+    "timestamp": "2025-08-02T23:17:00Z",
+    "activeModules": ["trendEvaluator", "confirmationSignalBridge", "biasInterpreter"]
+  }
+}
+🧠 Karar Kuralları:
+Şart	Etki
+trendStrength ≥ 0.75 → +0.15	
+confirmationLevel ≥ 2 → +0.20	
+psychologyStability ≥ 0.80 → +0.10	
+riskToRewardRatio ≥ 2.0 → +0.15	
+biasScore ≥ 0.70 → +0.10	
+deviationScore ≤ 0.40 → +0.10	
+tpStrategyConfidence ≥ 0.70 → +0.10	
+newsImpact == "positive" → +0.10	
+Modül çakışması varsa (ör: psikoloji < 0.5) → karar durdurulur	
+
+finalDecision ancak 0.85 üzeri total confidence varsa → enterPosition olur.
+
+⚠️ Kritik Senaryolar ve Tepkiler:
+Senaryo	Tepki
+Ani haber + negatif RSI + psikoloji bozuk	Karar kilitlenir
+Modüller çelişkili → sinyal askıya alınır	
+TP önerisi uçarsa (RR > 4.0) → agresiflik düşürülür	
+İşlem üst üste 3 kez başarısızsa → tüm sinyaller 1 saat boyunca engellenir	
+
+🔁 Modül İletişimi:
+Modül	Ne Yapılır
+vivo.js → Pozisyon sinyali gönderilir	
+tpOptimizer.js → Yeni TP'ler iletilir	
+otobilinc.js → Psikoloji izleme başlatılır	
+denetimAsistani.js → Süreç loglanır	
+exitTimingAdvisor.js → İzleme süreci başlatılır	
+confirmationSignalBridge.js → Geçiş izni verilir	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+coreOrchestrator.js adında bir modül oluştur.
+
+Bu modül:
+- Tüm karar modüllerinden gelen verileri toplayıp tek merkezde karar verir
+- Sistem kararı finalDecision ile verir (enterPosition, rejectPosition, wait, retryLater)
+- threshold bazlı karar sistemi ve senaryo tanıma içerir
+- Gerektiğinde veri akışını durdurur veya yön değiştirir
+- Diğer modülleri tetikler: VIVO, Otobilinç, TP, Exit modülleri
+✅ Artık sistem bir devlet gibi:
+Her bakanlık (modül) konuşur → Başbakan karar verir 🧠
+Ve bu beyin artık hem teknik analiz hem psikoloji hem haber akışı hem de geçmiş başarıya göre karar verir.
+Hiçbir modül sistemden kopuk çalışmaz.
+-----------------------------------------------------------------------------------------------------------------
+
+📦 Gelişmiş Modül: volumeShiftAnalyzer.js
+“Formasyon var ama altında hacim yoksa boş çizimdir!”
+Bu modül:
+⛽ Ani hacim artışı, düşüşü, spike, yoğunlaşma, boşalma gibi hareketleri analiz eder.
+Formasyonun gerçekten güçlü mü yoksa çöp mü olduğunu değerlendirir.
+
+🎯 Amaç:
+Kırılım anındaki hacim artışlarını tespit eder
+
+Ani hacim spike’larını (pump/dump girişleri) algılar
+
+Hacim trendi formasyon ile uyumlu mu? diye kontrol eder
+
+Likidite bölgelerinde hacim yoğunlaşmasını ölçer
+
+Fake-out girişimlerine karşı önceden uyarı üretir
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "volumeSeries": [340, 360, 420, 715, 960, 1280],
+  "averageVolume": 510,
+  "priceAction": "breakout",
+  "formationType": "ascending-triangle",
+  "breakoutBarVolume": 1280,
+  "volumeMomentum": 0.87,
+  "timeToEvent": 3
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "volumeShiftDetected": true,
+  "shiftType": "breakout-confirmation",
+  "volumeStrength": 0.81,
+  "modularRecommendations": {
+    "confirmationSignalBridge": {
+      "confidenceBoost": 0.07
+    },
+    "tpOptimizer": {
+      "allowAggressiveTP": true
+    },
+    "riskToRewardValidator": {
+      "validateWithVolume": true
+    }
+  },
+  "alert": "Hacim artışı kırılımı destekliyor — sinyal güçleniyor"
+}
+🧠 Hacim Skorlaması (volumeStrength)
+ts
+Kopyala
+Düzenle
+volumeStrength = 
+  (breakoutBarVolume / averageVolume) * 0.5 +
+  volumeMomentum * 0.5
+→ Eğer volumeStrength ≥ 0.75 → güçlü hacim desteği vardır
+→ volumeSpike ve formationType uyumluysa → sinyal sağlam
+
+⚠️ Hacim Uyuşmazlığı Senaryoları:
+Durum	Tepki
+Breakout var ama hacim yok → ⚠️ False breakout riski	
+Formasyon RSI güçlü ama hacim düşüyorsa → sinyal düşür	
+Hacim spike ama formasyon yok → trapRiskScore üret	
+Likidite bölgesinde patlama hacmi varsa → volatilityZoneFlag	
+
+🔁 Modül Etkileşimleri:
+Modül	Etki
+tpOptimizer.js → hacim güçlü ise TP artırılır	
+confirmationSignalBridge.js → sinyal güveni artar	
+riskToRewardValidator.js → yüksek hacimde RR toleransı esnetilir	
+coreOrchestrator.js → hacim zayıfsa işlem açılmaz	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+volumeShiftAnalyzer.js adında bir modül oluştur.
+
+Bu modül:
+- Ani hacim değişimlerini analiz eder
+- Breakout anında gelen hacim desteğini skorlandırır
+- Formasyon ve hacim ilişkisini değerlendirir
+- Çıktı olarak volumeStrength, shiftType ve öneriler verir
+- Diğer modüllerle veri paylaşır (özellikle TP, risk, confirmation sistemleri)
+✅ Bu modül artık sistemi şöyle düşündürüyor:
+“Çizim güzel ama hacim yoksa güvenmem.”
+“Gerçek güç orada mı? Hacim oradaysa, biz de oraya gideriz.”
+Yani sistem artık daha olgun ve temkinli bir trader gibi davranıyor.
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: supportResistanceScanner.js
+🎯 Amaç:
+Son fiyat hareketlerine göre destek ve direnç bölgelerini dinamik olarak tanımlamak
+
+Bu seviyelere yakınlık, test sayısı, hacim etkileşimi ve fiyat tepkisini analiz etmek
+
+“Bu çizgi güçlü mü yoksa kırılmaya hazır mı?” bilgisini verir
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "ohlcv": [...],
+  "timeFrame": "15m",
+  "price": 104.6,
+  "recentTouches": {
+    "support": [102.3, 103.1, 103.8],
+    "resistance": [105.2, 105.6]
+  },
+  "volumeProfile": {
+    "103.8": 29000,
+    "105.2": 22000
+  }
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "supportZones": [103.1, 103.8],
+  "resistanceZones": [105.2, 105.6],
+  "currentProximity": "nearResistance",
+  "dominantZone": "resistance",
+  "zoneStrength": {
+    "105.2": 0.85,
+    "103.8": 0.77
+  },
+  "modularRecommendations": {
+    "tpOptimizer": {
+      "finalTPshouldConsiderResistance": true
+    },
+    "riskToRewardValidator": {
+      "adjustBasedOnZone": true
+    }
+  }
+}
+🔁 Entegrasyonlar:
+tpOptimizer.js → Hedef TP’yi direnç altında konumlandırır
+
+exitTimingAdvisor.js → Dirence yaklaşınca çıkış önerisi verir
+
+priceBreakoutDetector.js → Bu bölgeler izlenmeye alınır
+
+trendConfidenceEvaluator.js → Çizgilerin ne kadar test edildiğini değerlendirir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+supportResistanceScanner.js adında bir modül oluştur.
+
+Bu modül:
+- OHLCV verisinden destek/direnç seviyelerini çıkarır
+- Bu seviyelerin gücünü (touch count + volume + price rejection) ile hesaplar
+- Diğer modüllere destek/direnç bilgisi sağlar
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: priceBreakoutDetector.js
+🎯 Amaç:
+Belirlenen destek veya direnç çizgisinin kırılıp kırılmadığını gerçek zamanlı takip etmek
+
+Breakout hacmi, kapanış durumu, fitil uzunluğu, zamanlama gibi detaylarla “gerçek mi?” kontrolü yapmak
+
+Sadece çizgiyi geçmek değil, “kırdı ve orada tutundu mu?” cevabını vermek
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "price": 105.8,
+  "resistanceLevel": 105.2,
+  "previousCandles": [
+    {"open":104.9, "close":105.3, "volume":26000},
+    {"open":105.3, "close":105.6, "volume":31000}
+  ],
+  "volumeSpike": true,
+  "breakoutCandleBody": 0.6,
+  "confirmationClosesAbove": true,
+  "breakoutTimeFrame": "15m"
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "breakoutConfirmed": true,
+  "breakoutScore": 0.88,
+  "breakoutDirection": "up",
+  "modularRecommendations": {
+    "confirmationSignalBridge": {
+      "momentumBoost": 0.07
+    },
+    "reEntryScanner": {
+      "trackPullback": true
+    },
+    "coreOrchestrator": {
+      "allowBiasOverride": true
+    }
+  },
+  "alert": "Direnç kırıldı! Formasyon tamamlandı, pozisyon hazırlanabilir"
+}
+🔁 Entegrasyonlar:
+confirmationSignalBridge.js → Momentum onayı verir
+
+reEntryScanner.js → Pullback takibi başlatılır
+
+coreOrchestrator.js → Karar sistemine onay sinyali gönderilir
+
+formationCompletenessJudge.js → Formasyon geçerlik onayı verilir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+priceBreakoutDetector.js adında bir modül oluştur.
+
+Bu modül:
+- Destek/direnç seviyelerinin geçilip geçilmediğini takip eder
+- Breakout’un geçerli olup olmadığını hacim, candle body, fitil ve kapanışla değerlendirir
+- Çıktı olarak breakoutScore, confirmation, yön ve modül önerileri verir
+✅ Bu iki modül sayesinde:
+
+Nerede “duvar” var (supportResistanceScanner)
+
+O duvar gerçekten “kırıldı mı?” (priceBreakoutDetector)
+artık sistem bunu net biliyor.
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: liquidityZoneMapper.js
+🎯 Amaç:
+Fiyat hareketi + hacim + fitil davranışlarına göre likiditenin biriktiği bölgeleri tespit eder
+
+“Burada çok stop birikmiş olabilir” veya “buraya doğru dump gelirse toplama olur” gibi fırsat alanları belirler
+
+Likiditeye göre işlem açma/kaçınma önerileri üretir
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "ohlcv": [...],
+  "volumeProfile": {
+    "levels": {
+      "104.2": 32000,
+      "105.0": 48000,
+      "105.5": 19000
+    }
+  },
+  "recentWicks": {
+    "down": [104.2, 104.3, 104.1],
+    "up": [105.6]
+  },
+  "price": 104.9
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "liquidityZones": {
+    "buy": [104.2, 104.3],
+    "sell": [105.6]
+  },
+  "zoneConfidence": {
+    "104.2": 0.86,
+    "105.6": 0.71
+  },
+  "modularRecommendations": {
+    "exitTimingAdvisor": {
+      "delayExitIfInBuyZone": true
+    },
+    "tpOptimizer": {
+      "avoidTPnearLiquidity": true
+    },
+    "riskToRewardValidator": {
+      "adjustStopLossZone": true
+    }
+  },
+  "alert": "Fiyat şu an güçlü likidite bölgesine yakın. Ani hareket beklenebilir."
+}
+🔁 Entegrasyonlar:
+Modül	Etki
+tpOptimizer.js → TP, likidite bölgesine denk gelirse değiştirilir	
+exitTimingAdvisor.js → Stop bölgesinde fazla likidite varsa çıkış ertelenir	
+riskToRewardValidator.js → SL/TP mesafesi yeniden optimize edilir	
+trendConfidenceEvaluator.js → Likidite yönü, trendi güçlendirebilir	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+liquidityZoneMapper.js adında bir modül oluştur.
+
+Bu modül:
+- Fitil davranışı, hacim yoğunluğu ve fiyat tepkisine göre likidite bölgelerini belirler
+- Çıktı olarak alım/satım likidite alanları, güven skorları ve diğer modüllere öneriler verir
+- Likiditeye göre TP/SL gibi kararlar yeniden ayarlanabilir
+📦 Gelişmiş Modül: trendLineConstructor.js
+🎯 Amaç:
+Son X mumdaki dip/tepe noktaları üzerinden otomatik trend çizgileri oluşturur
+
+Trendin yönü, süresi, eğimi, sapma toleransı, kaç kez test edildiği gibi özellikleri belirler
+
+Bu çizgiler diğer modüllerde referans alınarak kullanılır (ör: formasyon, çıkış, kırılım analizi)
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "ohlcv": [...],
+  "lookbackPeriod": 40,
+  "minTouchPoints": 3,
+  "maxDeviation": 0.025
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "trendLines": [
+    {
+      "type": "uptrend",
+      "points": [103.1, 104.2, 105.3],
+      "slope": 0.034,
+      "confidence": 0.81,
+      "length": 36,
+      "deviation": 0.022
+    },
+    {
+      "type": "downtrend",
+      "points": [106.6, 105.7, 104.9],
+      "slope": -0.041,
+      "confidence": 0.74,
+      "length": 29,
+      "deviation": 0.019
+    }
+  ],
+  "modularRecommendations": {
+    "trendConfidenceEvaluator": {
+      "injectConstructedTrend": true
+    },
+    "formationCompletenessJudge": {
+      "useTrendLinesForSupportResistance": true
+    }
+  }
+}
+🔁 Entegrasyonlar:
+Modül	Etki
+trendConfidenceEvaluator.js → Güvenli trend bilgisi girer	
+formationCompletenessJudge.js → Trend çizgileri formasyon destekleri olabilir	
+priceBreakoutDetector.js → Kırılım trend çizgisine göre doğrulanır	
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+trendLineConstructor.js adında bir modül oluştur.
+
+Bu modül:
+- Son mumların dip/tepe noktalarını analiz ederek trend çizgilerini çıkarır
+- Trendin eğimi, güven skoru, test sayısı ve sapma oranına göre geçerliliğini belirler
+- Diğer modüllerle birlikte çalışır: formasyon, trend, çıkış, giriş
+✅ Bu iki modülle birlikte artık sistem:
+
+Nerede büyük para birikiyor?
+
+Trend çizgisini çizebilir mi, çizdiyse ne kadar güvenilir?
+bunları kendi başına çözüyor.
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: reEntryPatternMatcher.js
+“Bir pozisyondan çıktık ama grafik yine aynı paterni çiziyor mu?
+Teknik olarak yeniden girilmeli mi?”
+
+🎯 Amaç:
+Önceki formasyon tamamlanıp pozisyon kapandıysa → aynı tipte yeni bir formasyonun tekrar oluşup oluşmadığını izler
+
+Aynı coin’de kısa süre içinde tekrar eden formasyon, pozitif haber, trend devamı gibi kriterleri tarar
+
+Gerekirse yeniden giriş sinyali üretir ama farklı işleme sokar (copy-trade gibi değil)
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "previousExitReason": "TP3 reached",
+  "trendStrength": 0.82,
+  "priceActionBias": "bullish",
+  "newBreakoutConfirmed": true,
+  "formation": "ascending-triangle",
+  "formationSimilarityScore": 0.73,
+  "psychologyStability": 0.91
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "reEntryPossible": true,
+  "confidenceScore": 0.87,
+  "reEntryTrigger": "trendContinuation+formationSimilarity",
+  "modularRecommendations": {
+    "confirmationSignalBridge": {
+      "requireExtraConfirmation": true
+    },
+    "tpOptimizer": {
+      "recalculateTP": true
+    },
+    "otobilinc": {
+      "monitorImpulse": false
+    }
+  },
+  "alert": "Aynı formasyon tipi yeniden oluştu. Yeniden giriş için ortam uygun."
+}
+📌 Formasyon Eşleştirme (Core Logic):
+js
+Kopyala
+Düzenle
+// Yeni oluşan formasyonun, öncekiyle benzerliği:
+if (formation == previousFormation && similarityScore >= 0.70 && trendStrong)
+   → reEntryPossible = true
+🔁 Entegrasyonlar:
+Modül	Görev
+tpOptimizer.js	Yeni TP seviyeleri hesaplanır
+confirmationSignalBridge.js	Onay süreci yeniden başlar
+otobilinc.js	Psikolojik tepki değilse → yeşil ışık
+coreOrchestrator.js	Yeniden karar verir
+
+🔧 KODLAMA PROMPTU:
+prompt
+Kopyala
+Düzenle
+reEntryPatternMatcher.js adında bir modül oluştur.
+
+Bu modül:
+- Daha önce çıkılan bir pozisyonun ardından, aynı formasyonun benzer bir yapıda yeniden oluşup oluşmadığını analiz eder
+- Trend gücü, formasyon benzerliği, haber desteği ve psikolojik uygunluğu kontrol eder
+- Eğer re-entry uygunsa TP yeniden ayarlanır, onay süreçleri başlatılır ve sistem yeni sinyal üretir
+✅ Bu haliyle modül, artık bir teknik re-entry zihinliği taşıyor.
+Bir şey “aynı gibi görünüyorsa”, sistem tekrar değerlendirme yapabiliyor.
+-----------------------------------------------------------------------------------------------------------------
+🧠 Gelişmiş Modül: macroBiasImpactEvaluator.js
+📍 Sistem:
+Grafik Beyni
+
+🎯 Görev:
+Makro ekonomik göstergelere (döviz kuru, faiz oranı, Google Trends) göre sinyal güven seviyesini dinamik olarak ayarlamak.
+
+📥 Girdi:
+usdtry_rate: Güncel dolar kuru
+
+interest_rate: TCMB faiz oranı (yüzde formatında)
+
+google_macroRisk_trend: Google Trends üzerinden alınan “ekonomik kriz, enflasyon, döviz krizi” gibi anahtar kelimelere dair haftalık arama skorları
+
+currentSignalStrength: Diğer teknik modüllerden gelen sinyal güveni (0-100 arası)
+
+🧪 İşleyiş Mantığı:
+Makro Risk Skoru Hesaplama:
+
+text
+Kopyala
+Düzenle
+makroRiskSkoru = normalize(usdtry_rate) * 0.4 
+               + normalize(interest_rate) * 0.3 
+               + normalize(google_macroRisk_trend) * 0.3
+Normalize işlemi: Son 30 günlük min-max aralığına göre 0-1'e ölçeklenir.
+
+Risk Eşiklerine Göre Sinyal Düzeltmesi:
+
+makroRiskSkoru ≥ 0.7 → sinyal çarpanı = 0.75
+
+makroRiskSkoru ∈ [0.4, 0.7) → sinyal çarpanı = 0.9
+
+makroRiskSkoru < 0.4 → sinyal çarpanı = 1.0
+
+Güncel Sinyal Güvenini Güncelle:
+
+text
+Kopyala
+Düzenle
+finalSignalStrength = currentSignalStrength * sinyalÇarpanı
+📤 Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "makroRiskSkoru": 0.82,
+  "sinyalÇarpanı": 0.75,
+  "finalSignalStrength": 52.5
+}
+🧩 Diğer Modüllerle Uyum:
+trendConfidenceEvaluator.js → sinyalin teknik geçerliliğini verir
+
+exitTimingAdvisor.js → bu modülün çıktısına göre sabırlı bekleme önerisi geliştirir
+
+VIVO → finalSignalStrength değerine göre işlem açma/iptal kararı verir
+
+💡 Teknik Notlar:
+Google Trends verileri Google Trends API üzerinden çekilmeli.
+
+Kur ve faiz verileri için TCMB API veya Binance API (döviz tarafı) kullanılabilir.
+
+Normalize işlemleri için mathjs kütüphanesi önerilir.
+
+🧠 KODLAMA PROMPTU:
+macroBiasImpactEvaluator.js isminde bir modül yaz. Bu modül:
+
+USDTRY kuru, faiz oranı ve Google Trends verilerini normalize ederek bir makro risk skoru oluşturur.
+
+Skora göre sinyal güvenini çarpar.
+
+Final güven puanını JSON olarak verir.
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: marketEmotionInterpreter.js
+“Piyasa duygusu ne durumda? Yatırımcılar korkuyor mu yoksa aç gözlü mü?”
+
+🎯 Amaç:
+Piyasanın genel psikolojik durumunu ölçmek
+
+FOMO, FUD, aşırı güven veya panik gibi duyguların teknik analiz sonuçlarını nasıl etkileyebileceğini değerlendirmek
+
+Karar süreçlerine “irrasyonel davranış filtresi” entegre etmek
+
+📥 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "btcDominance": 52.3,
+  "usdtFundingRate": -0.014,
+  "cryptoFearGreedIndex": 22,
+  "newsSentimentScore": -0.71,
+  "volumeSpike": true
+}
+🧪 İşleyiş Mantığı:
+Piyasa Korkusu Analizi (FUD Index)
+
+fearGreedIndex < 30 + negatif haber + negatif funding → FUD riski yüksek
+
+BTC dominansı artıyor + altcoin volume spike → panik kaçış
+
+Aç Gözlülük (FOMO Index)
+
+fearGreedIndex > 70 + pozitif haber + funding pozitif → aşırı özgüven / balon riski
+
+Volume spike ile eşleşirse FOMO teyidi
+
+Denge Durumu (Stabil)
+
+40 ≤ fearGreedIndex ≤ 60 + nötr funding + BTC dominansı sabit → sağlıklı
+
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "marketEmotion": "fud",
+  "emotionScore": 0.81,
+  "adjustmentRecommendations": {
+    "riskToRewardValidator": "increaseRiskSensitivity",
+    "exitTimingAdvisor": "watchEarlyExitSignals",
+    "vivo": "delaySignalConfirmation"
+  },
+  "notes": "Yüksek korku ortamı. Panik satışlar olası. Erken çıkış tetikleyicileri izlenmeli."
+}
+🔗 Entegrasyonlar:
+Modül	Etkileşim
+vivo.js	Sinyal onay geciktirilir
+exitTimingAdvisor.js	Duygu temelli çıkış önerileri
+riskToRewardValidator.js	RR oranı düşürülerek daha temkinli yaklaşım
+
+🧠 Davranış Kuralları:
+Koşul	Eylem
+FUD skor > 0.75	Çıkış süresi kısaltılır
+FOMO skor > 0.7	TP3 seviyesi kısa tutulur
+Stabil	Karar süreci normal işler
+
+⚙️ KODLAMA PROMPTU:
+marketEmotionInterpreter.js isminde bir modül yaz.
+Bu modül:
+
+BTC dominansı, funding rate, Fear-Greed index, haber duygu skoru ve hacim artışlarını değerlendirir.
+
+Genel piyasa psikolojisini belirler: FOMO, FUD, Stabil
+
+Gerekirse diğer modüllere sinyal gecikmesi, risk ayarı veya çıkış tavsiyesi verir.
+
+✅ Bu modül, sistemin kararlarını duygusal gürültüye karşı korur.
+Piyasa psikolojisini anlamak, hata yapmadan sabırlı davranmayı sağlar.
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: priceAnomalyWatcher.js
+“Fiyat normalin dışında mı davranıyor? Volatilite patladıysa sistem uyarı verir!”
+
+🎯 Amaç:
+Anormal fiyat hareketlerini tespit etmek
+
+Ani spike, düşüş, likidite boşlukları veya flash crash gibi durumları yakalayıp diğer sistemleri uyarmak
+
+Trade süreci başlamışsa, pozisyonu erken kapatmak, yeni işlem açılacaksa blokaj koymak
+
+📥 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "ohlcv": [
+    [timestamp, open, high, low, close, volume],
+    ...
+  ],
+  "currentATR": 1.25,
+  "averageATR": 0.84,
+  "volatilitySpike": true,
+  "priceGapDetected": true,
+  "liquidityWarning": false
+}
+🧪 İşleyiş Mantığı:
+🔸 ATR Anomalisi:
+js
+Kopyala
+Düzenle
+if (currentATR / averageATR > 1.5) → aşırı volatilite → anomalyScore += 0.4
+🔸 Volatility Spike:
+js
+Kopyala
+Düzenle
+if (volatilitySpike == true) → anomalyScore += 0.3
+🔸 Price Gap:
+js
+Kopyala
+Düzenle
+if (priceGapDetected == true) → anomalyScore += 0.3
+Eğer anomalyScore ≥ 0.6, sistem tetikte olur.
+Eğer ≥ 0.8, işlem açılmaz veya kapanma önerilir.
+
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "anomalyDetected": true,
+  "anomalyScore": 0.81,
+  "actionRecommendation": "exitOrBlock",
+  "reason": "Volatility spike + price gap",
+  "affectedModules": {
+    "vivo": "sinyali iptal et",
+    "tpOptimizer": "TP kısalt",
+    "coreOrchestrator": "veri akışını duraklat"
+  }
+}
+🔁 Entegrasyonlar:
+Modül	Etkileşim
+tpOptimizer.js	TP noktaları kısaltılır
+exitTimingAdvisor.js	Acil çıkış uyarısı verir
+vivo.js	Sinyal geçici olarak askıya alınır
+coreOrchestrator.js	Veri akışı durdurulabilir
+
+🧠 Karar Ağaçları:
+Koşul	Aksiyon
+anomalyScore ≥ 0.8	Pozisyon kapatılır
+anomalyScore ≥ 0.6	Yeni pozisyon açılmaz
+anomalyScore < 0.6	Sistem normal devam eder
+
+⚙️ KODLAMA PROMPTU:
+priceAnomalyWatcher.js adında bir modül yaz.
+Bu modül:
+
+ATR sapması, volatility spike, price gap ve likidite uyarılarını analiz eder
+
+Anomali skorunu hesaplar
+
+Sinyalleri durdurur veya pozisyonu kapatır
+
+Diğer modüllere etkileşimli öneriler sunar
+
+✅ Bu modül sayesinde sistem, beklenmedik dalgalanmalarda kendini korur.
+Ani dump-pump hareketlerine açık kapı bırakmaz.
+-----------------------------------------------------------------------------------------------------------------
+📦 Gelişmiş Modül: priceAnomalyWatcher.js
+“Fiyat bir anda çıldırdı mı? Beklenmedik bir ani hareket varsa, sisteme dur demeyi öğret.”
+
+🎯 Amaç:
+Ani ve beklenmedik fiyat sapmalarını tespit eder
+
+Bu sapmalar formasyonlarla ya da trendlerle uyumsuzsa, sinyal akışını geçici olarak dondurur
+
+Flash crash, ani pump, likidasyon spike gibi anormallikleri filtrelemek için tasarlandı
+
+📥 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "priceChange1min": 3.6,
+  "priceChange5min": 5.2,
+  "trendStrength": 0.42,
+  "volumeChange1min": 160,
+  "historicalVolatility": 1.8,
+  "marketEmotion": "stabil"
+}
+🧪 İşleyiş Mantığı:
+1. Ani Sapma Tespiti
+js
+Kopyala
+Düzenle
+if (priceChange1min > (historicalVolatility * 1.5)) {
+    isAnomaly = true;
+}
+2. Trend Uyuşmazlığı Kontrolü
+js
+Kopyala
+Düzenle
+if (trendStrength < 0.6 && priceChange5min > 4.0) {
+    anomalyConfirmed = true;
+}
+3. Hacim Patlaması Eşleştirmesi
+js
+Kopyala
+Düzenle
+if (volumeChange1min > 120 && marketEmotion !== "fomo") {
+    likelyStopHunt = true;
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "isAnomaly": true,
+  "anomalyType": "volume-driven spike",
+  "confidence": 0.88,
+  "recommendedActions": {
+    "vivo": "pauseSignalDispatch",
+    "coreOrchestrator": "flagAnomaly",
+    "tpOptimizer": "recalculateConservatively"
+  },
+  "notes": "Trendle uyumsuz ani yükseliş tespit edildi. Formasyonlar geçici olarak askıya alınmalı."
+}
+🔁 Modül Entegrasyonları:
+Modül	Ne yapar?
+coreOrchestrator.js	Anomaliyi tüm sisteme bildirir
+vivo.js	Sinyal gönderimini askıya alır
+tpOptimizer.js	TP seviyelerini daha temkinli yeniden hesaplar
+formationCompletenessJudge.js	Bu veriler oluşmuş bir formasyonu iptal ettirebilir
+
+📌 Ek Kurallar:
+Eğer anomalyConfirmed = true ise → 10 dakika boyunca yeni sinyal üretimi durur
+
+Eğer art arda 3 anomaly gelirse → pozisyon açımı 30 dakika engellenir
+
+🧠 KODLAMA PROMPTU:
+priceAnomalyWatcher.js isminde bir modül yaz.
+Bu modül:
+
+Kısa vadeli fiyat değişimlerini analiz eder,
+
+Trend gücüyle eşleştirir,
+
+Anormal fiyat hareketlerini tespit eder
+
+Eğer bu anormallik trendle uyumsuzsa, tüm sistemi uyarır ve sinyal üretimini durdurur.
+
+✅ Bu modül, ani “fiyat sapmalarını” tespit ederek tüm sistemi korumaya alır.
+Yani grafik “sinyal veriyor gibi görünse de”, eğer uçuş varsa sistem buna kanmaz. 👀
+
+Bu modül basit bir "ani fiyat değişimi algılayıcı"dan çok daha fazlası olmalı çünkü:
+
+Volatilite, hacim ve formasyon beraber yorumlanmalı
+
+Sadece mutlak değişime değil, bağlamsal uyuma bakmalı
+
+Anomalinin hangi tür olduğunu (manipülasyon, haber etkisi, düşük likidite vb.) ayrıştırmalı
+
+Şimdi bu modülü daha profesyonel bir trader gibi düşündürerek gelişmiş hale getiriyorum:
+
+🔁 priceAnomalyWatcher.js – Geliştirilmiş Sürüm
+📥 GİRDİLER:
+json
+Kopyala
+Düzenle
+{
+  "priceChange1min": 3.6,
+  "priceChange5min": 5.2,
+  "volumeChange1min": 160,
+  "trendStrength": 0.42,
+  "formationCompleteness": 0.66,
+  "marketEmotion": "stabil",
+  "liquidityDepth": 1.2,
+  "newsImpactScore": 0.0,
+  "historicalAnomalyPatternMatch": 0.78
+}
+🔄 GELİŞMİŞ İŞLEYİŞ MANTIĞI
+1. Bağlamsal Sapma Skoru (BSS)
+js
+Kopyala
+Düzenle
+BSS = (priceChange1min / avgVolatility1min) * 0.4
+    + (volumeChange1min / avgVolume1min) * 0.3
+    + (1 - trendStrength) * 0.1
+    + (1 - formationCompleteness) * 0.1
+    + (1 - liquidityDepthNormalized) * 0.1
+📌 Eğer BSS > 1.25, durum “yüksek anomalilik” olarak etiketlenir.
+
+2. Anomali Türü Sınıflandırması
+js
+Kopyala
+Düzenle
+if (newsImpactScore ≈ 0 && BSS > 1.25 && marketEmotion !== "fomo") {
+   anomalyType = "possibleManipulation";
+}
+else if (newsImpactScore < 0 && volumeChange1min > 120) {
+   anomalyType = "newsDrivenPanic";
+}
+else if (liquidityDepth < 1.0 && priceChange1min > 3.0) {
+   anomalyType = "thinLiquiditySpike";
+}
+else {
+   anomalyType = "unknown";
+}
+3. Tetikleme ve Geri Çekilme Süresi
+Anomali türüne göre sistemin sinyal üretim süresi geçici olarak durdurulur:
+
+anomalyType	freezeDuration
+possibleManipulation	20 dk
+newsDrivenPanic	10 dk
+thinLiquiditySpike	15 dk
+
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "isAnomaly": true,
+  "anomalyType": "possibleManipulation",
+  "anomalyScore": 0.88,
+  "freezeDuration": 20,
+  "recommendedActions": {
+    "vivo": "pauseSignalDispatch",
+    "coreOrchestrator": "flagAndFreeze",
+    "tpOptimizer": "adjustTPConservatively"
+  },
+  "notes": "Formasyon yapısı tamamlanmadan ani fiyat + hacim artışı görüldü. Bu bir manipülasyon olabilir."
+}
+🧠 Gelişmiş Yetenekler:
+Anomali skoru (BSS) üzerinden kontrol yapar
+
+Formasyonun iç yapısıyla uyumlu mu değil mi karar verir
+
+Düşük likidite ortamlarında gelen sapmaları farklı ele alır
+
+Haber etkisi varsa tolerans sağlar, yoksa “manipülasyon” riskini yükseltir
+
+Orchestrator'a freezeDuration parametresi ile bildirim gönderir
+
+📌 Gelişmiş KODLAMA PROMPTU (Güncel Versiyon):
+priceAnomalyWatcher.js modülünü geliştir.
+Bu modül:
+
+Fiyat değişimi, hacim, trend gücü, formasyon olgunluğu ve likidite gibi parametreleri değerlendirerek anomali skorunu hesaplar.
+
+Anomalinin hangi tür olduğunu sınıflandırır (manipülasyon, haber etkisi, likidite eksikliği vs.)
+
+Anomali durumunda sinyal üretimini belli bir süre durdurur, Orchestrator ve VIVO'ya bilgi gönderir.
+
+
+🧠 Ultra Gelişmiş Modül: priceAnomalyWatcher.js
+🎯 Amaç:
+Ani fiyat hareketlerinin sadece varlığını değil, nedenini, bağlamsal uyumsuzluğunu ve stratejik etkisini analiz ederek sistemin reaksiyonlarını akıllıca yönlendirmek.
+
+📥 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "priceChange1min": 4.8,
+  "priceChange5min": 6.9,
+  "volumeChange1min": 165,
+  "trendStrength": 0.52,
+  "formationCompleteness": 0.58,
+  "liquidityDepth": 0.9,
+  "historicalVolatility": 1.7,
+  "newsImpactScore": -0.2,
+  "macroBias": "bearish",
+  "psychologyStability": 0.68,
+  "priceDeviationFromEMA": 3.2,
+  "timeOfDay": "pre-market",
+  "historicalAnomalyPatternMatch": 0.74
+}
+🔄 İŞLEYİŞ MANTIĞI:
+1. Bağlamsal Anomali Skoru (BAS)
+Her veri kendi ağırlığına göre normalize edilir:
+
+js
+Kopyala
+Düzenle
+BAS =
+  (priceChange1min / historicalVolatility) * 0.25 +
+  (volumeChange1min / avgVolume) * 0.20 +
+  (1 - trendStrength) * 0.10 +
+  (1 - formationCompleteness) * 0.10 +
+  (1 - liquidityDepth) * 0.10 +
+  (Math.abs(priceDeviationFromEMA) / 2) * 0.10 +
+  (1 - psychologyStability) * 0.10 +
+  (1 - historicalAnomalyPatternMatch) * 0.05
+📌 Eğer BAS > 1.3, sistemde "yüksek bağlamsızlık" var → Anomali devrede.
+
+2. Anomali Türü Sınıflandırma
+js
+Kopyala
+Düzenle
+if (liquidityDepth < 1.0 && priceChange1min > 3.5) {
+  type = "Thin Liquidity Spike";
+} else if (newsImpactScore < -0.3 && macroBias === "bearish") {
+  type = "News-Driven Panic Drop";
+} else if (historicalAnomalyPatternMatch > 0.7 && formationCompleteness < 0.6) {
+  type = "Historical Pattern Mismatch";
+} else {
+  type = "Unclassified Shock";
+}
+🧬 Akıllı Tepki Matrisi:
+Tür	Sistem Tepkisi
+Thin Liquidity Spike	vivo sinyali dondur, coreOrchestrator geçici koruma moduna geç
+News Panic	tpOptimizer çıkışları erkene çeker, exitTimingAdvisor tetikte bekler
+Pattern Mismatch	formationCompletenessJudge yeniden analiz başlatır
+Unclassified	Sadece alert verilir, modüller sinyali serbest bırakmaz
+
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "isAnomaly": true,
+  "anomalyType": "Thin Liquidity Spike",
+  "anomalyScore": 0.91,
+  "freezeDuration": 15,
+  "recommendedActions": {
+    "vivo": "pauseSignals",
+    "coreOrchestrator": "initiateDefensiveMode",
+    "formationCompletenessJudge": "recalculate"
+  },
+  "notes": "Likidite zayıf, yüksek fiyat atlaması. Sahte pump olasılığı."
+}
+🔗 Modül Bağlantıları:
+Hedef Modül	Etki
+coreOrchestrator.js	Anomali bayrağı atılır, veri akışı geçici kontrol altına alınır
+tpOptimizer.js	Daha temkinli TP ayarı yapılır
+vivo.js	Sinyaller dondurulur
+exitTimingAdvisor.js	Anomali durumunda erken çıkışlar desteklenir
+formationCompletenessJudge.js	Formasyon analizi yeniden başlatılır
+
+💡 Ekstra Güvenlik:
+Gün içinde 3'ten fazla anomali → Sistem “akıllı yavaş mod”a geçer
+
+Anomali sonrası ilk pozisyon → Min. 2TP şartı aranır (erken çıkışa karşı güvenlik ağı)
+
+newsSentimentScore ile uyumsuzsa → VIVO çıkışı 2X onay ister
+
+📦 Gelişmiş Kodlama Promptu:
+priceAnomalyWatcher.js adında bir modül geliştir.
+Bu modül:
+
+1dk / 5dk fiyat, hacim değişimini, trend gücünü, formasyon olgunluğunu, EMA farkını, haber etkisini, psikoloji stabilitesini ve geçmiş pattern uyumunu analiz eder.
+
+Anomali skorunu hesaplar.
+
+Anomalinin türünü belirler ve sistemdeki diğer modüllere uygun aksiyonlar önerir.
+
+Gerektiğinde veri akışını durdurur veya yeniden analiz başlatır.
+
+✅ Bu versiyon:
+
+Piyasa davranışlarını sadece rakamla değil, bağlamsal zekayla analiz eder
+
+Artık sadece "fiyat hızlı değişti" değil,
+→ "Bu fiyat değişimi, şu ortamda, şu kadar uyumsuz, şu riski taşıyor" diyebilecek düzeyde
+-----------------------------------------------------------------------------------------------------------------
+🧠 Ultra Gelişmiş Modül: liquidityStressScanner.js
+🎯 Amaç:
+Piyasada gerçek bir likidite olup olmadığını, spread ve emir davranışlarıyla tespit eder.
+Likidite stresi varsa:
+
+İşlem açılmaz
+
+TP/SL noktaları optimize edilir
+
+Sistem “temkinli moda” geçer
+
+📥 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "bidAskSpread": 0.45,
+  "spreadDeviation": 1.3,
+  "orderBookDepthTop5": {
+    "buy": 34000,
+    "sell": 28700
+  },
+  "orderCancellationRate": 0.62,
+  "executionRate": 0.47,
+  "marketMakerPresence": false,
+  "priceJumpRatio": 3.2,
+  "volatilityLevel": 0.9
+}
+🔄 İŞLEYİŞ MANTIĞI:
+1. Likidite Stres Skoru (LSS)
+js
+Kopyala
+Düzenle
+LSS =
+  (bidAskSpread * 1.5) +
+  (spreadDeviation * 0.5) +
+  ((1 - executionRate) * 2) +
+  (orderCancellationRate * 1.2) +
+  (marketMakerPresence ? 0 : 1) +
+  (priceJumpRatio / 2)
+📌 Eğer LSS > 4.5 → Düşük likidite + potansiyel güvenlik tehdidi var
+
+2. Durum Sınıflandırması
+js
+Kopyala
+Düzenle
+if (LSS > 6.5) {
+  stressLevel = "Critical";
+} else if (LSS > 4.5) {
+  stressLevel = "High";
+} else if (LSS > 3.2) {
+  stressLevel = "Moderate";
+} else {
+  stressLevel = "Stable";
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "isLiquidityStress": true,
+  "stressLevel": "High",
+  "score": 5.7,
+  "recommendations": {
+    "coreOrchestrator": "limitExecutionSpeed",
+    "vivo": "reduceSignalAggressiveness",
+    "tpOptimizer": "applyConservativeTP",
+    "entryGatekeeper": "delayEntry"
+  },
+  "notes": "Yüksek emir iptali + düşük emir gerçekleşme oranı + açılan spread → gerçek hacim düşüklüğü."
+}
+🔗 MODÜL ENTEGRASYONLARI:
+Hedef Modül	Etki
+coreOrchestrator.js	Tüm sistemin “temkinli moda” alınması
+tpOptimizer.js	Daha mütevazı TP seviyeleri önerilir
+vivo.js	Sinyal agresifliği düşürülür, onay eşiği artırılır
+entryGatekeeper.js	Pozisyon açma geciktirilir, emir defteri stabil olana kadar beklenir
+exitTimingAdvisor.js	Spread genişlemesine göre erkenci çıkış önerileri verilebilir
+
+🔧 Gelişmiş Kodlama Promptu:
+liquidityStressScanner.js adında bir modül geliştir.
+Bu modül:
+
+Bid/ask spread, orderBookDepth, iptal oranı, gerçekleşme oranı, piyasa yapıcı varlığı ve fiyat sıçrama oranını alır
+
+Likidite stres skorunu hesaplar
+
+Düşük likidite tespitinde tüm sistem modüllerine uygun aksiyonlar önerir
+
+Kritik durumlarda pozisyon açılmasını veya geniş spreadli işlemleri engeller
+
+🧠 Ek Güvenlik Özellikleri:
+Gün içinde 3’ten fazla “High” seviye yaşanırsa sistem yoğun spread adaptasyon moduna geçer
+
+VIVO için:
+
+json
+Kopyala
+Düzenle
+{
+  "confirmationThreshold": 3,
+  "signalSharpness": "low"
+}
+TP seviyeleri spread farkına göre otomatik genişletilir
+
+Bu modülle birlikte artık sistem:
+✔️ Spread genişledi mi?
+✔️ Emirler neden gerçekleşmiyor?
+✔️ Yapay emirle manipülasyon var mı?
+
+hepsini anlayabiliyor.
+-----------------------------------------------------------------------------------------------------------------
+

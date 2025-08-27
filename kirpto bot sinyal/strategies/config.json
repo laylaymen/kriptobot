@@ -1,0 +1,8 @@
+{
+  "basicStop": {
+    "enabled": true
+  },
+  "volumeCompression": {
+    "enabled": true
+  }
+}
