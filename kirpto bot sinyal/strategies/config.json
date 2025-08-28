@@ -2,7 +2,13 @@
   "basicStop": {
     "enabled": true
   },
+  "basicStop-improved": {
+    "enabled": true
+  },
   "volumeCompression": {
+    "enabled": false
+  },
+  "volumeCompression-improved": {
     "enabled": true
   }
 }
