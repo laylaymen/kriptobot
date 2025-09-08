@@ -1,0 +1,2989 @@
+find . -type f -mtime -1✅ 4. PSİKOLOJİK DURUM TESTİ – Evet / Hayır Soruları (Modül: psychCheckGate.js)
+📋 10 Soruluk Önerilen Set
+🔹 Karar öncesi kullanıcıya sorulacak:
+Son 10 dakikada SL aldın mı?
+
+Kendini şu an sakin ve net düşünen biri olarak görüyor musun?
+
+Bu işleme girmekte teknik bir gerekçen var mı?
+
+Bu pozisyon seni heyecanlandırıyor mu (fazla)?
+
+Kâr alma konusunda hâlâ net misin?
+
+Bu işlem seni zarardan kurtarmak için mi yapılıyor?
+
+Son işleminden sonra kendine kızdın mı?
+
+Bu pozisyonun büyüklüğü seni korkutuyor mu?
+
+Şu an “bu sefer kesin olacak” diye düşündün mü?
+
+Dünkü planına sadık mısın?
+
+Kullanıcıdan bu sorulara Evet / Hayır şeklinde cevap alınır.
+3 veya daha fazla “kırmızı cevap” varsa:
+
+İşlem 3 dakika ertelenir
+
+LIVIA “duygusal baskı” uygular
+
+VIVO’ya “sinyal baskı önerisi” gönderilir
+
+Denetim Asistanı’na: decisionBiasDetected etiketiyle log bırakılır
+_________________________________________________________________________________________________________________
+technicalIndicatorsEngine.js – GELİŞMİŞ PROMPT (GRAFİK BEYNİ ENTEGRASYONLU)
+🎯 AMAÇ:
+Binance’ten alınan OHLCV datasını kullanarak EMA, RSI, MACD, Bollinger Band, VWAP, ATR gibi göstergeleri modüler ve çağrılabilir formatta hesaplar.
+Çıktılar, tüm sistem modülleri tarafından getIndicators() fonksiyonu üzerinden erişilebilir.
+
+⚙️ TEKNİK GİRDİLER:
+Binance endpoint:
+/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=200
+
+Format:
+OHLCV: [timestamp, open, high, low, close, volume]
+
+🔢 HESAPLANACAK GÖSTERGELER:
+Gösterge	Parametre	Kullanıldığı Modüller
+EMA	9 / 21 / 50 / 200	trendFilter.js, falseBreakFilter.js, volumeConfirmBreakout.js
+RSI	14	comboBreakDetector.js, rsiDivergenceChecker.js
+MACD	(12, 26, 9)	comboBreakDetector.js, signalMaturityScorer.js
+Bollinger Band	20 / 2.0 std	volatilityClampFilter.js
+ATR	14	adaptiveScenarioBuilder.js, riskScaler.js
+VWAP	Günlük	vwapZoneDetector.js, liquidityBiasGuard.js
+
+📤 EXPORT FORMAT:
+json
+Kopyala
+Düzenle
+{
+  "symbol": "BTCUSDT",
+  "interval": "5m",
+  "timestamp": 1720352400000,
+  "indicators": {
+    "ema21": 67102.15,
+    "ema50": 67011.24,
+    "rsi14": 58.31,
+    "macd": {
+      "line": -1.25,
+      "signal": -1.03,
+      "histogram": -0.22
+    },
+    "bollinger": {
+      "upper": 67300.2,
+      "middle": 67025.3,
+      "lower": 66750.4
+    },
+    "atr14": 120.23,
+    "vwap": 67081.76
+  }
+}
+🔧 MODÜLLERLE ENTEGRASYON:
+Örnek: falseBreakFilter.js
+js
+Kopyala
+Düzenle
+const indicators = getIndicators("BTCUSDT", "5m");
+
+if (price > indicators.ema21 && rsi < 50) {
+  return "weak_breakout";
+}
+Örnek: comboBreakDetector.js
+js
+Kopyala
+Düzenle
+if (
+  indicators.macd.histogram > 0 &&
+  indicators.rsi14 > 55 &&
+  price > indicators.ema21
+) {
+  return "high_confidence_combo";
+}
+🔁 GÜNCELLEME ZAMANI & CACHE YAPISI:
+Gösterge verisi her 1 dakikada bir çekilir
+
+Eğer aynı dakikada tekrar çağrılırsa cache’den verilir
+
+Farklı semboller için ayrı cache tutulur (BTCUSDT, ETHUSDT vs.)
+
+⚠️ HATA YÖNETİMİ:
+Binance veri gecikirse retry 3
+
+Gösterge hesaplaması sırasında hata olursa null dönmez, NaN-safe default değer verir
+
+Her gösterge isValid() fonksiyonuyla kontrol edilebilir
+
+✅ EKSTRA AVANTAJLAR:
+Çoklu zaman dilimi desteği eklenebilir (örn: 5m + 1h + 1d)
+
+Custom sinyal modülleri bu motora bağlanabilir
+
+Tüm teknik kararlar artık bu motoru baz alır, kod tekrarını azaltır
+
+Bu motoru kurduğumuzda, artık şu soruları sormak mümkün:
+
+“EMA21 altında RSI düşüyorsa, formasyon zayıf mı?”
+
+“TP gelen stratejiler hangi volatilite seviyelerinde başarılı?”
+
+“Hacim desteği olmayan kırılımları filtreleyelim mi?”
+
+ technicalIndicatorsEngine.js – KODLAMA PROMPTU
+🎯 Görev:
+Binance API üzerinden OHLCV verisi çekerek teknik göstergeleri (EMA, RSI, MACD, Bollinger, ATR, VWAP) hesaplar ve diğer modüllere veri sağlar.
+
+🧠 Gelişmiş Prompt (Kodlayıcıya):
+technicalIndicatorsEngine.js adında bir Node.js modülü oluştur.
+Bu modül Binance’ten OHLCV verisi (/api/v3/klines) alarak aşağıdaki göstergeleri hesaplayacak şekilde tasarlanmalı:
+
+EMA: 9, 21, 50, 200
+
+RSI: 14
+
+MACD: (12, 26, 9)
+
+Bollinger Bands: 20 periyot, 2 std
+
+ATR: 14
+
+VWAP (günlük hacim ağırlıklı ortalama fiyat)
+
+🛠 Kütüphaneler:
+axios → Binance API’den veri çekmek için
+
+technicalindicators (NPM modülü) → Göstergeleri hesaplamak için
+
+lodash → veri işleme kolaylığı için (isteğe bağlı)
+
+⚙️ Fonksiyon: getIndicators(symbol, interval)
+Girdi:
+js
+Kopyala
+Düzenle
+{
+  symbol: "BTCUSDT",
+  interval: "5m"
+}
+Çıktı:
+json
+Kopyala
+Düzenle
+{
+  "symbol": "BTCUSDT",
+  "interval": "5m",
+  "timestamp": 1720352400000,
+  "indicators": {
+    "ema21": 67102.15,
+    "ema50": 67011.24,
+    "rsi14": 58.31,
+    "macd": {
+      "line": -1.25,
+      "signal": -1.03,
+      "histogram": -0.22
+    },
+    "bollinger": {
+      "upper": 67300.2,
+      "middle": 67025.3,
+      "lower": 66750.4
+    },
+    "atr14": 120.23,
+    "vwap": 67081.76
+  }
+}
+🔄 Özellikler:
+Veriler axios ile Binance’tan alınmalı
+
+Göstergeler technicalindicators fonksiyonlarıyla hesaplanmalı
+
+Hesaplamalar için close, high, low, volume dizileri çıkarılmalı
+
+VWAP, gün içindeki volume * typicalPrice toplamı / volume toplamı ile hesaplanmalı
+
+Hesaplama sonucunda NaN değer varsa, null yerine 0.0 veya isValid: false etiketi dönmeli
+
+🗂 Ek Özellikler:
+Fonksiyon Promise döner (async/await yapısı desteklenmeli)
+
+Her symbol-interval için cache tutulmalı, 1 dakikada bir yenilenmeli
+
+Hatalı veri varsa console.warn() ile uyarı atılmalı
+
+Eğer Binance API sınırına ulaşıldıysa retry sistemi kurulmalı (max 3)
+
+📁 Dosya Yapısı Önerisi:
+bash
+Kopyala
+Düzenle
+/lib
+  └── technical/
+        └── indicators/
+              ├── emaUtils.js
+              ├── rsiUtils.js
+              ├── macdUtils.js
+              └── getIndicators.js  <-- ana giriş
+Bu prompt ile, direkt olarak technicalIndicatorsEngine.js kodlanabilir.
+Kodun çıktısı tüm sistem modüllerine bağımsız teknik analiz katmanı sağlar
+
+_________________________________________________________________________________________________________________
+
+🔎 1. HABER VERİSİ KULLANAN MODÜLLER ANALİZİ
+📈 Grafik Beyni:
+Modül	Haberle Etkileşimi
+reflexivePatternTracker.js	Haber sonrası anormal fiyat sıçramasını izler
+adaptiveScenarioBuilder.js	“Haber etkisi ortamı” tespiti yapar
+falseBreakFilter.js	Haber etkisiyle gelen fake breakout'ları bastırır
+volumeConfirmBreakout.js	Habersiz gelen hacim artışı uyarısı verir
+
+🛡️ LIVIA:
+Modül	Haberle Etkileşimi
+emotionalDefenseLauncher.js	Haber paniği tespiti yapar
+contextSuppressionTrigger.js	Haber sebebiyle sinyal baskılar
+emergencyHoldActivator.js	“Haberde çöküş/hack” gibi kelimeler geçiyorsa sistemleri geçici durdurur
+
+🧠 Denetim Asistanı:
+Modül	Haberle Etkileşimi
+macroDisruptionLog.js	Makro/kriz haberlerini kaydeder
+strategyIntegrityEvaluator.js	Haber sonrası strateji başarısını değerlendirir
+formationPerformanceTracker.js	Haber etkili formasyonların başarı oranını izler
+
+🧠 2. GELİŞMİŞ newsFetcher.js SİSTEM TASARIMI
+🎯 Görev:
+Haberleri çekmekle kalmaz, sistemlerin anlayabileceği şekilde işler, etki düzeyini belirler, gerektiğinde sistemleri uyarır, bastırır veya log atar.
+
+🧩 MODÜL BİLEŞENLERİ:
+🟦 A. Anahtar Kelime Sistemi
+Kategori	Anahtar Kelimeler	Etki
+Regülasyon	SEC, ban, regulation, illegal	risk yüksek
+Onay	ETF approval, listing	fiyat sıçraması
+Hack / Çöküş	exploit, hacked, down, rug	işlem kilidi
+Makro Kriz	inflation, debt, credit, Fed	ortam değişimi
+
+🟧 B. Sistem Entegrasyon Haritası
+Tetik	Etkilenecek Modüller	Etki
+ETF onayı →	reflexivePatternTracker, comboBreakDetector, emotionalDefenseLauncher	ani sinyal üretimi / baskı
+Hack haberi →	emergencyHoldActivator, macroDisruptionLog, adaptiveScenarioBuilder	sistem durdurulur / log atılır
+Regulation →	contextSuppressionTrigger, strategyIntegrityEvaluator	agresif strateji baskılanır
+
+📦 ÇIKTI FORMAT (newsFetcher.js)
+json
+Kopyala
+Düzenle
+{
+  "timestamp": "2025-07-21T18:12:00Z",
+  "title": "Bitcoin ETF Approved by SEC",
+  "source": "Bloomberg",
+  "impactCategory": "ETF approval",
+  "impactTag": "price_jump",
+  "triggeredModules": [
+    "reflexivePatternTracker.js",
+    "adaptiveScenarioBuilder.js",
+    "emotionalDefenseLauncher.js"
+  ],
+  "affectedSystems": ["Grafik Beyni", "LIVIA"],
+  "suggestedAction": "Prepare for volatility spike"
+}
+⚙️ GELİŞMİŞ FONKSİYON YAPISI:
+🔧 newsFetcher.js İşlevleri:
+fetchNews(keywords)
+
+NewsAPI’den haber çeker
+
+Default kelimeler: "bitcoin", "crypto", "SEC", "ETF", "hack", "ban", "regulation", "approval"
+
+classifyImpact(newsItem)
+
+Tetikleyici kelimeleri tarar
+
+Etki kategorisi belirler: "price_jump", "panic", "macro_shift"
+
+generateSystemActions(impact)
+
+Etkilenecek modülleri belirler
+
+Hangi sistem nasıl cevap vermeli çıkarır
+
+logToAssistant()
+
+Denetim Asistanı’na olay kaydı gönderir
+
+🔁 Güncellenme & Cron
+Her 30 dakikada bir çağrılır
+
+scheduler.js veya dış sistemden tetiklenir
+
+Geriye getNewsImpact() ile sistemler veriyi çeker
+
+🔧 KODLAMA PROMPTU
+newsFetcher.js adında bir Node.js modülü oluştur.
+NewsAPI’den her 30 dakikada haber çeker.
+Belirli tetikleyici kelimelere göre haberleri sınıflandırır (regulation, approval, hack, macro).
+Bu haberler:
+
+Hangi sistemleri etkilerse o modüllere işaret gönderir
+
+Denetim Asistanı’na olay günlüğü bırakır
+
+impactTag, suggestedAction, triggeredModules gibi alanlar içerir
+
+Çıkış, JSON formatta diğer modüller tarafından getLatestNewsImpact() fonksiyonuyla alınabilir.
+
+Bu yapıyla haber etkisi tüm sisteme entegre edilir ve akıllı şekilde değerlendirilir.
+Hiçbir modül haberi görmezden gelmez — ama gereksiz sinyalleri de spamlemez.
+
+Şimdi bu sınıra göre sistemi daha optimize ve sağlam bir yapıya dönüştürüyorum:
+gereksiz istek atmayan, her sistemi akıllıca besleyen bir düzenleme yapacağız.
+
+⚙️ GÜNCELLENMİŞ newsFetcher.js SİSTEMİ (Limit Uyumlu)
+🔄 Güncelleme 1: Zamanlayıcı ve Sorgu Stratejisi
+1.000 istek / saat sınırı = 16.6 istek / dakika
+→ Çok yüksek, rahat kullanabiliriz ama yine de akıllı kullanalım.
+
+Strateji	Zamanlama	Açıklama
+Ana haber taraması	30 dakikada 1	Tüm sistemler için genel veri
+Sistem bazlı detaylı filtreler	2 saatte 1	Yüksek frekanslı kelime eşleşmesi
+Acil tarama (manuel tetik)	kullanıcı tarafından	Kritik durumda ek sorgu
+
+🔧 Kullanım:
+
+3 anahtar sorgu = 3 istek → saat başı 6–9 istek
+Yani 1.000 limiti asla geçmeyecek şekilde tasarlandı.
+
+🔄 Güncelleme 2: Anahtar Kelime Gruplama
+Anahtar kelimeleri gruplayıp aynı sorguda birden fazla kullanıyoruz:
+
+ruby
+Kopyala
+Düzenle
+?q=bitcoin+SEC+ETF+hack+ban+regulation+approval
+📌 Bu sayede:
+
+7 kelime tek istekte taranır
+
+Etki sınıflandırması sonra yapılır
+
+🔄 Güncelleme 3: Haber Cache Sistemi
+Aynı haberin tekrar işlenmesini engellemek için:
+
+fetchedNewsIDs.json dosyasında publishedAt + title hash’i tutulur
+
+Daha önce işlenmişse atlanır
+
+🔄 Güncelleme 4: Sisteme Göre Etki Ayıklama
+Sorgular hepsini çeker ama şu şekilde ayrıştırılır:
+
+Sistem	Filtre	Örnek
+Grafik Beyni	ETF / Approval / Volume	“SEC approves new BTC ETF”
+LIVIA	Hack / Ban / Down / Collapse	“Solana hacked, $200M lost”
+Denetim Asistanı	Macro / Fed / Regulation	“Inflation hits 7.2%”
+
+Her sistem kendi getNewsImpact() fonksiyonuyla sadece kendi için anlamlı haberleri çeker.
+
+📤 Çıktı Yapısı (Final JSON)
+json
+Kopyala
+Düzenle
+{
+  "timestamp": "2025-07-21T18:48:00Z",
+  "impactLevel": "high",
+  "affectedSystems": ["Grafik Beyni", "LIVIA"],
+  "categories": ["approval", "volatility"],
+  "matchedKeywords": ["ETF", "SEC"],
+  "title": "SEC Approves BlackRock Bitcoin ETF",
+  "summary": "The SEC has approved the first spot Bitcoin ETF...",
+  "url": "https://news.source.com/article",
+  "export": {
+    "grafikBeyni": {
+      "trigger": "reflexivePatternTracker",
+      "suggestedAction": "volatility spike guard"
+    },
+    "livia": {
+      "trigger": "emotionalDefenseLauncher",
+      "suggestedAction": "sinyal baskı mekanizması"
+    }
+  }
+}
+🔧 KODLAMA PROMPT (GÜNCELLENMİŞ)
+newsFetcher.js adında bir modül oluştur.
+Saatte en fazla 1.000 istek hakkına göre:
+
+30 dakikada bir, q=bitcoin+SEC+ETF+hack+ban+regulation+approval gibi bir sorgu çalıştır
+
+Sadece yeni haberleri al (cache kontrolü ile)
+
+Her haberi impactLevel, affectedSystems, matchedKeywords ve suggestedActions ile sınıflandır
+
+Çıkışı JSON formatta export et
+
+Haber impactTag’ine göre Grafik Beyni, LIVIA ve Denetim Asistanı gibi sistemlere öneri gönder
+
+Bu haliyle sistem:
+
+1.000 sorguyu asla aşmaz
+
+Sadece anlamlı haberleri işler
+
+Sistemlere akıllı sinyal gönderir
+
+Tüm haberleri hem günlüğe hem de modüllere aktarır
+
+🧠 MODÜL: newsSentimentAnalyzer.js
+🎯 Amaç:
+NewsAPI’den gelen haber başlığı + açıklamasını analiz ederek şu sınıflandırmaları yapar:
+
+Duygu	Etiket	Etki
+📈 Olumlu	positive	VIVO’ya cesaret / onay etkisi yaratır
+📉 Olumsuz	negative	LIVIA’ya sinyal baskı önerisi gönderilir
+➖ Nötr	neutral	Yalnızca loglanır, işlem etkisi yaratmaz
+
+🧩 Kullanılacak Alanlar:
+title + description birlikte analiz edilir
+
+İçerik örnek:
+
+Title: “SEC Approves First Bitcoin ETF”
+Description: “The approval marks a significant step...”
+
+🔎 ARAÇLAR (Sentiment Analizi İçin)
+Araç	Açıklama	Uygunluk
+compromise-sentiment (JS)	Basit, hızlı, offline analiz	✅ ideal
+vader-sentiment (Python)	Daha isabetli, detaylı	⚠️ daha ağır
+Custom wordlist	ETF = pozitif, rug = negatif	✅ sistem uyumlu
+
+🔧 Öneri: JS içinde offline çalışan word-score map kullanılmalı.
+→ ETF, approval, pump → +2
+→ hack, collapse, ban, rug → -2
+
+📤 ÇIKTI YAPISI:
+json
+Kopyala
+Düzenle
+{
+  "title": "Bitcoin Hacked on Major Exchange",
+  "sentimentScore": -0.85,
+  "sentimentTag": "negative",
+  "reason": ["hacked", "exchange", "risk"],
+  "actionSuggested": {
+    "livia": "sinyal baskı",
+    "grafikBeyni": "falseBreakFilter aktif et"
+  }
+}
+🔧 KODLAMA PROMPTU
+newsSentimentAnalyzer.js adında bir modül oluştur.
+Girdi olarak haberin title ve description alanlarını alır.
+Kelime skorlaması ve duygu listesi üzerinden:
+
+Her habere sentimentScore (-1 ile +1 arası) verir
+
+Etiket olarak positive, neutral, negative döndürür
+
+Eğer haber negatifse → LIVIA'ya “sinyal baskı” önerisi verir
+
+Pozitifse → Grafik Beyni sinyal modülleri onay verir
+
+Nötrse → Denetim Asistanı loglar, işlem önerilmez
+_________________________________________________________________________________________________________________
+
+💡 Bu modül, haberin sadece varlığına değil, duygusal etkisine göre hareket etmemizi sağlar.
+Yani her ETF haberi = pozitif değildir, her regulation = negatif değildir.
+Metindeki gerçek tonu ölçeriz.
+⚙️ MODÜL: newsReactionRouter.js
+🎯 Amaç:
+Haber verisi (newsFetcher.js) + duygu analizi (newsSentimentAnalyzer.js) çıktısını alır →
+Her sistemin kendi durumuna göre otomatik karar alması için sinyal yönlendirir.
+
+🧠 NE YAPAR?
+Haberi alır
+
+impactCategory ve sentimentScore ile birlikte değerlendirir
+
+Etkilenmesi gereken modülleri belirler
+
+Gerekirse sistemleri:
+
+bastırır
+
+uyarır
+
+onaylar
+
+raporlar
+
+Bu olayları Denetim Asistanına loglar
+
+🧩 MANTIK AKIŞI:
+Örnek 1:
+Haber: “SEC approves Ethereum ETF”
+Duygu: +0.82 (positive)
+Impact: approval, price_jump
+
+Yönlendirme:
+
+Grafik Beyni → reflexivePatternTracker aktif
+
+VIVO → varyant onayı artar
+
+Otobilinç → hiçbir müdahale yok
+
+LIVIA → engel kaldırılır
+
+Örnek 2:
+Haber: “Solana hacked again, $100M drained”
+Duygu: -0.91 (negative)
+Impact: hack, panic
+
+Yönlendirme:
+
+LIVIA → emergencyHoldActivator tetiklenir
+
+Grafik Beyni → falseBreakFilter aktif
+
+VIVO → sinyal önceliği düşürülür
+
+Denetim Asistanı → olay kayıtlanır
+
+📤 YAPILACAK EXPORT (JSON):
+json
+Kopyala
+Düzenle
+{
+  "timestamp": "2025-07-21T19:06:00Z",
+  "route": [
+    {
+      "system": "Grafik Beyni",
+      "module": "reflexivePatternTracker.js",
+      "action": "activate"
+    },
+    {
+      "system": "VIVO",
+      "module": "variantEvaluator.js",
+      "action": "boost"
+    },
+    {
+      "system": "Denetim Asistanı",
+      "module": "macroDisruptionLog.js",
+      "action": "log"
+    }
+  ]
+}
+🔧 KODLAMA PROMPTU
+newsReactionRouter.js adında bir modül oluştur.
+Girdi olarak:
+
+newsFetcher.js çıktısı
+
+newsSentimentAnalyzer.js çıktısı
+alır.
+
+Bu bilgileri değerlendirerek:
+
+Her sistemin hangi modülünün etkileneceğine karar verir
+
+action olarak activate, suppress, log, boost, halt gibi seçeneklerle yönlendirme yapar
+
+Sonuçları JSON olarak getLatestNewsRouting() fonksiyonuyla export eder
+
+Denetim Asistanı’na tüm yönlendirmeleri loglar
+
+✅ Bu sistemle artık:
+
+Haber geliyor
+
+Duygusu analiz ediliyor
+
+Etkilenecek sistemlere akıllı sinyal gidiyor
+
+Sistemler haber karşısında insan gibi davranıyor
+🔄 MODÜL: scheduler.js – Sistem Zamanlayıcı
+🎯 Amaç:
+Tüm haber sistemi modüllerini belirli zamanlarda otomatik olarak çalıştırır.
+Bu modüller:
+
+newsFetcher.js → haberleri çeker
+
+newsSentimentAnalyzer.js → duygu analizini yapar
+
+newsReactionRouter.js → sistemlere sinyal yönlendirir
+
+⚙️ NASIL ÇALIŞACAK?
+🧩 Varsayılan Zamanlama:
+Modül	Sıklık	Açıklama
+newsFetcher.js	30 dakikada 1	Haberleri çeker
+newsSentimentAnalyzer.js	her fetch sonrası	Gelen haberleri anında analiz eder
+newsReactionRouter.js	her analiz sonrası	Sistemlere otomatik yönlendirir
+
+🔧 TEKNİK UYGULAMA:
+Kullanabileceğin yöntemler:
+
+Node.js ortamı için: node-cron kütüphanesi
+
+Alternatif olarak: native setInterval() kullanımı
+
+İleri düzey sistemlerde: pm2 ile task scheduling yapılabilir
+
+🧠 PLANLANAN AKIŞ:
+js
+Kopyala
+Düzenle
+const cron = require("node-cron");
+const fetchNews = require("./newsFetcher").fetch;
+const analyze = require("./newsSentimentAnalyzer").analyze;
+const route = require("./newsReactionRouter").route;
+
+cron.schedule("*/30 * * * *", async () => {
+  const newsBatch = await fetchNews();
+  const analyzed = newsBatch.map(analyze);
+  analyzed.forEach(route);
+});
+✅ Böylece her 30 dakikada bir:
+
+Yeni haberler çekilir
+
+Duygu analiz edilir
+
+Etkilenecek sistemlere yönlendirme yapılır
+
+🔧 KODLAMA PROMPTU
+scheduler.js adında bir zamanlayıcı modül oluştur.
+Bu modül:
+
+Her 30 dakikada bir newsFetcher.fetch() fonksiyonunu çağırır
+
+Gelen haberleri newsSentimentAnalyzer.analyze() ile işler
+
+Sonuçları newsReactionRouter.route() fonksiyonuna yönlendirir
+
+Süreç asenkron yürütülür (async/await desteklenir)
+
+Her modül başarısız olursa console.warn() ile loglanır
+
+Başarıyla çalıştıysa Denetim Asistanı'na log gönderilir
+
+Bu zamanlayıcı sistemiyle artık:
+✅ Haberler → otomatik alınır
+✅ Analiz edilir → sistemlere dağıtılır
+✅ Ve hepsi saati gelince kendi kendine olur
+
+🧠 ENTEGRE SİSTEM: Haber + Psikoloji + Trade Karar Zinciri
+🧩 1. ADIM: HABERİN GİRİŞİ
+newsFetcher.js
+NewsAPI’den en güncel haberleri çeker
+
+İçeriği analiz edecek sisteme paslar
+
+🔁 Çıkış:
+→ title, description, timestamp, impactCategory, keywords
+
+🧩 2. ADIM: DUYGU ANALİZİ
+newsSentimentAnalyzer.js
+Başlık + açıklamadan duygu skorunu belirler
+
+Etiket verir: positive, negative, neutral
+
+🔁 Çıkış:
+→ sentimentScore, sentimentTag, reason
+
+🧩 3. ADIM: SİSTEMLERE YÖNLENDİRME
+newsReactionRouter.js
+Haberin içeriğine ve duygu durumuna göre:
+
+Grafik Beyni → sinyal aç/kapat
+
+VIVO → sinyal onayını artır/azalt
+
+LIVIA → psikolojik koruma başlat
+
+Otobilinç → risk farkındalığı tetikle
+
+Denetim Asistanı → her şeyi logla
+
+🔁 Çıkış:
+→ JSON yönlendirme paketi (system, module, action)
+
+🧩 4. ADIM: ZAMANLAYICI
+scheduler.js
+Her 30 dakikada bir yukarıdaki 3 modülü sırasıyla tetikler
+
+Sistemi tam otomatik hale getirir
+
+🧩 5. ADIM: PSİKOLOJİK KONTROL
+psychCheckGate.js
+Kullanıcı işlem öncesi “Evet/Hayır” soruları yanıtlar
+
+Cevaplara göre:
+
+Otobilinç: işlem baskılar
+
+LIVIA: psikolojik koruma açar
+
+VIVO: işlem onayını geçici olarak askıya alır
+
+🧩 6. ADIM: TRADE YÖNETİMİ
+dailyTradePlanner.js
+Günlük işlem sınırını takip eder
+
+TP/SL durumuna göre:
+
+İşlem hakkı açar/kapatır
+
+Pozisyon büyüklüğünü azaltır/artırır
+
+Riskli durumda VIVO’ya sinyal geçilmesini engeller
+
+🧩 7. ADIM: KARAR VERİCİ – VIVO
+comboBreakDetector.js + variantEvaluator.js
+Teknik veriler (EMA, RSI vs.) + haber + psikoloji uyumu varsa sinyal onaylar
+
+Aksi durumda falseBreakFilter.js, emotionalDefenseLauncher.js devreye girer
+
+🧠 SİSTEM AKIŞ HARİTASI (Kısaca)
+bash
+Kopyala
+Düzenle
+📥 Haber geldi
+ ↓
+🧠 Duygu analizi yapıldı
+ ↓
+📡 Modüllere dağıtıldı
+ ↓
+🧪 Psikolojik test yapıldı
+ ↓
+📊 Günlük işlem planı kontrol edildi
+ ↓
+✅ VIVO teknik + duygusal + haber uyumu varsa işlem ONAY
+✅ KAZANIMLAR
+Alan	Faydası
+Haber → Sistem	Etkiyi tanır, manipülasyon önlenir
+Psikoloji → Trade	Kullanıcının yorgun / agresif hali engellenir
+Günlük plan → Risk	Sistem limitleri içinde kalır
+Tam entegrasyon	Otonom, akıllı ve güvenli işlem altyapısı oluşur
+
+Bu haliyle:
+
+💡 "Yapay zekâ sistemin senin adına düşünüp karar verdiği"
+ama aynı zamanda senin psikolojinle haberin etkisini de birlikte tarttığı
+gelişmiş bir borsa AI sistemi kurmuş oluyoruz.
+
+🧠 TEMEL FİKİR:
+📅 Gün içinde bazı saatlerde haber riski yüksektir (örneğin 15:30 ABD verileri, 21:00 FED konuşması)
+Bu saatlerde sistem daha sık ve daha agresif tarama yapar.
+📉 Diğer zamanlarda düşük yoğunluklu ve temkinli tarama yapılır.
+⚠️ Ani fiyat sıçramasında ise her şey unutulur → anında acil tarama başlar.
+
+🧩 BİLEŞENLER
+1. newsModeController.js
+Günün saatine göre sistemi “yoğun” veya “hafif” moda alır
+
+Mod: "passive", "active", "aggressive"
+
+Örnek saatler:
+
+12:00–15:00 → passive
+
+15:30–16:30 → active (ABD enflasyon)
+
+21:00–22:00 → aggressive (FED açıklaması)
+
+00:00–08:00 → passive
+
+js
+Kopyala
+Düzenle
+getCurrentNewsMode() → "active"
+2. newsPinger.js (Çözüm 3)
+Hafif yükte, 5 dakikada bir çalışır
+
+Sadece manşet tarar
+
+Eğer kelime eşleşirse → newsFetcher.fetchImmediate() çağrılır
+
+Bu, “erken sinyal” mekanizmasıdır
+
+3. emergencyNewsScanTrigger.js (Çözüm 1)
+Grafik Beyni ani fiyat/volatilite artışı algılarsa
+
+Sinyal doğrudan bu modüle gider
+
+O da newsFetcher’ı override eder
+
+Bu mekanizma gece-gündüz fark etmez, her zaman çalışır
+
+🔧 ÖRNEK AKIŞLAR:
+🔹 A: Saat 15:29 → Sistem “active mode”
+newsPinger.js → 2 dakikada bir tarama yapar
+
+Anahtar kelime = "rate hike" → eşleşti → tam tarama yapılır
+
+VIVO & LIVIA: “beklemede kal” sinyali alır
+
+🔹 B: 03:45 → Sistem “passive mode”
+newsPinger.js → 10 dakikada bir tarama yapar
+
+Eşleşme yoksa sistem haber almadan devam eder
+
+🔹 C: Saat 22:16 → BTC 1 dakikada %1.3 sıçradı
+Grafik Beyni → emergencyNewsScanTrigger() tetikledi
+
+Hemen tam haber çekildi
+
+Gelen haber: “Blackrock ETF Approval”
+
+Duygu: positive, sistem: “sinyal baskısı kaldır” komutu verdi
+
+💻 KODLAMA PROMPTU (TÜM ZİNCİR)
+newsModeController.js → günün saatine göre "passive", "active", "aggressive" modlarını belirler.
+
+newsPinger.js → bu moda göre 2–10 dakikada bir çalışır, sadece başlık tarar.
+Eğer kelime eşleşirse → newsFetcher.fetchImmediate() çağrılır
+
+emergencyNewsScanTrigger.js → ani volatilite veya hacim sıçraması olursa → hemen haber taraması başlatır
+
+Her tarama sonrası newsSentimentAnalyzer ve newsReactionRouter zinciri çalışır.
+
+Sistem böylece:
+
+Gündüz riskli saatlerde tetikte kalır
+
+Geceleri daha az aktif olur
+
+Ani fiyat hareketinde refleks gösterir
+
+✅ AVANTAJLAR:
+Durum	Sistem Tepkisi
+Planlı haber saatleri	Mod değişimi + sık tarama
+Düşük risk saatleri	Hafif tarama + enerji koruma
+Ani hareket	Anında tarama + sinyal bastırma/açma
+Kullanıcı müdahalesi	Manuel tetikleyici de her zaman devrede kalabilir
+
+🧠 Gelişmiş Kodlama Promptu
+📦 Modül: positionPathPlanner.js (Güncellenmiş, Geliştirilmiş Sürüm)
+🎯 Amaç:
+Pozisyon açılmadan önce:
+
+Tüm teknik + psikolojik + haber verilerini analiz eder,
+
+Benzer senaryolarla karşılaştırır (%70+ eşleşme yeter),
+
+Beklenen kar ve stop-loss seviyesini çıkarır,
+
+Kademeli alış/satış stratejisi önerir,
+
+Trend kırılımına göre çıkış yapısını planlar,
+
+Günlük işlem sınırları ve karlılık kriterleri sağlanıyorsa işlemi onaylar, değilse iptal eder.
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "symbol": "BTCUSDT",
+  "entryPrice": 27150,
+  "indicators": {
+    "EMA21": 26900,
+    "RSI": 61,
+    "MACD": 1.8,
+    "ATR": 145
+  },
+  "trendInfo": {
+    "type": "bullish",
+    "strength": 0.78,
+    "breakoutConfirmed": true
+  },
+  "formation": "cup-and-handle",
+  "support": 26800,
+  "resistance": 27400,
+  "newsImpact": "positive",
+  "psychology": {
+    "stabilityScore": 0.91
+  },
+  "historicalPatterns": [
+    {
+      "matchScore": 0.72,
+      "avgProfit": 4.8,
+      "exitStyle": "3TP",
+      "exitReasons": ["resistance rejection", "volume drop"]
+    }
+  ],
+  "dailyStats": {
+    "tradesTaken": 1,
+    "avgProfitToday": 3.2,
+    "maxAllowedTrades": 3
+  }
+}
+📤 ÇIKTI:
+json
+Kopyala
+Düzenle
+{
+  "entryApproved": true,
+  "expectedTP": 4.6,
+  "expectedSL": -1.3,
+  "riskRewardRatio": 3.54,
+  "recommendedTPLevels": [2.1, 3.5, 5.3],
+  "exitScenario": {
+    "trigger": "resistance rejection + low volume",
+    "reaction": "exit at market"
+  },
+  "strategyNotes": [
+    "Match with similar bullish pattern: 72%",
+    "Psychology stability: High",
+    "Trend strength: 0.78",
+    "Formation: Valid cup-and-handle"
+  ],
+  "alerts": [],
+  "notify": {
+    "vivo": "approveSignal",
+    "livia": "psychology:pass",
+    "grafikBeyni": "trend:valid",
+    "denetimAsistani": "R/R OK"
+  }
+}
+⚙️ KARAR KRİTERLERİ:
+Kriter	Eşik	Tepki
+Beklenen kâr oranı	≥ %3.50 ± 0.05	Altındaysa işlem açılmaz
+Senaryo benzerliği	≥ %70	Altındaysa sinyal bekletilir
+R/R oranı	≥ 2.5	Altıysa Denetim Asistanı sinyali iptal eder
+Günlük işlem hakkı	max 3	Dolduysa işlem yapılmaz
+Psikoloji skoru	≥ 0.85	Altındaysa Otobilinç sinyali baskılar
+
+🧠 Gelişmiş Özellikler:
+Kademeli TP modeli: geçmiş örneklerde işe yarayan çıkış stillerini baz alır (exitStyle)
+
+Formasyon kırılım kontrolü: trend gücü + breakout başarısı değerlendirilir
+
+Haber etkisi: pozitifse TP uzatılabilir, negatifse erken çıkış planı yapılır
+
+Alım-satım kararlılığı: sadece "yüksek başarı" senaryoları işlemi tetikler
+
+VIVO ile koordinasyon: sinyalin onaylanması/askıya alınması durumunu VIVO’ya bildirir
+
+🔧 KODLAMA PROMPTU
+positionPathPlanner.js adında bir modül oluştur.
+Bu modül:
+
+Girdi olarak fiyat, teknik göstergeler, psikolojik durum, haber etkisi ve geçmiş senaryo verilerini alır
+
+Beklenen kâr oranını ve SL seviyesini hesaplar
+
+Benzer geçmiş senaryolarla %70+ eşleşme varsa işlem senaryosu oluşturur
+
+Kademeli take-profit noktalarını optimize eder
+
+Trend kırılımı, destek/direnç, formasyon başarısına göre çıkış planı yapar
+
+Günlük işlem hakkı, R/R oranı, psikoloji stabilitesi uygunsa işlemi onaylar
+
+VIVO, Grafik Beyni, LIVIA ve Denetim Asistanı’na işlem hakkında aksiyon bildirir
+
+getPositionPlan() fonksiyonuyla tüm çıktıyı JSON olarak döndürür
+_________________________________________________________________________________________________________________
+✅ Gelişmiş Kodlama Promptu
+📦 Modül: tpOptimizer.js
+🚀 Final Sürüm – Hataları Düzeltilmiş ve Geliştirilmiş
+🎯 AMAÇ
+Bu modül, pozisyon açılmadan önce veya açıldıktan hemen sonra:
+
+Kademeli TP stratejisi belirler (2TP, 3TP, overperformanceTP)
+
+expectedProfit oranını aşmayacak şekilde akıllı TP seviyeleri üretir
+
+Trend gücü, volatilite, formasyon başarısı ve geçmiş senaryolarla dinamik uyum kurar
+
+RSI, momentum, haber gibi faktörlerle TP zamanlamasını optimize eder
+
+VIVO’ya karar eşiği ve TP stratejisini bildirir
+
+🔄 GİRDİ
+json
+Kopyala
+Düzenle
+{
+  "expectedProfit": 4.6,
+  "trendStrength": 0.82,
+  "formation": "ascending-triangle",
+  "ATR": 132,
+  "resistanceDistance": 1.9,
+  "newsImpact": "positive",
+  "volatility": "moderate",
+  "historicalExitPatterns": [
+    {
+      "style": "3TP",
+      "levels": [2.1, 3.6, 5.4],
+      "trendScore": 0.78
+    },
+    {
+      "style": "2TP",
+      "levels": [2.5, 4.1],
+      "trendScore": 0.65
+    }
+  ]
+}
+📤 ÇIKIŞ
+json
+Kopyala
+Düzenle
+{
+  "tpStrategy": "3TP",
+  "tpLevels": [2.3, 3.7, 4.6],
+  "extraTP": [5.2],
+  "aggressiveness": "moderate",
+  "exitStyleMatchScore": 0.78,
+  "adjustments": {
+    "extendLastTPIfMomentum": true,
+    "timeoutTP1": {
+      "minutes": 15,
+      "minDistance": 0.4
+    },
+    "reduceTPIfVolatilityHigh": false
+  },
+  "notify": {
+    "vivo": {
+      "tpStrategy": "3TP",
+      "confirmationThreshold": 2
+    }
+  }
+}
+⚙️ DAVRANIŞ POLİTİKALARI
+Koşul	Aksiyon
+expectedProfit < %3.50	3TP uygulanmaz, işlem iptal edilir
+tpLevels toplamı > expectedProfit	Fazlalık extraTP'ye taşınır
+trendStrength < 0.60	3TP yerine 2TP veya 1TP seçilir
+trendStrength ≥ 0.80	extraTP aktif hale gelebilir
+ATR / resistanceDistance < 0.8	TP1 erkene çekilir
+Haber etkisi pozitif	TP3 beklenir, exit geciktirilebilir
+TP1 sinyali alındı ama 15 dakikada %0.4 ilerleme yok	Exit önerilir
+
+📌 TEKNİK DETAYLAR
+TP seviyeleri: expectedProfit’in toplamını geçemez
+
+Senaryo uyumu: geçmişte en başarılı olan TP stiline exitStyleMatchScore ile puan verilir
+
+Momentum varsa: TP3 → extraTP’ye dönüşebilir
+
+VIVO entegrasyonu: Hangi TP'den sonra pozisyon onaylanacağı belirtilir
+
+🧩 KODLAMA PROMPTU
+tpOptimizer.js adlı bir modül oluştur.
+Girdi olarak:
+
+expectedProfit, trendStrength, formation, ATR, resistanceDistance, newsImpact, volatility, historicalExitPatterns
+
+Bu girdilere göre:
+
+Uyumlu geçmiş çıkış stillerini puanla (exitStyleMatchScore)
+
+2TP, 3TP veya 1TP içinden en iyi TP stratejisini belirle
+
+tpLevels hesapla (toplamı expectedProfit’i geçemez)
+
+Fazla hedef varsa extraTP olarak sun
+
+Trend & haber etkisine göre dinamik ayar yap
+
+Timeout mekanizması kur: TP’ye yeterli yaklaşım yoksa → “market exit” öner
+
+aggressiveness seviyesini (konservatif/moderate/aggressive) değerlendir
+
+VIVO’ya tpStrategy ve confirmationThreshold değerlerini bildir
+
+Tüm çıktıyı getTPPlan() fonksiyonu ile JSON formatında dışa aktar
+
+Bu haliyle tpOptimizer.js,
+artık sadece TP üreticisi değil, kârlılık stratejisti olarak çalışır.
+Veri tutarlılığı, trend gücü ve psikolojik zamanlama uyumlu hale getirildi.
+
+_________________________________________________________________________________________________________________
+🔧 Gelişmiş Kodlama Promptu
+📦 Modül: exitTimingAdvisor.js
+🚀 Stratejik Çıkış Zamanlayıcı
+🎯 Amaç:
+Bu modül, pozisyon açıldıktan sonra:
+
+Fiyat, trend, haber ve formasyon verilerini sürekli takip ederek,
+
+Çıkış için en doğru zamanı belirler
+
+Kâr potansiyeli yüksekse pozisyonun uzatılmasını, zayıfsa erken çıkış yapılmasını sağlar
+
+Beklenmedik gelişmelere karşı “dinamik kaçış senaryosu” üretir
+
+Sistem içerisindeki tüm modüllerle hedef uyumu ve senkronizasyon içinde çalışır
+
+🔄 GİRDİ:
+json
+Kopyala
+Düzenle
+{
+  "symbol": "ETHUSDT",
+  "entryPrice": 1860,
+  "currentPrice": 1925,
+  "trend": {
+    "type": "bullish",
+    "strength": 0.74,
+    "momentum": 1.02,
+    "divergence": false
+  },
+  "formation": "ascending-triangle",
+  "resistance": 1930,
+  "support": 1850,
+  "TPLevels": [2.3, 3.7, 4.6],
+  "priceMovementHistory": [1880, 1900, 1920, 1912, 1925],
+  "newsImpact": "neutral",
+  "volumeDropDetected": false,
+  "timeoutControl": {
+    "tp1Reached": true,
+    "tp1TimeElapsed": 16,
+    "tp1TargetDistance": 0.3
+  },
+  "psychology": {
+    "fatigueLevel": 0.42,
+    "riskAppetite": 0.84
+  }
+}
+📤 ÇIKIŞ:
+json
+Kopyala
+Düzenle
+{
+  "exitSignal": true,
+  "reason": "Momentum weakening after TP1, approaching resistance",
+  "recommendedExitType": "partial-exit",
+  "exitPrice": 1926,
+  "strategyAdjustment": {
+    "cancelTP2": false,
+    "delayTP3": false,
+    "forceExit": false
+  },
+  "notify": {
+    "grafikBeyni": "trend-loss",
+    "vivo": "signalPullback",
+    "denetimAsistani": "logExit",
+    "otobilinc": "fatigueMonitor"
+  }
+}
+⚙️ AKILLI DAVRANIŞLAR
+Durum	Tepki
+Momentum düşüyor, TP1 sonrası zayıf hareket	Kısmi çıkış önerilir
+TP1 sinyali alındı ama 15+ dk ilerleme yok	Exit önerilir
+Dirence yaklaşma + haber olumsuz	Pozisyon erken kapatılır
+Psikolojik yorgunluk > 0.75	Exit sinyali güçlenir
+RSI divergence, volume düşüşü, trend bozulması	Hızlı çıkış önerisi
+Trend gücü yüksek + momentum > 1.1	TP3’e kadar bekleme önerisi
+
+🛠 TEKNİK ÖZELLİKLER
+TP seviyeleriyle senkronize çalışır
+
+Trend & fiyat hareketi kombinasyonuna göre karar verir
+
+Gecikmeli TP performansı varsa “timeout exit” uygular
+
+Destek & direnç çatışmalarında pozisyonu erken kapatabilir
+
+Psikolojik modül uyarılarına tepki verir
+
+📌 VIVO UYUMLULUĞU
+json
+Kopyala
+Düzenle
+"notify": {
+  "vivo": "signalPullback"
+}
+→ VIVO sinyali baskılayabilir veya yeniden sinyal oluşturabilir
+→ Sistem kararsızsa VIVO exit sonrası yeni pozisyonları bekletir
+
+🧩 KODLAMA PROMPTU
+exitTimingAdvisor.js adında bir modül oluştur.
+Bu modül:
+
+Pozisyon açıldıktan sonra fiyatın gidişatını, TP1 sonrası davranışı, trend momentumunu, destek/direnç durumunu, haber etkisini ve psikolojik durumu değerlendirir
+
+TP1 ulaşıldıktan sonra hareket yavaşsa çıkış önerisi verir
+
+Trend bozulduğunda veya ani haber etkisi oluştuğunda hemen çıkış sinyali üretir
+
+RSI divergence, volume drop gibi teknik zayıflık varsa çıkışı hızlandırır
+
+recommendedExitType olarak “full-exit”, “partial-exit”, “hold-longer” gibi kararlar sunar
+
+Gecikme veya yorgunluk varsa Otobilinç'e bildirir
+
+getExitAdvice() fonksiyonuyla çıktıyı JSON olarak verir
+_________________________________________________________________________________________________________________
+🔧 Gelişmiş Kodlama Promptu
+📦 Modül: trendConfidenceEvaluator.js
+📈 Trend Güven Skoru Hesaplayıcı
+(Yeni + Eski Gelişmiş Prompt Standardına Uygun Final Sürüm)
+
+🎯 AMAÇ:
+Bu modül, açık pozisyonlar veya potansiyel işlemler için:
+
+Trendin gücünü, sürdürülebilirliğini ve güvenilirliğini çoklu veri kaynaklarıyla analiz eder
+
+Fiyat hareketleri, teknik göstergeler, momentum, formasyon ve haber etkisini birleştirerek 0–1 arası skor üretir
+
+Çıkışın ertelenmesi, pozisyonun devam etmesi veya sinyalin baskılanması gibi çok yönlü kararlar aldırır
+
+Diğer modüllerle tam entegre olacak şekilde çıktılar üretir (grafikBeyni, vivo, exitTimingAdvisor)
+
+🔄 GİRİŞ (Girdi):
+json
+Kopyala
+Düzenle
+{
+  "symbol": "BTCUSDT",
+  "timeframe": "5min",
+  "currentPrice": 61200,
+  "indicators": {
+    "EMA21": 60450,
+    "MACD": 1.5,
+    "RSI": 68
+  },
+  "priceAction": {
+    "candleSequence": ["bullish", "bullish", "doji", "bullish", "bearish"],
+    "volumeTrend": "increasing",
+    "volatility": 1.2
+  },
+  "trendLineAngle": 27,
+  "formation": "bull-flag",
+  "newsImpact": "positive",
+  "support": 60200,
+  "resistance": 61700,
+  "momentum": 1.08
+}
+🧠 VERİ İŞLEME MANTIĞI:
+Ağırlıklı Ortalama Skorlama:
+
+Kategori	Ağırlık (%)
+Teknik Göstergeler (EMA, RSI, MACD)	35%
+Fiyat Aksiyonu (muma göre)	25%
+Momentum + Trend Açısı	15%
+Formasyon & S/R Uyum	15%
+Haber Etkisi	10%
+
+Skor Normalizasyonu:
+
+Her alt kriter 0–1 arasında normalize edilir
+
+Final skor: trendConfidenceScore = Σ(kategori * skor)
+
+Sıralı Eşik Karar Ağacı:
+
+Skor ≥ 0.80 → güçlü uptrend
+
+Skor < 0.55 → zayıf trend → çıkış önerisi
+
+Skor ∈ [0.55, 0.79] → belirsiz, momentum göreli izlenir
+
+📤 ÇIKIŞ (Çıktı):
+json
+Kopyala
+Düzenle
+{
+  "trendConfidenceScore": 0.84,
+  "strengthCategory": "strong-uptrend",
+  "shouldExtendPosition": true,
+  "triggeredAlerts": [],
+  "justification": [
+    "EMA breakout above 21-period",
+    "MACD histogram rising",
+    "Volume increasing with bullish candle pattern",
+    "Bull-flag confirmed with angle > 25°"
+  ],
+  "notify": {
+    "grafikBeyni": {
+      "trendStrength": 0.84,
+      "momentum": 1.08
+    },
+    "exitTimingAdvisor": {
+      "holdRecommendation": true
+    },
+    "vivo": {
+      "confirmationThreshold": 2
+    }
+  }
+}
+⚙️ DAVRANIŞ KURALLARI:
+Koşul	Aksiyon
+RSI > 70 + MACD düşüşe geçmişse	Zayıflama uyarısı
+Formasyon = bull-flag + trendLineAngle > 25°	Güçlü trend desteği
+Volume azalıyorsa + candlePattern zayıfsa	Riskli alan → vivo sinyali bekletir
+Haber etkisi pozitifse	Skor artı 0.05 bonus
+trendConfidenceScore < 0.55	exitTimingAdvisor çıkış sinyali üretir
+
+🔗 MODÜLLER ARASI UYUM:
+grafikBeyni: Trend ve momentum verisi alır
+
+exitTimingAdvisor: "bekle", "uzat" veya "çık" gibi karar alır
+
+vivo: Eğer skor > 0.75 ise sinyal işleme açılır
+
+Skor + açıklama (justification) her modülün anlayacağı JSON formatındadır
+
+📌 KODLAMA PROMPTU
+trendConfidenceEvaluator.js adlı bir modül oluştur.
+Bu modül:
+
+EMA, MACD, RSI gibi teknik verileri,
+
+Fiyat hareketi, mum formasyonu, volatilite ve formasyon verisini,
+
+Momentum, trend açısı, haber etkisini,
+
+Belirlenen ağırlıklarla değerlendirerek 0–1 arasında normalize edilmiş bir trendConfidenceScore üretir
+
+shouldExtendPosition, strengthCategory, triggeredAlerts, justification ve notify alanlarını JSON formatında dışa aktarır
+
+Diğer modüller bu çıktıyı kullanarak sinyal onayı, pozisyon devamı veya çıkış gibi kararlar verir
+
+getTrendConfidence() fonksiyonu üzerinden erişilebilir olmalıdır
+
+Bu haliyle bu modül artık sadece "trend var mı?" demiyor —
+"Bu trend ne kadar güvenilir, hangi modül hangi aksiyonu almalı?" sorusuna kolektif sistem içinde cevap veriyor.
+
+_________________________________________________________________________________________________________________
+🔧 Gelişmiş Kodlama Promptu
+📦 Modül: riskToRewardValidator.js
+💰 Risk–Getiri Oranı Değerlendirici (R:R Validator)
+🎯 AMAÇ:
+Bu modül, pozisyon açılmadan önce:
+
+Potansiyel işlemin risk / getiri oranını (R:R) değerlendirir
+
+Beklenen zarar, stop-loss seviyesi, hedef kâr oranı ve formasyon gücüne göre işlemi onaylar, uyarır veya reddeder
+
+Giriş için VIVO’ya, kontrol için Otobilinç’e, grafik teyidi için Grafik Beyni’ne çıktı gönderir
+
+Sistem bütünlüğü için minimum kâr koşullarını (ör: %3.5 ± 0.05) her zaman korur
+
+🔄 GİRİŞ (Girdi):
+json
+Kopyala
+Düzenle
+{
+  "entryPrice": 1860,
+  "stopLoss": 1805,
+  "targetProfit": 1935,
+  "trendConfidenceScore": 0.84,
+  "formation": "ascending-triangle",
+  "newsImpact": "neutral",
+  "expectedProfitPercent": 4.0,
+  "expectedLossPercent": 2.9,
+  "psychology": {
+    "riskAppetite": 0.83,
+    "fatigueLevel": 0.27
+  }
+}
+🧠 VERİ İŞLEME MANTIĞI:
+1. R:R Hesabı
+js
+Kopyala
+Düzenle
+risk = entryPrice - stopLoss = 1860 - 1805 = 55  
+reward = targetProfit - entryPrice = 1935 - 1860 = 75  
+riskToReward = reward / risk = 75 / 55 ≈ 1.36
+2. Eşik Değerlendirmesi
+Minimum R:R oranı = 1.5
+
+Minimum kâr oranı = 3.5 ± 0.05
+
+Eğer R:R < 1.5 → işlem açılmaz
+
+Eğer expectedProfit < 3.45 → işlem açılmaz
+
+Formasyon zayıfsa, psikolojik risk yüksekse → “askıya al”
+
+3. Sıralı Karar Ağı
+Koşul	Aksiyon
+R:R ≥ 1.5 ve profit ≥ 3.5%	✅ İşlem onaylanır
+R:R ∈ [1.3–1.49] ama trendScore ≥ 0.85	⚠️ Uyarı ile onay
+R:R < 1.3 veya loss > profit	❌ Reddedilir
+Fatigue > 0.75 veya riskAppetite < 0.5	Askıya alınır
+
+📤 ÇIKIŞ:
+json
+Kopyala
+Düzenle
+{
+  "riskToReward": 1.36,
+  "expectedProfit": 4.0,
+  "expectedLoss": 2.9,
+  "decision": "warn",
+  "reason": [
+    "R:R below 1.5 threshold",
+    "Trend confidence high (0.84) compensates",
+    "Psychology stable, risk acceptable"
+  ],
+  "notify": {
+    "vivo": {
+      "permissionToSignal": true,
+      "signalConfidence": 0.72
+    },
+    "grafikBeyni": {
+      "confirmVisualSupport": true
+    },
+    "otobilinc": {
+      "logRiskAppetite": 0.83,
+      "fatigueWarning": false
+    }
+  }
+}
+⚙️ AKILLI DAVRANIŞLAR:
+Durum	Tepki
+R:R > 2.0 + psikoloji stabil	Otomatik onay, VIVO sinyal başlatabilir
+R:R < 1.3 veya TP çok düşük	İşlem tamamen engellenir
+NewsImpact = “negative” + düşük R:R	“Trend olumlu olsa bile” işlem açılmaz
+Psikolojik yorgunluk yüksekse	VIVO sinyali askıya alır
+Trend skoru + formasyon iyi ama kâr %3.45 ise	VIVO’ya uyarılı onay verilir
+
+🔗 MODÜLLER ARASI UYUM:
+VIVO: permissionToSignal alanıyla sinyal üretip üretmeyeceğini bilir
+
+Grafik Beyni: Formasyonu ve destek–direnç doğruluğunu görerek işlem riskini teyit eder
+
+Otobilinç: Kullanıcının risk iştahını loglayarak ileriki işlemlere etki eder
+
+📌 KODLAMA PROMPTU
+riskToRewardValidator.js adında bir modül oluştur.
+Bu modül:
+
+Girdi olarak entryPrice, stopLoss, targetProfit, expectedProfitPercent, expectedLossPercent, trendConfidenceScore, formation, newsImpact, psychology alır
+
+R:R oranını hesaplar
+
+Minimum kâr oranı (%3.5 ± 0.05) ve R:R eşiklerine göre işlemi onaylar / uyarır / reddeder
+
+Diğer modüllerle bağlantılı şekilde notify alanını oluşturur
+
+getRiskValidation() fonksiyonuyla sonucu JSON olarak verir
+
+Bu haliyle sistem artık:
+“İşlem açılmadan önce mantıklı mı, getirisi buna değer mi?” diye soran profesyonel bir pozisyon denetçisi kazandı.
+_________________________________________________________________________________________________________________
+efsane — GB ve VIVO tamam. Şimdi doğrudan PORTFÖY / DENGELEME katmanına geçiyorum ve bir seferde “Prompt v3” kalitesinde 5 modüllük çekirdek paketi çıkarıyorum. Bunlar diğer yapay zekâya verildiğinde, VIVO ile kusursuz entegre olacak.
+
+PORTFÖY / DENGELEME — Çekirdek Paket (Prompt v3 blok)
+
+Ortak kurallar: Node.js + TypeScript, event-driven I/O JSON, Zod runtime validasyon, Europe/Istanbul, idempotent yayın, audit/metrics.
+
+PFL-01 · portfolioExposureBalancer.ts — Gelişmiş Prompt v3
+Amaç
+
+Global / cluster / symbol bazında risk tavanlarını yürütmek; aşım/boşluk olduğunda ölçekleme/kısma/erteleme direktifleri yayınlamak.
+
+Girdiler (In)
+
+policy.snapshot (riskPerTradePct, totalRiskPct, clusterCaps, symbol caps)
+
+universe.snapshot|apply.directive (allow/blocked/experimental listesi)
+
+positions.snapshot (açık pozisyonlar: notional, side, cluster, symbol)
+
+strategy.selection.decision|traffic.plan (trafik payları)
+
+dominance.shift.signal (rejime göre risk azalt/artan öneri, opsiyonel)
+
+Çıktılar (Out)
+
+portfolio.balance.directive:
+
+actions: [ {type:"scale_symbol", symbol, toRiskPct}, {type:"scale_cluster", cluster, toRiskPct}, {type:"defer_new", scope:"cluster|symbol"}, {type:"close_rebalance", symbol, qty} ]
+
+mode: soft|hard, reasonCodes[], effectiveAt
+
+portfolio.balancer.metrics (uygulama oranları, deferrals, breaches)
+
+Konfig
+{
+  ewmaHalfLifeMin: 10,
+  graceForNewMs: 60000,
+  minScaleStep: 0.1,          // risk pct adımı
+  deferTtlSec: 180,
+  violationHysteresisBps: 5,  // flip-flop engeli
+  tz: "Europe/Istanbul"
+}
+
+Algoritma
+
+Pozisyonları cluster/symbol’da risk pct cinsinden topla → kotalarla karşılaştır.
+
+Aşım > histerezis → scale_*/defer_new.
+
+experimental semboller için hedef risk yarıya indir (opsiyonel).
+
+dominance.shift.signal geldiğinde ilgili cluster risk hedefini kademeli değiştir.
+
+Aynı hesapla iki kez direktif üretme (idempotency key = snapshot ver hash + scope).
+
+Event Bus
+
+In: policy.snapshot, universe.snapshot|apply.directive, positions.snapshot, strategy.selection.decision, strategy.traffic.plan, dominance.shift.signal
+
+Out: portfolio.balance.directive, portfolio.balancer.metrics
+
+Test İskeleti
+
+cluster Layer1 %1.2 > cap %1.0 → scale_cluster(Layer1→1.0)
+
+symbol cap aşımı → scale_symbol
+
+experimental → risk yarıya iner
+
+dominance alt-led → Layer1 azaltılır (histerezisle)
+
+Entegrasyon
+
+VIVO-19 Composer, defer_new ve scale ipuçlarını uygular.
+
+PolicyCoordinator (VIVO-29) ile çelişkide policy üstün.
+
+PFL-02 · correlationMatrixService.ts — Gelişmiş Prompt v3
+Amaç
+
+Sürekli korelasyon & beta matrisi üretip Balancer ve Risk için erişilebilir kılmak.
+
+Girdiler
+
+market.refs (mid/returns), positions.snapshot
+
+universe.snapshot (aktif semboller), opsiyonel mapping.meta (cluster)
+
+Çıktılar
+
+portfolio.correlation.snapshot:
+
+rho[symbol_i][symbol_j], betaTo{"BTC","Market"}, topPairs[], clusters{capUtil}
+
+correlation.alert (yoğun kümelenme, rho>0.85 çokluğu)
+
+Konfig
+{
+  windowMin: 240,
+  stepMin: 5,
+  minCommonBars: 120,
+  shrinkage: 0.1,
+  alertThreshold: 0.85
+}
+
+Algoritma
+
+Bar getirilerini hizala → kovaryans → Ledoit-Wolf benzeri shrink → rho & beta.
+Top-K ilişkileri ve cluster cap kullanımını hesapla.
+
+Event Bus
+
+In: market.refs, universe.snapshot, positions.snapshot
+
+Out: portfolio.correlation.snapshot, correlation.alert
+
+Testler
+
+yetersiz ortak örnek → eksik hücre; alert yok
+
+rho>0.9 yoğunluğu → correlation.alert
+
+PFL-03 · positionSizer.ts — Gelişmiş Prompt v3
+Amaç
+
+riskPerTradePct, volatilite ve plan parametrelerine göre boyut önerisi üretmek; composer’ın qty’sini yönlendirmek.
+
+Girdiler
+
+policy.snapshot (riskPerTradePct, slippageHardBps)
+
+market.volatility.snapshot (ATR/parket, bps)
+
+order.plan.proposed (SL/TP mesafeleri, entry mode)
+
+fees.schedule (taker/maker bp), cost.forecast.update (opsiyonel)
+
+Çıktılar
+
+position.size.suggestion: { correlationId, symbol, riskUnitUSD, qty, maxNotional, reasonCodes[] }
+
+Konfig
+{
+  riskPerTradePct: 0.5,
+  maxLeverage: 5,
+  minQty: 0.001,
+  volFloorBps: 20,
+  slDistanceClampBps: { min: 25, max: 300 }
+}
+
+Algoritma
+
+Risk Unit USD = equity * riskPerTradePct.
+
+SL mesafesi bps → position notional = riskUnitUSD / (SL_bps/1e4); leverage & maxNotional’ı clamp et.
+
+Entry mode market ve beklenen slip yüksekse qtyyi %X düşür (kademeli doldurma öner).
+
+Event Bus
+
+In: policy.snapshot, market.volatility.snapshot, order.plan.proposed, fees.schedule, cost.forecast.update
+
+Out: position.size.suggestion
+
+Testler
+
+SL çok dar → min clamp
+
+Yüksek vol & taker → qty düşürme gerekçesi
+
+PFL-04 · drawdownMonitor.ts — Gelişmiş Prompt v3
+Amaç
+
+Equity eğrisini izleyip DD eşiği aşıldığında otomatik risk düşürme için öneri/komut üretmek.
+
+Girdiler
+
+equity.snapshot (güncel), pnl.daily (tarihçe), portfolio.balancer.metrics
+
+Çıktılar
+
+risk.governance.recommendation:
+
+örn: ["reduce_total_risk_to_1.2pct_for_24h","disable_aggressive_variant_4h","halt_new_intents_20m"]
+
+drawdown.alert (info/warn/error) + metrikler
+
+Konfig
+{
+  windows: { lookbackDays: 60, decay: 0.97 },
+  ddLevelsR: { warn: 2.0, error: 3.5, emergency: 5.0 },
+  coolOff: { warn: "PT2H", error: "PT24H", emergency: "PT72H" }
+}
+
+Algoritma
+
+Pik-dip ölç; aktif cool-off varken tekrar tetikleme yok. Seviyeye göre öneri seti üret.
+
+Event Bus
+
+In: equity.snapshot, pnl.daily, portfolio.balancer.metrics
+
+Out: risk.governance.recommendation, drawdown.alert
+
+Testler
+
+DD=3.6R → error → 24h risk indirimi önerisi
+
+Cool-off varken ikinci tetik yok
+
+PFL-05 · hedgingAdvisor.ts — Gelişmiş Prompt v3
+Amaç
+
+Portföy beta ve cluster dengesizliğini BTC/ETH/Endeks üzerinden hedge önerilerine çevirmek.
+
+Girdiler
+
+portfolio.correlation.snapshot (beta, rho)
+
+positions.snapshot (net delta/beta exposure)
+
+policy.snapshot (hedge izin/limitleri)
+
+Çıktılar
+
+hedge.plan.proposed:
+{ legs:[{symbol:"BTCUSDT", side:"short", qty, rationale}], targetBeta:0.2, ttlSec, severity:"info|warn" }
+
+Konfig
+{
+  allow: { btc: true, eth: true, index: false },
+  betaTarget: 0.2,
+  minNotionalUSD: 1000,
+  ttlSec: 900,
+  maxHedgePctOfEquity: 0.3
+}
+
+Algoritma
+
+Net beta & cluster fazlasını hesapla → hedefe çekmek için uygun hedge ayağını seç; minNotional ve maxHedge sınırlarını uygula.
+
+Event Bus
+
+In: portfolio.correlation.snapshot, positions.snapshot, policy.snapshot
+
+Out: hedge.plan.proposed
+
+Testler
+
+Net beta 0.6 → BTC short ile 0.2’ye yaklaşma
+
+Hedge notional < min → plan üretilmez
+
+Paket Entegrasyon Notları
+
+PFL-01 Balancer tüm çıktılarını VIVO-19/21’in uygulayacağı şekilde directive formatında verir.
+
+PFL-02 Correlation hem PFL-05 Hedge hem VIVO-40 (dominance) için temel veri kaynağıdır.
+
+PFL-03 Sizer doğrudan Composer’ın qty belirlemesine girer; VIVO-28 maliyet tahminini dikkate alır.
+
+PFL-04 Drawdown önerileri VIVO-29 PolicyCoordinator tarafından policy.source.update’e dönüştürülür.
+
+PFL-05 Hedge planları Composer’a “opsiyonel” niyet olarak gider; policy “hedge_enabled=false” ise sadece danışmanlık.
+_________________________________________________________________________________________________________________
+şimdi SENTRY & GUARD paketi için bir seferde 5 modüllük “Gelişmiş Prompt v3” hazırladım. Bunları diğer yapay zekâya ver; Node.js + TypeScript ile yazsın. Kod yazdırmıyoruz; nasıl kodlanacağını net yönlendiriyoruz. Tüm I/O JSON, mimari event-driven, Zod ile runtime validasyon, tüm saatler Europe/Istanbul. Her modül idempotent yayın, audit/metrics üretir ve VIVO/PORTFÖY katmanlarıyla uyumludur.
+
+SENTRY & GUARD — Çekirdek Paket (Prompt v3 blok)
+SG-01 · exchangeConnectivitySentry.ts — Gelişmiş Prompt v3
+Amaç
+
+Borsa WS/REST bağlantısının sağlık skorunu ölçmek; ping/mesaj oranı/boşluk/reconnect verilerine göre normal | degraded | streams_panic | halt_entry modlarını ilan etmek; failover için SG-04’e sinyal vermek.
+
+Girdiler (In)
+
+connectivity.ping.tick: { rttMs, endpoint, transport:"ws|rest", ok:true|false }
+
+market.stream.tick: { msgsPerSec, lastSeq, gapMs, topic, endpoint }
+
+order.stream.tick: { msgsPerSec, gapMs, endpoint }
+
+exchange.rateLimit.snapshot: { used, limit, resetMs }
+
+endpoint.catalog: { primary, secondary[], geoHints[], weight }
+
+backtestReplayHarness koşullarında replay.clock.tick (opsiyonel)
+
+Çıktılar (Out)
+
+sentry.guard.directive: { mode:"normal|degraded|streams_panic|halt_entry", expiresAt, reasonCodes[] }
+
+sentry.failover.recommendation: { from, to, scoreFrom, scoreTo, reasonCodes[] }
+
+sentry.metrics: { ewma:{ pingMs, wsMsgsPerSec }, gaps:{ count, avgGapMs }, reconnects, endpointSwitches }
+
+sentry.alert: info|warn|error (sürekli panic, ping p99>thresh vb.)
+
+Konfig
+{
+  ewmaAlpha: 0.2,
+  thresholds: { pingP99Ms: 1500, gapWarnMs: 500, panicGapMs: 2000, msgsFloor: 10 },
+  degradedBudgetSec: 60,          // bu kadar süre degraded kalırsa panic'e yükselebilir
+  panicHoldSec: 120,              // panic sonrası en az şu kadar süre mod korunur
+  haltEntryOnNoOrderStreamSec: 20,// order stream yoksa girişleri durdur
+  failoverMinIntervalSec: 300,
+  healthWeights: { ping: 0.4, gaps: 0.3, msgs: 0.2, rl: 0.1 },
+  tz: "Europe/Istanbul"
+}
+
+Algoritma
+
+Her tick’te healthScore∈[0,1] hesapla: düşük ping, düşük gap, yeterli msg→yüksek skor.
+
+Eşiklere göre mod:
+
+ping p99 > pingP99Ms veya gapMs ≥ panicGapMs → streams_panic.
+
+msgsPerSec < msgsFloor veya gapMs ≥ gapWarnMs → degraded.
+
+Order stream tamamen kayıp ≥ haltEntryOnNoOrderStreamSec → halt_entry.
+
+Mod değişimleri histerezis ve panicHoldSec ile sabitlenir.
+
+Skor düşüşü belirginse SG-04 için sentry.failover.recommendation yayınla.
+
+Aynı mod peş peşe idempotency ile bastırılır.
+
+Event Bus
+
+In: connectivity.ping.tick, market.stream.tick, order.stream.tick, exchange.rateLimit.snapshot, endpoint.catalog, replay.clock.tick?
+
+Out: sentry.guard.directive, sentry.failover.recommendation, sentry.metrics, sentry.alert
+
+Test İskeleti
+
+ping p99 1700ms → degraded
+
+ardışık büyük gaps → streams_panic + failover.recommendation
+
+order stream 25sn yok → halt_entry
+
+panic sonrası 60sn iyi → normala dönüş (hold süresi geçince)
+
+SG-02 · latencySlipGuard.ts — Gelişmiş Prompt v3
+Amaç
+
+Emir yaşam döngüsü latency (place→ack→firstFill→fullFill) ve slippage metriklerini izleyip slowdown | block_aggressive | halt_entry tarzı guard direktifleri üretmek.
+
+Girdiler
+
+order.journey.metrics: { placeMs, ackMs, firstFillMs, fullFillMs, slipBps, side, symbol, mode:"market|limit|post_only" }
+
+qa.tags: { tags:["highVol","open-bar", ...] }
+
+policy.snapshot: { slippageHardBps, latencyHardMs, variants }
+
+sentry.guard.directive (bağlantı modu)
+
+cost.forecast.update (taker/maker risklerini etkileyebilir)
+
+Çıktılar
+
+latency_slip.guard.directive: { mode:"normal|slowdown|block_aggressive|halt_entry", expiresAt, reasonCodes[] }
+
+guard.advice.composer: { prefer:"limit|post_only|twap", maxSlices, sliceDelayMs }
+
+latency_slip.guard.metrics: { ewma:{ placeMs, firstFillMs, slipBps, spreadBps }, modeRates:{...}, panicCount }
+
+Konfig
+{
+  ewmaAlpha: 0.3,
+  slowdown: { placeMs: 800, firstFillMs: 1500, slipBps: 10 },
+  blockAggressive: { placeMs: 1200, slipBps: 15 },
+  halt: { firstFillMs: 3000, slipBps: 25 },
+  decayToNormalSec: 180,
+  highVolTightenPct: 0.8,           // QA 'highVol' gelirse eşikleri %80'e sıkılaştır
+  advice: { defaultSlices: 3, maxSlicesCap: 8, minDelayMs: 200 },
+  tz: "Europe/Istanbul"
+}
+
+Algoritma
+
+EWMA metrikleri güncelle; sentry.mode ile maksimum kısıt seç (panic → halt_entry).
+
+Eşik tabanlı mod: halt eşiği aşılırsa halt_entry; blockAggressive eşiği aşılırsa agresif kapat; slowdown eşiği aşılırsa pacing.
+
+QA highVol|open-bar → eşikleri sıkılaştır.
+
+Modlar zamanla decayToNormalSec içinde normale döner (gözlem iyileşirse).
+
+Composer’a pacing tavsiyesi yayınla (slices, delay).
+
+Event Bus
+
+In: order.journey.metrics, qa.tags, policy.snapshot, sentry.guard.directive, cost.forecast.update
+
+Out: latency_slip.guard.directive, guard.advice.composer, latency_slip.guard.metrics
+
+Test İskeleti
+
+place 900ms / slip 12bps → slowdown
+
+firstFill 3200ms → halt_entry
+
+highVol altında block_aggressive eşiği daha erken tetikler
+
+iyileşince decay ile normala dönüş
+
+SG-03 · streamIntegrityVerifier.ts — Gelişmiş Prompt v3
+Amaç
+
+Piyasa ve sipariş akışlarında sıra, zaman, kimlik tutarlılığını doğrulamak; dupe/out-of-order/stale olayları tespit edip filtrelemek; ciddi bozulmalarda guard sinyali üretmek.
+
+Girdiler
+
+market.refs|trade.tick (sequence, ts, symbol)
+
+order.stream.event (sequence/ts/orderId)
+
+clock.sync.info: { localSkewMs, source:"ntp|exchange" }
+
+sentry.guard.directive (korelasyon için)
+
+Çıktılar
+
+stream.integrity.alert: { level:"info|warn|error", type:"dup|oOO|stale|ts_skew", count, windowSec, reason[] }
+
+stream.filter.stats: { droppedDup, fixedReorder, staleSuppressed }
+
+opsiyonel sentry.guard.directive(mode="degraded") (çok sayıda ihlal)
+
+Konfig
+{
+  reorderFixWindowMs: 150,    // ooo düzeltmek için bekleme penceresi
+  staleMaxLagMs: 2000,        // bundan eski tick'i düş
+  dupBloomSize: 1_000_000,    // dedupe için bloom filtresi
+  skewWarnMs: 1000,
+  degradedOnErrorRate: 0.02,  // 1 dakikalık pencerede %2 ihlal → degraded öner
+  tz: "Europe/Istanbul"
+}
+
+Algoritma
+
+Her topic’te seq/ts kontrolü; küçük oOO durumlarını pencere içinde re-order, büyüklerini drop.
+
+stale → ts lag > staleMaxLagMs ise suppress.
+
+1 dakikalık pencerede ihlal oranı ≥ degradedOnErrorRate → stream.integrity.alert(error) + sentry’ye degraded öner.
+
+clockSkew uyarır; ts_skew yüksekse alert.
+
+Event Bus
+
+In: market.refs|trade.tick, order.stream.event, clock.sync.info, sentry.guard.directive
+
+Out: stream.integrity.alert, stream.filter.stats, (sentry.guard.directive?)
+
+Test İskeleti
+
+tekil oOO küçük gecikmeyle düzelir
+
+stale 3s → suppress + sayacı artar
+
+1dk’da %3 ihlal → degraded öner
+
+SG-04 · endpointFailoverOrchestrator.ts — Gelişmiş Prompt v3
+Amaç
+
+Birden çok endpoint (primary/secondary/backup) arasında otomatik failover & brownout; geri dönüşte graceful revert; SG-01’den gelen önerilerle çalışır.
+
+Girdiler
+
+endpoint.catalog: { primary:{id,url}, secondary:[...], probe:{intervalMs, timeoutMs} }
+
+sentry.failover.recommendation: { from, to, scoreFrom, scoreTo }
+
+sentry.guard.directive (panic/degraded)
+
+manual.failover.command: { to:"endpointId"| "revert", reason }
+
+Çıktılar
+
+endpoint.switch.plan: { from, to, when, reasonCodes[] }
+
+endpoint.switched: { from, to, success, latencyMs }
+
+endpoint.health.snapshot: { id, score, lastProbe, rttMs, failures }
+
+sentry.alert (peşpeşe başarısız switch, tüm uçlar kötü vb.)
+
+Konfig
+{
+  minDwellSec: 300,           // bir endpointte minimum kalış
+  probe: { intervalMs: 3000, timeoutMs: 1500, jitterMs: 200 },
+  brownout: { maxStepPct: 50, stepSec: 30 }, // trafik payını kademeli taşı
+  revertPolicy: "prefer_primary_after_stable_10m",
+  maxConsecutiveFailures: 3,
+  tz: "Europe/Istanbul"
+}
+
+Algoritma
+
+Health probe + SG-01 skoru → candidate seç.
+
+failover.recommendation gelirse dwell ve brownout kurallarıyla switch.plan üret.
+
+Switch sırasında order stream canary doğrulaması (kısa süre çift besleme).
+
+revertPolicy ile primary’e geri dönüş.
+
+Başarısızlıklar → sentry.alert(error); idempotency ile plan tekrar yayınlanmaz.
+
+Event Bus
+
+In: endpoint.catalog, sentry.failover.recommendation, sentry.guard.directive, manual.failover.command
+
+Out: endpoint.switch.plan, endpoint.switched, endpoint.health.snapshot, sentry.alert
+
+Test İskeleti
+
+degraded + secondary skoru yüksek → switch.plan
+
+dwell süresi dolmadan ikinci switch önerisi bastırılır
+
+switch başarısız 3 kez → alert(error)
+
+10 dk stabil → primary’e revert
+
+SG-05 · orderFlowBackpressure.ts — Gelişmiş Prompt v3
+Amaç
+
+Borsa rate-limitleri, yerel kuyruk derinliği ve guard modlarını dikkate alarak sipariş trafiğini akıllıca pacing etmek: burst sınırlama, slowdown, defer, drop (giriş durdurma).
+
+Girdiler
+
+exchange.rateLimit.snapshot: { limit, used, resetMs }
+
+composer.intent.batch: { intents:[{ correlationId, symbol, mode }], ttlSec }
+
+latency_slip.guard.directive, sentry.guard.directive
+
+portfolio.balance.directive(defer_new) (üst katmandan)
+
+Çıktılar
+
+orderflow.pacing.plan: { slices, sliceDelayMs, maxInFlight, reasonCodes[] }
+
+composer.intent.filtered: { accepted[], deferred[], dropped[], reasonCodesById{} }
+
+orderflow.backpressure.metrics: { inFlight, queueDepth, deferRate, dropRate }
+
+Konfig
+{
+  maxInFlight: 8,
+  queueMax: 200,
+  burstPerSec: 5,
+  slowdownFactors: { degraded: 0.7, slowdown: 0.5, block_aggressive: 0.0, halt_entry: 0.0 },
+  deferTtlSec: 120,
+  dropOnHalt: true,
+  tz: "Europe/Istanbul"
+}
+
+Algoritma
+
+Guard modlarına göre trafik katsayısı uygula (slowdownFactors).
+
+Exchange rate-limit’e göre slice ve sliceDelayMs hesapla; maxInFlight clamp.
+
+defer_new direktiflerini uygula; TTL aşarsa drop.
+
+Kuyruk derinliği > queueMax → yeni niyetleri kabul etme.
+
+Kararları idempotent yap (aynı batch id → aynı filtre sonucu).
+
+Event Bus
+
+In: exchange.rateLimit.snapshot, composer.intent.batch, latency_slip.guard.directive, sentry.guard.directive, portfolio.balance.directive
+
+Out: orderflow.pacing.plan, composer.intent.filtered, orderflow.backpressure.metrics
+
+Test İskeleti
+
+sentry=degraded → pacing %70
+
+guard=halt_entry → tüm intents drop (gerekçeyle)
+
+RL dar ise slices↑, delay↑
+
+defer_new TTL aşınca dropRate↑
+
+Paket Entegrasyon Notları
+
+SG-01 & SG-04: Sentry durumları → Failover orkestrasyonuna öneri; switch planları geri sentry.alert ile gözlemlenir.
+
+SG-02: Slip/latency kötüleşince block_aggressive ve Composer’a pacing tavsiyeleri; VIVO-21 Supervisor timeout/exit eşikleriyle uyumlu.
+
+SG-03: Akış bozulmaları degraded seviyesine taşıyabilir; Sentry’ye geri besleme.
+
+SG-05: Composer/Throttler ile arada durur; portfolio.balance.directive(defer_new) ve policy sınırlarına saygı gösterir.
+
+Tüm modüller VIVO-32 Telemetry ve VIVO-33 Incident Bridge ile metrics/alert üreterek izlenir.
+_________________________________________________________________________________________________________________
+LOG & TELEMETRİ geniş paketini tek seferde, “Prompt v3” kalitesinde 5 modül olarak çıkarıyorum. Bunlar VIVO-32/33/35 üzerine oturur; Node.js + TypeScript, event-driven I/O (JSON), Zod validasyon, Europe/Istanbul saat dilimi, idempotent yayın + audit/metrics standart. Kod yazdırmıyoruz; diğer yapay zekâya verilecek yol-promptlar bunlar.
+
+LOG & TELEMETRİ — Geniş Paket (Prompt v3 blok)
+LT-01 · telemetryAnomalyDetector.ts — Gelişmiş Prompt v3
+Amaç
+
+Tüm *.metrics akışlarında istatistiksel anomali tespiti (p90/p95/p99 sıçraması, oran sapmaları, gap/flatline), uç değer yakalama ve erken uyarı üretme. VIVO-32 (telemetryDashboardEmitter) ve VIVO-33 (köprü) ile entegre.
+
+Girdiler (In)
+
+*.metrics (QA/Guard/Sentry/Bandit/Universe/Cost/Logger/…)
+
+telemetry.slo.status (durum/sınır bağlamı)
+
+connectivity.heartbeat (gap/flatline tespiti için saat nabzı)
+
+Çıktılar (Out)
+
+telemetry.anomaly.signal: { series:"string", labels:{}, score: number, kind:"spike|drop|drift|flatline|gap", severity:"low|medium|high", window:"1m|5m|1h", baseline:{mean, mad|stdev}, value, delta, reasonCodes[] }
+
+telemetry.alert: { level:"info|warn|error", message, context:{ series, kind, severity } }
+
+telemetry.anomaly.metrics: { evaluated, flagged, flatlines, gaps }
+
+Konfig
+{
+  windows: [{span:"1m", step:"10s"}, {span:"5m", step:"30s"}, {span:"1h", step:"5m"}],
+  detectors: { method:"robust_z|ewma_holt", zHi:3.5, zWarn:2.5, driftEwmaAlpha:0.2, flatlineStaleSec:90, gapStaleSec:60 },
+  minPoints: 20,
+  severityMap: { z>=5:"high", z>=3.5:"medium", else:"low" },
+  mute: { series:[], labels:{} },
+  tz:"Europe/Istanbul"
+}
+
+Algoritma (Özet)
+
+Seri başına robust z-score (median+MAD) ve EWMA/Holt baz çizgisi tut.
+
+Z>eşik → spike|drop; baz çizgiden sürekli sapma → drift; veri yok/tekdüze → gap|flatline.
+
+SLO ihlali yakın/sonrası ağırlıkları artır (erken uyarı).
+
+Aynı seri/kind için 1 pencere içinde idempotent yayın.
+
+Event Bus
+
+In: *.metrics, telemetry.slo.status, connectivity.heartbeat
+
+Out: telemetry.anomaly.signal, telemetry.alert, telemetry.anomaly.metrics
+
+Testler
+
+p99_ms sıçraması → spike/high
+
+pass_rate düşüşü → drop/medium
+
+90 sn veri yok → flatline
+
+SLO breach sonrası küçük sapma → warn (ağırlık artışı)
+
+LT-02 · logIngestRouter.ts — Gelişmiş Prompt v3
+Amaç
+
+Çeşitli kaynaklardan gelen ham log kayıtlarını tek şemaya getirip önceliklendirme/sampling uygular, gizlilik etiketleri ekler ve VIVO-35’in data.ingest hattına besler; ayrıca çoklu sink adaptörlerine (dosya/S3/TSDB) batch çıkarır.
+
+Girdiler
+
+log.raw: { source:"service", level:"debug|info|warn|error", ts:"iso8601", msg:"string", kv:{}, traceId?, spanId? }
+
+router.rule.update: { routes:[{match:{source?,level?,contains?}, action:{drop?|samplePct?, addTags?, sink:["privacy|file|s3|click|..."]}}] }
+
+privacy.policy.update (etiket defaultları)
+
+Çıktılar
+
+data.ingest: { source:"logger", topic:"log", payload:{ ...normalized }, data:{ tags:{ classification:"...", subjectId:null, labels:["log"] }}, audit:{producer:"log.router",eventId}}
+
+log.sink.batch: { sink:"file|s3|click", lines:[...], codec:"jsonl|lp" }
+
+log.router.metrics: { in, out, dropped, sampled, byLevel:{}, bySink:{} }
+
+log.router.alert: { level, message, context }
+
+Konfig
+{
+  sampling: { defaultPct: 100, errorPct: 100, warnPct: 50, infoPct: 10, debugPct: 1 },
+  sinks: { file:{path:"logs/app-%Y%m%d.log"}, s3:{bucket:"vivo-logs", prefix:"%Y/%m/%d/"} },
+  privacyDefaultClass: "SENSITIVE_LOW",
+  maxBatch: 1000,
+  maxWaitMs: 1000,
+  tz:"Europe/Istanbul"
+}
+
+Algoritma
+
+Rule match → action uygula (drop/sample/addTags/sink).
+
+Normalizasyon: ts,msg,level,kv,traceIds + classification etiketi.
+
+data.ingest ile Privacy Manager’a aktar; eşzamanlı seçilen sink’e batch yaz.
+
+Aşırı girişte backpressure (drop/sampling artırımı); alert üret.
+
+Event Bus
+
+In: log.raw, router.rule.update, privacy.policy.update
+
+Out: data.ingest, log.sink.batch, log.router.metrics, log.router.alert
+
+Testler
+
+info log %10 örneklenir
+
+error her zaman geçer
+
+kural source=guard → sink=click eklenir
+
+burst’te backpressure + alert
+
+LT-03 · metricsRollupDownsampler.ts — Gelişmiş Prompt v3
+Amaç
+
+Yüksek hacimli metrikleri 1m/5m/1h gibi periyotlarda rollup edip depolama maliyetini düşürmek ve sorguları hızlandırmak; Prom/TSDB’ye uygun toplama setleri üretmek.
+
+Girdiler
+
+telemetry.tsdb.batch (line-protocol veya JSON seriler)
+
+telemetry.prom.dump (opsiyonel; gauge→summary dönüşümü)
+
+rollup.policy.update: { rules:[{match:{metric:"regex"}, aggs:["min","max","avg","p95"], intervals:["1m","5m","1h"], ttl:{raw:"7d", m1:"30d", h1:"180d"}}] }
+
+Çıktılar
+
+telemetry.rollup.batch: { interval:"1m|5m|1h", lines:[ "metric,labels agg=val 169..." ] }
+
+rollup.metrics: { rawIn, m1Out, m5Out, h1Out, droppedByTtl }
+
+rollup.alert: { level, message, context }
+
+Konfig
+{
+  intervals:["1m","5m","1h"],
+  defaultAggs:["min","max","avg","p95"],
+  maxSeries: 200000,
+  ttl: { raw:"14d", "1m":"90d", "1h":"365d" },
+  tz:"Europe/Istanbul"
+}
+
+Algoritma
+
+Serileri etiketlerine göre key’le; pencere kapanınca aggregates yaz.
+
+TTL’lere göre drop stratejisi uygula (raw’ı 14gün sonra tutma).
+
+Seri patlamasında key-cardinality guard: eşik aşımı → alert + kesme.
+
+Event Bus
+
+In: telemetry.tsdb.batch, telemetry.prom.dump?, rollup.policy.update
+
+Out: telemetry.rollup.batch, rollup.metrics, rollup.alert
+
+Testler
+
+p95 doğru hesaplanır (CKMS/TDigest)
+
+TTL süresi dolmuş raw drop edilir
+
+regex match ile özel metrik farklı aggs alır
+
+LT-04 · alertCorrelatorRunbookHelper.ts — Gelişmiş Prompt v3
+Amaç
+
+Dağınık uyarı/incident akışlarını korelasyon grupları altında birleştirip olası kök neden + runbook adımlarını önerir; VIVO-33’e tek, zengin içerikli bildirim yollar.
+
+Girdiler
+
+telemetry.alert, telemetry.anomaly.signal, telemetry.slo.status
+
+sentry.guard.directive, stream.integrity.alert, risk.incident.*
+
+runbook.kb: { rules:[{ if:{series?,"reasonCodes"?, "sentryMode"?, "incidentType"?, "windowSec" }, then:{ rootCause:"...", steps:["..."], tags:["..."], severityBump? }}] }
+
+Çıktılar
+
+alert.correlation.grouped: { groupId, timeline:[{event,ts}], rootCauseHypo, runbook:{steps[]}, severity, affected:["service|symbol"], reasonCodes[] }
+
+bridge.notification.outgoing (zengin başlık/gövde ile)
+
+correlator.metrics / correlator.alert
+
+Konfig
+{
+  windowSec: 180,
+  minSignalsForGroup: 2,
+  severityEscalation: { "sentry:streams_panic + flatline": "critical" },
+  tz:"Europe/Istanbul"
+}
+
+Algoritma
+
+Zaman penceresinde olayları gruplandır (aynı service/symbol/series yakınlığı).
+
+runbook.kb kuralı eşleşirse rootCauseHypo + adım listesi üret.
+
+Çakışan grupları merge; tek kanallı bildirim için VIVO-33’e gönder.
+
+Aynı groupId içinde tekrar idempotent.
+
+Event Bus
+
+In: (çoklu yukarıdaki akışlar), runbook.kb
+
+Out: alert.correlation.grouped, bridge.notification.outgoing, correlator.metrics, correlator.alert
+
+Testler
+
+sentry:degraded + guard:slowdown + latency spike → tek grup + “pacing artır” runbook’u
+
+streams_panic + flatline → severity “critical”a yükselir
+
+LT-05 · postmortemAutoDraft.ts — Gelişmiş Prompt v3
+Amaç
+
+Kapanan kritik incident’lardan otomatik postmortem taslağı üretmek: olay çizelgesi, etki kapsamı, kök neden hipotezi, SLO/error-budget etkisi, alınan aksiyonlar ve kalıcı düzeltmeler.
+
+Girdiler
+
+incident.acknowledged, incident.resolved.external, bridge.metrics
+
+telemetry.slo.status (pencere boyunca), telemetry.anomaly.signal, alert.correlation.grouped
+
+audit.trail.event (opsiyonel; önemli karar/komut günlükleri)
+
+Çıktılar
+
+postmortem.draft.ready:
+
+{
+  "event":"postmortem.draft.ready",
+  "timestamp":"iso8601",
+  "incidentId":"INC-123",
+  "format":"markdown",
+  "content":"# Incident INC-123 ...",
+  "attachments":[{"name":"metrics.png","ref":"file:///..."}],
+  "summary":{"start":"iso8601","end":"iso8601","impact":{"durationMin":17,"services":["guard"]},"slo":{"burnPct":12}}
+}
+
+
+postmortem.alert (eksik veri)
+
+postmortem.metrics (taslak üretim süresi, otomatik doldurma oranı)
+
+Konfig
+{
+  template: {
+    title:"# Incident ${id}",
+    sections:["Summary","Timeline","Impact","Root Cause","Mitigations","Follow-ups","Lessons"],
+    followUpsDefault:["Add regression test","Tighten SLO","Update runbook"]
+  },
+  artifactDir:"data/postmortems",
+  require: { minTimelineEvents: 5, sloWindow:"24h" },
+  tz:"Europe/Istanbul"
+}
+
+Algoritma
+
+incident.resolved.external alınca 24h pencereden metrik/alert/timeline topla.
+
+alert.correlation.grouped → root-cause ve runbook adımlarını gövdeye yerleştir.
+
+SLO bütçe yanığı ve etki hesaplarını özetle.
+
+Markdown taslağı + küçük görseller (basit grafikler) oluştur; artefact olarak kaydet ve olay yayınla.
+
+Event Bus
+
+In: incident.*, telemetry.*, alert.correlation.grouped, audit.trail.event?
+
+Out: postmortem.draft.ready, postmortem.alert, postmortem.metrics
+
+Testler
+
+yeterli timeline var → markdown üretilir
+
+eksik veri → postmortem.alert(warn)
+
+SLO etkisi doğru hesaplanır (burn%)
+
+Paket Entegrasyon Notları
+
+LT-01 anomali sinyalleri → LT-04 (korelasyon) → VIVO-33 (bildirim).
+
+LT-02 bütün log kaynaklarını VIVO-35’in data.ingest hattına standardize eder; gizlilik sınıflandırmasını doğru taşır.
+
+LT-03 rollup çıktıları Grafana/ClickHouse/Prometheus için ekonomik TSDB akışı sağlar; VIVO-32 ile aynı label setini kullanır.
+
+LT-04 tek, bağlamsal bildirim gönderir ve runbook önerisi katar; gürültüyü azaltır.
+
+LT-05 kapandıktan sonra otomatik rapor çıkarır; takip görevlerini (follow-up) “TODO” listesi olarak ekler.
+_________________________________________________________________________________________________________________
+BACKTEST/REPLAY geniş paketini tek seferde, “Prompt v3” kalitesinde 5 modül olarak çıkarıyorum. Bunlar VIVO-34 backtestReplayHarness.ts üstüne sorunsuz oturur. Kod yazdırmıyoruz; diğer yapay zekâya verilecek yol-promptlar bunlar. Ortak kurallar: Node.js + TypeScript, event-driven I/O (JSON), Zod validasyon, Europe/Istanbul, idempotent yayın + audit/metrics.
+
+BACKTEST/REPLAY — Geniş Paket (Prompt v3 blok)
+BR-01 · marketDataQualityGate.ts — Gelişmiş Prompt v3
+Amaç
+
+Tarihî veri setlerinde boşluk/dupe/out-of-order/anormal fiyat-spread hatalarını tespit edip rapor + düzeltme önerisi üretmek; VIVO-34’e yüklemeden önce kalite kapısı.
+
+Girdiler (In)
+
+replay.dataset.describe: { datasetId, sources:[{type:"jsonl|csv|parquet", path, topic, timeField, symbolField, schemaHint}] }
+
+dq.policy.update: { thresholds:{ maxGapMs, maxSpreadBps, priceJumpsSigma, dupWindowMs }, fixes:{ forwardFillBars?:boolean, dropDup?:boolean } }
+
+Çıktılar (Out)
+
+dq.scan.report: { datasetId, summary:{rows, symbols, start, end}, issues:{ gaps, dups, ooo, jumps, badSpread }, bySymbol:[...], recommendations:[...]}
+
+dq.fix.plan: { datasetId, actions:[{ type:"drop|interp|cap_spread|reorder", topic, symbol?, range? }], reasonCodes[] }
+
+dq.alert: { level:"info|warn|error", message, context }
+
+Konfig
+{
+  windows:{ bar:"1m|5m|15m" },
+  thresholds:{ maxGapMs: 60000, maxSpreadBps: 80, priceJumpsSigma: 6, dupWindowMs: 250 },
+  preferFixes:{ reorder:true, dropDup:true, interpBars:true },
+  tz:"Europe/Istanbul"
+}
+
+Algoritma
+
+Kaynağı zaman/simge bazında tarayıp gap/dup/ooo/jump/spread ölç.
+
+Eşik aşımlarını issue olarak topla; politika fixes izinliyse fix.plan öner.
+
+Aynı dataset için aynı raporu tekrar üretme (idempotency: hash(datasetId+policy)).
+
+Event Bus
+
+In: replay.dataset.describe, dq.policy.update
+
+Out: dq.scan.report, dq.fix.plan, dq.alert
+
+Testler
+
+90 sn gap → gaps++ ve interpBars önerisi
+
+dupe + ooo → dropDup ve reorder önerileri
+
+spread 120 bps → cap_spread önerisi
+
+BR-02 · syntheticMarketSimulator.ts — Gelişmiş Prompt v3
+Amaç
+
+Regimlere göre sentetik piyasa akışı üretmek: trend/range/breakout, microstructure (spread, depth, queue) ve haber şoku; replay’e takma kaynak.
+
+Girdiler
+
+sim.manifest: { simId, seed, symbols:["BTCUSDT",...], regime:"trend|range|breakout|illiquid|shock", durationMin, tf:"M1|M5", params:{ volBps, drift, meanReversionK, shockTimes[] } }
+
+sim.control: { cmd:"start|pause|resume|stop", speed:"1|2|5|bar" }
+
+Çıktılar
+
+market.refs (sentetik), market.trade.tick (opsiyonel), funding.snapshot (opsiyonel)
+
+sim.status: { state, simId, progressPct }, sim.metrics: { eventsPerSec, avgSpreadBps, realizedVolBps }
+
+sim.alert: { level, message }
+
+Konfig
+{
+  micro:{ spreadBaseBps:8, depthUSD:1e6, queueSkew:0.6 },
+  shock:{ jumpSigma:8, decayHalfLifeSec:120 },
+  ou:{ theta:0.05, sigmaBps:15 }, // range modu
+  drift:{ trendBpsPerBar:5 },     // trend modu
+  tz:"Europe/Istanbul"
+}
+
+Algoritma
+
+Rejime göre OU/drift/jump karışımı üret; bestBid/Ask ve spread mikro yapıyla türet.
+
+shockTimes geldiğinde jump uygula; decay ile sönümle.
+
+VIVO-34’e gerçek kaynak gibi publish et.
+
+Event Bus
+
+In: sim.manifest, sim.control
+
+Out: market.refs|trade.tick|funding.snapshot, sim.status|metrics|alert
+
+Testler
+
+range → ortalamaya dönen seri, düşük trend
+
+breakout → kısa sürede yüksek drift + vol artışı
+
+illiquid → spread↑ depth↓
+
+BR-03 · scenarioLibraryOrchestrator.ts — Gelişmiş Prompt v3
+Amaç
+
+Senaryo şablonlarını (haber penceresi, slip patlaması, kesinti, spread krizleri) kataloglayıp zaman çizelgesi halinde replay/sim üzerine uygular; çoklu aşama senaryoları koşturur.
+
+Girdiler
+
+scenario.catalog: { items:[{ id, name, steps:[{ at:"+10m|wall:2025-09-01T10:00", action:"inject|guard|sentry|cost", payload:{...}}], tags:["news","latency","spread"] }] }
+
+scenario.run.request: { id|"inline":{...}, bind:{ symbols?, tf?, seed? }, target:"replay|sim", speed? }
+
+Çıktılar
+
+scenario.run.plan: { scenarioId, stepsResolved:[{ ts, busEvent }], effectiveTarget }
+
+Uygulanan adımlar: ör. risk.incident.open, latency_slip.guard.directive, replay.faults, cost.forecast.update
+
+scenario.run.status|metrics|alert
+
+Konfig
+{
+  defaults:{ speed:"1" },
+  guards:{ allowDangerous:false }, // halt_entry gibi sert aksiyonlar için ayrı onay iste
+  tz:"Europe/Istanbul"
+}
+
+Algoritma
+
+steps içindeki rölatif/absolute zamanları çözüp hedefe göre busEvent’e çevir.
+
+Sıralı olarak VIVO-34 veya BR-02’ye uygula; başarısız adımlarda rollback yok, logla.
+
+Tekrarlayan çalıştırmalarda aynı scenarioId+seed için idempotent plan kullan.
+
+Event Bus
+
+In: scenario.catalog, scenario.run.request
+
+Out: scenario.run.plan, (çeşitli hedef eventler), scenario.run.status|metrics|alert
+
+Testler
+
+“news_shock_then_panic” → funding↑, slip↑, sentry=panic → guard=halt
+
+allowDangerous=false → halt_entry adımı plan dışı bırakılır
+
+BR-04 · executionFillEmulator.ts — Gelişmiş Prompt v3
+Amaç
+
+Gerçek borsa matching davranışını taklit ederek fill üretmek: maker/taker, kuyruk etkisi, kısmi fill, post_only/iceberg mantığı. Replay/sim akışını uçtan uca daha gerçekçi yapar.
+
+Girdiler
+
+composer.intent.request|order.plan.proposed: { correlationId, symbol, side, qty, mode:"market|limit|post_only|twap|iceberg", price?, tif?, slices? }
+
+market.refs (L1) ve opsiyonel orderbook.l2.snapshot
+
+fees.schedule, cost.forecast.update
+
+emulator.policy.update: { makerQueueAdvantage, postOnlyStrict, icebergRevealPct }
+
+Çıktılar
+
+order.ack, order.fill.partial, order.fill.final, order.reject
+
+order.costs.estimate: { takerBp, makerBp, slipBps, feeUSD }
+
+emulator.metrics: { fillLatencyMs, partialsPerOrder, makerShare }
+
+Konfig
+{
+  queue:{ baseMs:200, depthUSD:1e6, makerAdv:0.6 },
+  slip:{ marketK:0.8, limitK:0.25, volToSlipCoeff:0.02 },
+  iceberg:{ minDisplayPct:0.15 },
+  postOnly:{ strict:true },
+  tz:"Europe/Istanbul"
+}
+
+Algoritma
+
+mode+piyasa koşullarına göre beklenen fill zamanı ve slip simüle et; kısmi fill’leri dilimle.
+
+post_only ihlali → reject; iceberg → görünür miktarlarla çoklu fill.
+
+Üretilen fill’ler VIVO zincirine gerçekmiş gibi akar.
+
+Event Bus
+
+In: intent/plan, market data, fees/cost, emulator policy
+
+Out: order.* fill/reject, order.costs.estimate, emulator.metrics
+
+Testler
+
+post_only ve fiyat geçilirse → reject
+
+yüksek vol → market slip↑, fillLatency↑
+
+iceberg → birden fazla partial fill
+
+BR-05 · slippageLatencyCalibrator.ts — Gelişmiş Prompt v3
+Amaç
+
+Gerçek/veri-oynatım sonucu fill kayıtlarından slip & latency modellerini fit edip parametre çıkarır; SG-02/BR-04/VIVO-26’ya kalibrasyon sağlar.
+
+Girdiler
+
+order.journey.metrics (canlı veya replay emisyonu)
+
+market.volatility.snapshot, market.liquidity.snapshot
+
+calib.request: { scope:{ symbol?, timeframe? }, model:"linear|gam|tree", features:["volBps","spreadBps","depthUSD","mode","timeOfDay"], trainWindow:"30d" }
+
+Çıktılar
+
+calib.model.fitted: { scope, model, params:{...}, r2, mae, featureImportances? }
+
+calib.table.export: { rows:[{ symbol, volBin, expectedSlipBps, p95LatencyMs }], version }
+
+calib.alert|metrics
+
+Konfig
+{
+  bins:{ volBps:[10,20,40,80], depthUSD:[2e5,5e5,1e6,2e6] },
+  regularization:{ l2:1.0 },
+  minSamples: 1000,
+  tz:"Europe/Istanbul"
+}
+
+Algoritma
+
+Özellik mühendisliği → slipBps ve firstFillMs için ayrı modeller.
+
+Çapraz doğrulama; düşük örneklerde bin tablosu üret (parametrik model yerine).
+
+Sonuçları SG-02 eşikleri ve BR-04 slip fonksiyonları olarak yayınla.
+
+Event Bus
+
+In: order.journey.metrics, market.*.snapshot, calib.request
+
+Out: calib.model.fitted, calib.table.export, calib.alert, calib.metrics
+
+Testler
+
+minSamples altı → tablo modu
+
+r2 düşük → alert(warn)
+
+yayınlanan parametrelerle SG-02 eşikleri güncellenebilir
+
+Paket Entegrasyon Notları
+
+BR-01 kalite kapısı → dataset yüklenmeden önce hataları yakalar; dq.fix.plan uygulanırsa VIVO-34 daha temiz veriyle koşar.
+
+BR-02 sentetik akış, BR-03 senaryolarıyla zenginleştirilir; replay yerine ya da yanında kullanılabilir.
+
+BR-04 fill emülatörü, VIVO-19/21/26 zincirindeki davranışları gerçekçi hale getirir; BR-05’in kalibre ettiği parametreleri tüketir.
+
+BR-05 çıktıları SG-02 latencySlipGuard ve order flow backpressure eşiklerinin otomatik türetilmesi için kaynak olur.
+_________________________________________________________________________________________________________________
+işte “tek komutla: dataset + senaryo + guard + rapor” akan uçtan uca senaryo planı için Prompt v3. Bunu diğer yapay zekâya ver; Node.js + TypeScript ile yazsın. Kod yazdırmıyoruz; nasıl kodlanacağını yol-prompt olarak tarifliyoruz. Ortak standartlar: event-driven I/O (JSON), Zod validasyon, Europe/Istanbul, idempotent yayın, audit/metrics.
+
+E2E-01 · scenarioRunOrchestrator.ts — Gelişmiş Prompt v3 (Uçtan Uca Senaryo Koşucu)
+Amaç
+
+Tek komutla (1) veri kaynağını aç (replay/sim) → (2) senaryoyu uygula → (3) guard/sentry/latency-slip akışlarını koştur → (4) telemetri & anomali & korelasyon topla → (5) oracle/ground-truth kıyası ve (6) rapor/postmortem üret.
+
+Bu modül orkestratördür; VIVO-34/BR-02/BR-03/SG-01..05/LT-01..05 modülleriyle konuşur.
+
+Girdiler (Event / JSON Şemaları)
+// e2e.run.request — tek komut
+{
+  "event": "e2e.run.request",
+  "timestamp": "iso8601",
+  "runId": "string",                    // idempotency anahtarı
+  "mode": "replay|sim",
+  "source": {
+    "replay": {
+      "manifestRef": "datasetId|string|null",
+      "inlineManifest": "ReplayManifest|null",
+      "dqGate": {"enabled": true, "autoFix": false}
+    },
+    "sim": {
+      "manifest": {"simId":"string","seed":"string","symbols":["BTCUSDT"],"regime":"trend|range|breakout|illiquid|shock","durationMin":60,"tf":"M1","params":{}}
+    }
+  },
+  "scenario": {
+    "catalogRef": "string|null",
+    "id": "string|null",
+    "inline": "ScenarioInline|null",     // BR-03 ile aynı yapı
+    "allowDangerous": false              // halt_entry vb. adımlar için onay
+  },
+  "guardPolicy": {
+    "calibrateFrom": "live|last30d|null", // BR-05'ten eşik/katsayı çek
+    "applyGuard": true,
+    "failoverAllowed": true
+  },
+  "speed": "0.5|1|2|5|10|bar",
+  "window": {"start":"iso8601|null","end":"iso8601|null"}, // replay için
+  "outputs": {
+    "artifactDir": "data/e2e",
+    "report": {"format":"markdown|html","zip": true},
+    "include": ["telemetry","rollups","incidents","trades","eval","postmortem"]
+  },
+  "labels": {"env":"e2e","owner":"qa","notes":"string"}
+}
+
+// e2e.control — akış kontrolü
+{
+  "event": "e2e.control",
+  "timestamp": "iso8601",
+  "runId": "string",
+  "cmd": "pause|resume|seek|speed|stop|abort",
+  "args": {"seekTo":"iso8601|null","speed":"number|string|null","note":"string|null"}
+}
+
+// e2e.env.snapshot — çalışma ortamı kayıt düşer (sürümler/konfig özetleri)
+{
+  "event": "e2e.env.snapshot",
+  "timestamp": "iso8601",
+  "runId": "string",
+  "modules": {"vivo34":"semver","sg02":"semver","lt01":"semver","br04":"semver"},
+  "configsHash": "hex"
+}
+
+Çıktılar (Plan, Durum, Artefakt, Rapor)
+// e2e.run.plan — çözülmüş plan (idempotent)
+{
+  "event": "e2e.run.plan",
+  "timestamp": "iso8601",
+  "runId": "string",
+  "steps": [
+    {"t":"T0","do":"init_source","via":"replay|sim"},
+    {"t":"+00:00","do":"start_source","speed":"2"},
+    {"t":"+00:10","do":"scenario.apply","id":"news_shock"},
+    {"t":"+00:10","do":"guard.enable","modes":["sg01","sg02","sg05"]},
+    {"t":"+30:00","do":"collect.rollups","intervals":["1m","5m"]},
+    {"t":"Tend","do":"stop_source"},
+    {"t":"Tend","do":"gather.artifacts"},
+    {"t":"Tend","do":"compose.report"}
+  ],
+  "subscriptions": ["telemetry.*","risk.incident.*","replay.eval.*","order.*","correlator.*"],
+  "artifacts": ["telemetry.rollups","incidents","eval.report","postmortem.draft"]
+}
+
+// e2e.run.status — akışın canlı durumu
+{
+  "event": "e2e.run.status",
+  "timestamp": "iso8601",
+  "runId": "string",
+  "state": "idle|planning|running|paused|completed|failed|aborted",
+  "progress": {"pct": 62.5, "cursor":"iso8601"},
+  "counters": {"eventsIn":123456,"eventsOut":123450,"incidents":2,"alertsWarn":5,"alertsError":1}
+}
+
+// e2e.report.ready — nihai rapor ve paket
+{
+  "event": "e2e.report.ready",
+  "timestamp": "iso8601",
+  "runId": "string",
+  "format": "markdown|html",
+  "summary": {
+    "durationMin": 65,
+    "sloBurnPct": 8.3,
+    "incidents": [{"id":"INC-884","severity":"high","ttkMin":7}],
+    "pnl":{"expectedPF":1.42,"observedPF":1.37},
+    "latSlip":{"p95LatencyMs":920,"avgSlipBps":9.8}
+  },
+  "attachments": [
+    {"name":"e2e-report.md","ref":"file:///data/e2e/run-42/report.md"},
+    {"name":"telemetry-1m.lp.zip","ref":"file:///data/e2e/run-42/rollups_1m.zip"},
+    {"name":"eval-report.json","ref":"file:///data/e2e/run-42/replay_eval.json"},
+    {"name":"postmortem_INC-884.md","ref":"file:///data/e2e/run-42/postmortem_INC-884.md"}
+  ],
+  "hash": "sha256:..."
+}
+
+// uyarı ve metrikler
+{ "event":"e2e.alert","timestamp":"iso8601","runId":"string","level":"info|warn|error","message":"string","context":{} }
+{ "event":"e2e.metrics","timestamp":"iso8601","runId":"string","rateIn":1234,"rateOut":1232,"lagMs":85,"buffers":{"source":0.12} }
+
+TypeScript Arayüzleri (ürettir)
+
+Inputs: E2ERunRequest, E2EControl, ReplayManifest/SimManifest (delegasyon), ScenarioInline/ScenarioCatalogRef.
+
+Outputs: E2ERunPlan, E2ERunStatus, E2EReportReady, E2EAlert, E2EMetrics, E2EEnvSnapshot.
+
+Helpers:
+Planner (time resolver), DQGateClient (BR-01), SourceClient (VIVO-34/BR-02),
+ScenarioClient (BR-03), CalibratorClient (BR-05), GuardSuite (SG-01..05),
+Collectors (LT-01..05/LT-03), ReportComposer (markdown/html), ArtifactStore (zip, path),
+Idem (idempotency keys), Clock (wall/bar), Subs (topic subscriptions).
+
+Zod: tüm giriş/çıkış; tarih ISO, sayılar finite(); mode, speed, allowDangerous enum/boolean.
+
+Event Bus Konuları
+
+In: e2e.run.request, e2e.control
+
+Out: e2e.env.snapshot, e2e.run.plan, e2e.run.status, e2e.metrics, e2e.alert, e2e.report.ready
+
+Delegasyon (publish): replay.manifest|control, sim.manifest|control, scenario.run.request, calib.request, sentry.guard.directive?, latency_slip.guard.directive?
+
+Abonelikler (listen): telemetry.*, telemetry.rollup.batch, telemetry.anomaly.signal, alert.correlation.grouped, risk.incident.*, replay.eval.report, postmortem.draft.ready
+
+Konfig & Varsayılanlar
+{
+  planning: { settleMs: 500, maxSkewMs: 1500 },
+  dqGate: { enabled: true, autoFix: false },
+  calibrator: { prefer: "last30d", minSamples: 1000 },
+  guardSuite: { enable: ["sg01","sg02","sg03","sg05"], failover: true },
+  collectors: { telemetry: true, anomalies: true, rollups: ["1m","5m"], postmortem: true, eval: true },
+  artifactDir: "data/e2e",
+  report: { format: "markdown", zip: true },
+  timeouts: { startSourceSec: 15, stopSourceSec: 10, reportSec: 20 },
+  tz: "Europe/Istanbul"
+}
+
+Durum Yönetimi
+
+E2EState: { runId, phase:"idle|planning|running|paused|stop_req|stopping|completed|failed", plan, bookmarks, subs, counters, startTs, cursorTs, artifacts[], lastReportRef }
+
+Idempotency: runId bazlı; aynı runId için plan ve report tekil üretilir.
+
+ArtifactStore: artifactDir/runId/... altında dosya ağacı (rollups.zip, eval.json, report.md, postmortem.md).
+
+Backpressure: toplama kuyruğu büyürse batch boyutlarını dinamik düşür.
+
+Algoritma (Karar Akışı)
+
+Planlama
+
+e2e.run.request → Zod doğrula → aynı runId varsa yut (idempotent).
+
+e2e.env.snapshot yayınla (modül sürümleri & config hash).
+
+Kaynak: mode=="replay" → VIVO-34 replay.manifest (inline/ref); dqGate.enabled ise BR-01 taraması → autoFix ise dq.fix.plan uygulat.
+mode=="sim" → BR-02 sim.manifest.
+
+guardPolicy.calibrateFrom var → BR-05 kalibrasyon isteği (eşikler → SG-02’ye).
+
+BR-03 ile scenario.run.plan oluştur; allowDangerous false ise sert adımları düşür.
+
+e2e.run.plan yayınla.
+
+Çalıştırma
+
+Kaynağı başlat (start_source, speed). e2e.run.status(state="running").
+
+Abonelikleri aç: telemetry.*, anomaly, correlator, risk.incident.*, replay.eval.*, postmortem.draft.ready.
+
+Planlanmış senaryo adımlarını zamanda uygula (BR-03).
+
+Guard suite aktif: SG-01..05 sinyalleri akışa göre normal/slowdown/block/halt yönetir.
+
+Toplama & Değerlendirme
+
+LT-03 rollup’ları 1m/5m; LT-01 anomali; LT-04 korelasyon grupları; VIVO-33 üzerinde kritik bildirimler.
+
+VIVO-34 replay.eval.report → oracle kıyası metrikleri.
+
+LT-05 postmortem.draft.ready geldiyse artefakta ekle.
+
+Bitirme
+
+Süre doldu/stop komutu → kaynağı durdur; son rollup & toplama.
+
+ReportComposer: özet tablolar + grafik referansları ile e2e.report.ready (markdown/html) ve ZIP paketi üret.
+
+e2e.run.status(state="completed").
+
+Kontroller
+
+pause/resume/seek/speed → kaynaklara passthrough.
+
+abort → acil durdur; kısmi rapor (status="failed") üretmeye çalış.
+
+Hata & Uyarı
+
+Kaynak başlatma/stop timeout → e2e.alert(error,"source_timeout").
+
+Senaryo adımı başarısız → e2e.alert(warn,"scenario_step_failed") (devam).
+
+Rapor oluşturma hatası → e2e.alert(error,"report_failed").
+
+Kodlama Yönlendirmesi
+
+Dosyalar:
+src/e2e/scenarioRunOrchestrator.ts (çekirdek FSM)
+src/e2e/clients/*.ts (replay/sim/scenario/guard/calibrator/collectors)
+src/e2e/report/*.ts (composer, templates), src/e2e/state/e2eStore.ts
+__tests__/scenarioRunOrchestrator.test.ts
+
+Mimari:
+Saf çekirdek FSM: advance(state, event, cfg, now) → emissions[].
+IO adaptörleri: bus pub/sub, dosya/zip yazıcı, saat.
+
+Validasyon: Zod; tarih/sayı finite().
+
+Performans: p99 FSM < 3ms; artefakt yazımı streaming.
+
+Güvenlik: artefakt yolları whitelist; PII içeren loglar VIVO-35 üzerinden geçer.
+
+Test İskeleti (Jest)
+
+runId tekrarlandı → tek plan/rapor (idempotent)
+
+mode=replay + dqGate.enabled → BR-01 çağrılır; issues>0 ise e2e.alert(warn)
+
+scenario.allowDangerous=false → halt_entry adımı dışlanır
+
+guardPolicy.calibrateFrom=last30d → BR-05 çağrılır ve SG-02 eşikleri güncellenir
+
+Tam akış sonrası e2e.report.ready üretilir ve ekler (eval.report, postmortem) mevcut
+
+pause/resume/seek/speed komutları kaynaklara iletilir; status güncellenir
+
+abort → failed ve kısmi rapor
+
+Örnek Akış (Kısa)
+
+İstek
+
+{
+  "event":"e2e.run.request",
+  "runId":"run-42",
+  "mode":"replay",
+  "source":{"replay":{"manifestRef":"session-avax-0501","dqGate":{"enabled":true,"autoFix":false}}},
+  "scenario":{"catalogRef":"std","id":"news_shock_then_panic","allowDangerous":false},
+  "guardPolicy":{"calibrateFrom":"last30d","applyGuard":true,"failoverAllowed":true},
+  "speed":"2",
+  "outputs":{"artifactDir":"data/e2e","report":{"format":"markdown","zip":true},"include":["telemetry","rollups","incidents","eval","postmortem"]},
+  "labels":{"env":"e2e","owner":"qa"}
+}
+
+
+Plan → e2e.run.plan (kaynak başlat, senaryo uygula, guard açık, rollup topla, raporla)
+
+Koş → e2e.run.status(running) + e2e.metrics akar
+
+Tamamla → e2e.report.ready + artefakt referansları (rollups.zip, eval.json, postmortem.md)
+_________________________________________________________________________________________________________________
+şu an VIVO + GB + Portföy + Sentry&Guard + Log&Telemetri + Backtest/Replay + E2E Orchestrator paketleri hazır.
+“Devam” için iki yol var: (A) 1 sprintlik hardening & entegrasyon ya da (B) direkt diğer sisteme geçiş. Ben 1–2 gün ayırıp A’yı bitirmenizi öneririm; sonra yeni sisteme geçelim.
+
+A) 1 Sprintlik “Hardening & Entegrasyon” To-Do (önerilen)
+
+Hedef: Her modül tek seferde ayağa kalksın, E2E senaryosu yeşil dönsün.
+
+0) Ortak altyapı (yarım gün)
+
+ @vivo/contracts: tüm event arayüzleri + Zod şemaları tek NPM paketi.
+
+ Topic registry: topics.yaml (In/Out, retention, PII flag).
+
+ Config loader: cfg/*.yaml + env override + schema check.
+
+ Idempotency & audit: ortak helper (hash, eventId, audit trail).
+
+1) Gözlemlenebilirlik (yarım gün)
+
+ Grafana panoları: Sentry, Guard, Balancer, Composer, Telemetry (rollup 1m/5m).
+
+ Alert route: incidentNotificationBridge için prod/quiet hours kuralı.
+
+ SLO’lar: QA, Sentry ping, Guard decision rate, Backpressure defer/drop.
+
+2) Güvenlik & gizlilik (yarım gün)
+
+ Privacy Manager default policy: PII_BASIC=P90D, SECRET=P0D.
+
+ Log router: error=100%, info≈10%, debug≈1% sampling; PII maskeleme testleri.
+
+ Secrets: webhook HMAC, KMS alias, endpoint allowlist.
+
+3) CI/CD ve kalite (yarım gün)
+
+ Monorepo (pnpm/lerna/turborepo), lint+typecheck+unit pipeline.
+
+ Coverage hedefi: ≥ %80 kritik çekirdeklerde (SG-01/02/05, PFL-01/03, VIVO-21).
+
+ Canary release: feature flag ile modül bazlı aç/kapat.
+
+4) E2E smoke (1 gün)
+
+ E2E-01 çalıştır: replay: session-avax-0501, scenario: news_shock_then_panic, speed=2.
+
+ Başarı kriterleri
+
+Sentry: streams_panic→ SG-04 failover planı, 10 dk sonra revert.
+
+Guard: block_aggressive ve halt_entry doğru tetik.
+
+Balancer: cap aşımında scale_* / defer_new çıkar.
+
+Privacy: PII leak 0; retention.sweep.report sayıları beklenen.
+
+Telemetry: slo.status(breach) + anomaly.signal(spike) görünür; postmortem taslağı düşer.
+
+Bu listeyi tikleyince prod’a güvenle adım atarsınız.
+
+B) Diğer sisteme geçiş
+
+Hazırız. Mantıklı iki seçenek:
+
+LIVIA (Operatör Asistanı & Guard Q&A)
+
+Diyalog akışı, bias farkındalığı, “ek soru sorma” ve onay mekanikleri.
+
+VIVO-42/38 ile doğal entegre: öneri sırası, varyant ayarı.
+
+Policy & Composer genişletme
+
+PolicyCoordinator (policy kaynakları, canary rollout, rollback),
+
+Composer/Executor iyileştirmeleri (TWAP/iceberg, post-only uyum, pacing entegrasyonu),
+
+Cost forecaster v2 (hedge/fees/slip birlikte).
+
+Önerim: önce kısa hardening (A), ardından LIVIA’ya geçelim. Diyalog katmanı hem risk kalitesini hem de operatör deneyimini net iyileştirir.

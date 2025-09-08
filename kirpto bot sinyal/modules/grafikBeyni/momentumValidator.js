@@ -432,3 +432,22 @@ class MomentumValidator extends GrafikBeyniModuleBase {
 }
 
 module.exports = MomentumValidator;
+
+/*
+# KRIPTOBOT GELİŞİM NOTLARI
+
+## [TARIH] - İşlemler
+
+### Yapılanlar:
+- [işlem 1]
+- [işlem 2]
+
+### Sonraki Adımlar:
+- [yapılacak 1]
+- [yapılacak 2]
+
+### Problemler:
+- [sorun varsa]
+
+---
+*/

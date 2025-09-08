@@ -255,7 +255,7 @@ class TimeBasedSignalSync extends GrafikBeyniModuleBase {
                 marketConditionImpact: this.analyzeSessionMarketConditionImpact(sessionPerformance, marketConditions),
                 volatilityImpact: this.analyzeSessionVolatilityImpact(sessionPerformance),
                 volumeImpact: this.analyzeSessionVolumeImpact(sessionPerformance),
-                relativeSessı yoncaonRankingank: this.calculateSessionRanking(sessionPerformance)
+                relativeSessionRanking: this.calculateSessionRanking(sessionPerformance)
             };
         });
 

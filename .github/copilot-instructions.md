@@ -1,4 +1,460 @@
-# Copilot Instructions for kriptobot
+/**
+ * Template Module - Yeni modüller için şablon
+ * Kriptobot Ana Sistem Modülü
+ */
+
+class TemplateModule {
+    constructor(config = {}) {
+        this.name = 'TemplateModule';
+        this.config = {
+            enabled: true,
+            logLevel: 'info',
+            ...config
+        };
+        this.isInitialized = false;
+        this.logger = null;
+    }
+
+    /**
+     * Modülü başlat
+     */
+    async initialize(logger) {
+        try {
+            this.logger = logger;
+            this.logger.info(`${this.name} başlatılıyor...`);
+            
+            // Başlatma işlemleri burada
+            await this.setup();
+            
+            this.isInitialized = true;
+            this.logger.info(`${this.name} başarıyla başlatıldı`);
+            return true;
+        } catch (error) {
+            this.logger.error(`${this.name} başlatma hatası:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * Kurulum işlemleri
+     */
+    async setup() {
+        // Modül özel kurulum işlemleri
+        if (this.config.enabled) {
+            this.logger.info(`${this.name} kurulumu tamamlandı`);
+        }
+    }
+
+    /**
+     * Ana işlem fonksiyonu
+     */
+    async process(data) {
+        if (!this.isInitialized) {
+            throw new Error(`${this.name} henüz başlatılmadı`);
+        }
+
+        try {
+            // Ana işlem mantığı burada
+            const result = await this.analyze(data);
+            return {
+                success: true,
+                data: result,
+                timestamp: new Date().toISOString(),
+                source: this.name
+            };
+        } catch (error) {
+            this.logger.error(`${this.name} işlem hatası:`, error);
+            return {
+                success: false,
+                error: error.message,
+                timestamp: new Date().toISOString(),
+                source: this.name
+            };
+        }
+    }
+
+    /**
+     * Analiz fonksiyonu - alt sınıflarda override edilebilir
+     */
+    async analyze(data) {
+        // Burada modül özel analiz mantığı
+        return {
+            processed: true,
+            input: data,
+            output: 'Template output'
+        };
+    }
+
+    /**
+     * Modül durumunu al
+     */
+    getStatus() {
+        return {
+            name: this.name,
+            initialized: this.isInitialized,
+            enabled: this.config.enabled,
+            config: this.config
+        };
+    }
+
+    /**
+     * Modülü durdur
+     */
+    async shutdown() {
+        try {
+            this.logger.info(`${this.name} durduruluyor...`);
+            // Temizlik işlemleri burada
+            this.isInitialized = false;
+            this.logger.info(`${this.name} başarıyla durduruldu`);
+        } catch (error) {
+            this.logger.error(`${this.name} durdurma hatası:`, error);
+        }
+    }
+}
+
+module.exports = TemplateModule;/**
+ * Template Module - Yeni modüller için şablon
+ * Kriptobot Ana Sistem Modülü
+ */
+
+class TemplateModule {
+    constructor(config = {}) {
+        this.name = 'TemplateModule';
+        this.config = {
+            enabled: true,
+            logLevel: 'info',
+            ...config
+        };
+        this.isInitialized = false;
+        this.logger = null;
+    }
+
+    /**
+     * Modülü başlat
+     */
+    async initialize(logger) {
+        try {
+            this.logger = logger;
+            this.logger.info(`${this.name} başlatılıyor...`);
+            
+            // Başlatma işlemleri burada
+            await this.setup();
+            
+            this.isInitialized = true;
+            this.logger.info(`${this.name} başarıyla başlatıldı`);
+            return true;
+        } catch (error) {
+            this.logger.error(`${this.name} başlatma hatası:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * Kurulum işlemleri
+     */
+    async setup() {
+        // Modül özel kurulum işlemleri
+        if (this.config.enabled) {
+            this.logger.info(`${this.name} kurulumu tamamlandı`);
+        }
+    }
+
+    /**
+     * Ana işlem fonksiyonu
+     */
+    async process(data) {
+        if (!this.isInitialized) {
+            throw new Error(`${this.name} henüz başlatılmadı`);
+        }
+
+        try {
+            // Ana işlem mantığı burada
+            const result = await this.analyze(data);
+            return {
+                success: true,
+                data: result,
+                timestamp: new Date().toISOString(),
+                source: this.name
+            };
+        } catch (error) {
+            this.logger.error(`${this.name} işlem hatası:`, error);
+            return {
+                success: false,
+                error: error.message,
+                timestamp: new Date().toISOString(),
+                source: this.name
+            };
+        }
+    }
+
+    /**
+     * Analiz fonksiyonu - alt sınıflarda override edilebilir
+     */
+    async analyze(data) {
+        // Burada modül özel analiz mantığı
+        return {
+            processed: true,
+            input: data,
+            output: 'Template output'
+        };
+    }
+
+    /**
+     * Modül durumunu al
+     */
+    getStatus() {
+        return {
+            name: this.name,
+            initialized: this.isInitialized,
+            enabled: this.config.enabled,
+            config: this.config
+        };
+    }
+
+    /**
+     * Modülü durdur
+     */
+    async shutdown() {
+        try {
+            this.logger.info(`${this.name} durduruluyor...`);
+            // Temizlik işlemleri burada
+            this.isInitialized = false;
+            this.logger.info(`${this.name} başarıyla durduruldu`);
+        } catch (error) {
+            this.logger.error(`${this.name} durdurma hatası:`, error);
+        }
+    }
+}
+
+module.exports = TemplateModule;/**
+ * Template Module - Yeni modüller için şablon
+ * Kriptobot Ana Sistem Modülü
+ */
+
+class TemplateModule {
+    constructor(config = {}) {
+        this.name = 'TemplateModule';
+        this.config = {
+            enabled: true,
+            logLevel: 'info',
+            ...config
+        };
+        this.isInitialized = false;
+        this.logger = null;
+    }
+
+    /**
+     * Modülü başlat
+     */
+    async initialize(logger) {
+        try {
+            this.logger = logger;
+            this.logger.info(`${this.name} başlatılıyor...`);
+            
+            // Başlatma işlemleri burada
+            await this.setup();
+            
+            this.isInitialized = true;
+            this.logger.info(`${this.name} başarıyla başlatıldı`);
+            return true;
+        } catch (error) {
+            this.logger.error(`${this.name} başlatma hatası:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * Kurulum işlemleri
+     */
+    async setup() {
+        // Modül özel kurulum işlemleri
+        if (this.config.enabled) {
+            this.logger.info(`${this.name} kurulumu tamamlandı`);
+        }
+    }
+
+    /**
+     * Ana işlem fonksiyonu
+     */
+    async process(data) {
+        if (!this.isInitialized) {
+            throw new Error(`${this.name} henüz başlatılmadı`);
+        }
+
+        try {
+            // Ana işlem mantığı burada
+            const result = await this.analyze(data);
+            return {
+                success: true,
+                data: result,
+                timestamp: new Date().toISOString(),
+                source: this.name
+            };
+        } catch (error) {
+            this.logger.error(`${this.name} işlem hatası:`, error);
+            return {
+                success: false,
+                error: error.message,
+                timestamp: new Date().toISOString(),
+                source: this.name
+            };
+        }
+    }
+
+    /**
+     * Analiz fonksiyonu - alt sınıflarda override edilebilir
+     */
+    async analyze(data) {
+        // Burada modül özel analiz mantığı
+        return {
+            processed: true,
+            input: data,
+            output: 'Template output'
+        };
+    }
+
+    /**
+     * Modül durumunu al
+     */
+    getStatus() {
+        return {
+            name: this.name,
+            initialized: this.isInitialized,
+            enabled: this.config.enabled,
+            config: this.config
+        };
+    }
+
+    /**
+     * Modülü durdur
+     */
+    async shutdown() {
+        try {
+            this.logger.info(`${this.name} durduruluyor...`);
+            // Temizlik işlemleri burada
+            this.isInitialized = false;
+            this.logger.info(`${this.name} başarıyla durduruldu`);
+        } catch (error) {
+            this.logger.error(`${this.name} durdurma hatası:`, error);
+        }
+    }
+}
+
+module.exports = TemplateModule;/**
+ * Template Module - Yeni modüller için şablon
+ * Kriptobot Ana Sistem Modülü
+ */
+
+class TemplateModule {
+    constructor(config = {}) {
+        this.name = 'TemplateModule';
+        this.config = {
+            enabled: true,
+            logLevel: 'info',
+            ...config
+        };
+        this.isInitialized = false;
+        this.logger = null;
+    }
+
+    /**
+     * Modülü başlat
+     */
+    async initialize(logger) {
+        try {
+            this.logger = logger;
+            this.logger.info(`${this.name} başlatılıyor...`);
+            
+            // Başlatma işlemleri burada
+            await this.setup();
+            
+            this.isInitialized = true;
+            this.logger.info(`${this.name} başarıyla başlatıldı`);
+            return true;
+        } catch (error) {
+            this.logger.error(`${this.name} başlatma hatası:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * Kurulum işlemleri
+     */
+    async setup() {
+        // Modül özel kurulum işlemleri
+        if (this.config.enabled) {
+            this.logger.info(`${this.name} kurulumu tamamlandı`);
+        }
+    }
+
+    /**
+     * Ana işlem fonksiyonu
+     */
+    async process(data) {
+        if (!this.isInitialized) {
+            throw new Error(`${this.name} henüz başlatılmadı`);
+        }
+
+        try {
+            // Ana işlem mantığı burada
+            const result = await this.analyze(data);
+            return {
+                success: true,
+                data: result,
+                timestamp: new Date().toISOString(),
+                source: this.name
+            };
+        } catch (error) {
+            this.logger.error(`${this.name} işlem hatası:`, error);
+            return {
+                success: false,
+                error: error.message,
+                timestamp: new Date().toISOString(),
+                source: this.name
+            };
+        }
+    }
+
+    /**
+     * Analiz fonksiyonu - alt sınıflarda override edilebilir
+     */
+    async analyze(data) {
+        // Burada modül özel analiz mantığı
+        return {
+            processed: true,
+            input: data,
+            output: 'Template output'
+        };
+    }
+
+    /**
+     * Modül durumunu al
+     */
+    getStatus() {
+        return {
+            name: this.name,
+            initialized: this.isInitialized,
+            enabled: this.config.enabled,
+            config: this.config
+        };
+    }
+
+    /**
+     * Modülü durdur
+     */
+    async shutdown() {
+        try {
+            this.logger.info(`${this.name} durduruluyor...`);
+            // Temizlik işlemleri burada
+            this.isInitialized = false;
+            this.logger.info(`${this.name} başarıyla durduruldu`);
+        } catch (error) {
+            this.logger.error(`${this.name} durdurma hatası:`, error);
+        }
+    }
+}
+
+module.exports = TemplateModule;# Copilot Instructions for kriptobot
 
 ## Big Picture Architecture
 - The project is a modular crypto trading bot with 5 main systems: Grafik Beyni (technical analysis), Otobilinç (psychological analysis), VIVO (signal routing), LIVIA (emotional filtering), and Denetim Asistanı (monitoring/feedback).

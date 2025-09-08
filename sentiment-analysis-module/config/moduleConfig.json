@@ -1,0 +1,19 @@
+{
+    "moduleName": "Sentiment Analysis Module",
+    "version": "1.0.0",
+    "description": "Configuration settings for the sentiment analysis module.",
+    "logging": {
+        "level": "info",
+        "file": "logs/sentiment-analysis.log"
+    },
+    "performanceTracking": {
+        "enabled": true,
+        "reportInterval": 60000
+    },
+    "maxHistorySize": 100,
+    "defaultConfidenceThreshold": 0.5,
+    "defaultSentimentScoreRange": {
+        "min": -1,
+        "max": 1
+    }
+}

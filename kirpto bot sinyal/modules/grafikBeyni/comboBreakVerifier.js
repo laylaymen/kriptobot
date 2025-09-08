@@ -354,8 +354,7 @@ class ComboBreakVerifier extends GrafikBeyniModuleBase {
             decliningVolume: volumeRatio < this.thresholds.volume.decline_multiplier,
             normalVolume: volumeRatio >= this.thresholds.volume.decline_multiplier && 
                          volumeRatio <= this.thresholds.volume.surge_multiplier,
-            confidence: this.calculateVolumeConfidence(volumeRatio, volumeM
-Data, volumePriceCorrelation)
+confidence: this.calculateVolumeConfidence(volumeRatio, volumeData, volumePriceCorrelation)
         };
     }
 

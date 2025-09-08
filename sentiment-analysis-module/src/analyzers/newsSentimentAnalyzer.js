@@ -1,34 +1,19 @@
-// GELİŞMİŞ News Sentiment Analyzer - Ek modüller.txt prompt'una göre geliştirildi
-// Haber başlığı + açıklamasını analiz ederek duygu sınıflandırması yapar
-// Offline word-score mapping ile çalışır, sistem entegrasyonu
-
-/**
- * Enhanced News Sentiment Analyzer Module
- * Haber duygu analizi - Ek modüller.txt prompt'una göre implementasyon
- * Haber başlığı + açıklamasını analiz ederek duygu sınıflandırması yapar
- * Offline word-score mapping ile çalışır
- */
 class NewsSentimentAnalyzer {
     constructor() {
         this.moduleName = 'newsSentimentAnalyzer';
         
-        // Sentiment word mapping (ek modüller.txt'den)
         this.sentimentWords = {
-            // Pozitif kelimeler (+2, +1)
             positive: {
                 strong: ['ETF', 'approval', 'approved', 'pump', 'bull', 'surge', 'rally', 'moon', 'adoption', 'breakthrough'],
                 moderate: ['good', 'positive', 'green', 'up', 'rise', 'gain', 'profit', 'success', 'win', 'bullish']
             },
-            // Negatif kelimeler (-2, -1)
             negative: {
                 strong: ['hack', 'hacked', 'collapse', 'crash', 'ban', 'banned', 'rug', 'scam', 'exploit', 'stolen'],
                 moderate: ['down', 'fall', 'drop', 'loss', 'bear', 'red', 'decline', 'worry', 'concern', 'risk']
             },
-            // Nötr kelimeler (0)
             neutral: ['stable', 'unchanged', 'flat', 'sideways', 'consolidation', 'waiting', 'analysis']
         };
         
-        // Action suggestions mapping (ek modüller.txt format'ında)
         this.actionMappings = {
             positive: {
                 high: {
@@ -62,7 +47,6 @@ class NewsSentimentAnalyzer {
         this.analysisHistory = [];
         this.maxHistorySize = 100;
         
-        // Performance metrics
         this.performanceMetrics = {
             totalAnalysis: 0,
             positiveCount: 0,
@@ -73,35 +57,21 @@ class NewsSentimentAnalyzer {
         };
     }
 
-    /**
-     * Ana sentiment analiz fonksiyonu - ek modüller.txt format'ında
-     */
     analyzeSentiment(title, description = '') {
         const startTime = Date.now();
         
         try {
-            // Input validation
             if (!title || typeof title !== 'string') {
                 throw new Error('Invalid title provided');
             }
             
-            // Text preprocessing
             const fullText = `${title.toLowerCase()} ${(description || '').toLowerCase()}`;
             const words = this.preprocessText(fullText);
-            
-            // Sentiment scoring
             const sentimentScore = this.calculateSentimentScore(words);
-            
-            // Sentiment classification
             const sentimentTag = this.classifySentiment(sentimentScore);
-            
-            // Reason analysis (matched words)
             const reasonAnalysis = this.analyzeReasons(words, sentimentScore);
-            
-            // Action suggestions
             const actionSuggestions = this.generateActionSuggestions(sentimentTag, sentimentScore);
             
-            // Final result (ek modüller.txt format'ında)
             const result = {
                 title: title,
                 sentimentScore: this.roundScore(sentimentScore),
@@ -120,7 +90,6 @@ class NewsSentimentAnalyzer {
                 }
             };
             
-            // History ve metrics güncelleme
             this.updateHistory(result);
             this.updatePerformanceMetrics(result, startTime);
             
@@ -132,23 +101,16 @@ class NewsSentimentAnalyzer {
         }
     }
 
-    /**
-     * Text preprocessing
-     */
     preprocessText(text) {
-        // Lowercase, noktalama temizleme, kelime ayırma
         const cleanText = text
             .toLowerCase()
-            .replace(/[^\w\s]/g, ' ') // Noktalama işaretlerini kaldır
-            .replace(/\s+/g, ' ') // Çoklu boşlukları tek boşluk yap
+            .replace(/[^\w\s]/g, ' ')
+            .replace(/\s+/g, ' ')
             .trim();
         
-        return cleanText.split(' ').filter(word => word.length > 2); // 2 karakterden uzun kelimeler
+        return cleanText.split(' ').filter(word => word.length > 2);
     }
 
-    /**
-     * Sentiment score hesaplama
-     */
     calculateSentimentScore(words) {
         let totalScore = 0;
         let matchedWords = 0;
@@ -161,48 +123,27 @@ class NewsSentimentAnalyzer {
             }
         });
         
-        // Normalize score (-1 ile +1 arası)
         if (matchedWords === 0) return 0;
         
         const avgScore = totalScore / matchedWords;
-        return Math.max(-1, Math.min(1, avgScore / 2)); // -1 ile +1 arası sınırla
+        return Math.max(-1, Math.min(1, avgScore / 2));
     }
 
-    /**
-     * Kelime skorunu bulma
-     */
     getWordScore(word) {
-        // Pozitif strong kelimeler: +2
         if (this.sentimentWords.positive.strong.includes(word)) return 2;
-        
-        // Pozitif moderate kelimeler: +1
         if (this.sentimentWords.positive.moderate.includes(word)) return 1;
-        
-        // Negatif strong kelimeler: -2
         if (this.sentimentWords.negative.strong.includes(word)) return -2;
-        
-        // Negatif moderate kelimeler: -1
         if (this.sentimentWords.negative.moderate.includes(word)) return -1;
-        
-        // Nötr kelimeler: 0
         if (this.sentimentWords.neutral.includes(word)) return 0;
-        
-        // Bilinmeyen kelimeler: 0
         return 0;
     }
 
-    /**
-     * Sentiment sınıflandırma
-     */
     classifySentiment(score) {
         if (score > 0.2) return 'positive';
         if (score < -0.2) return 'negative';
         return 'neutral';
     }
 
-    /**
-     * Neden analizi
-     */
     analyzeReasons(words, sentimentScore) {
         const matchedWords = [];
         const wordAnalysis = [];
@@ -234,16 +175,12 @@ class NewsSentimentAnalyzer {
         };
     }
 
-    /**
-     * Action suggestions oluşturma (ek modüller.txt format'ında)
-     */
     generateActionSuggestions(sentimentTag, sentimentScore) {
         const intensity = Math.abs(sentimentScore) > 0.5 ? 'high' : 'moderate';
         const actionKey = sentimentTag === 'neutral' ? 'any' : intensity;
         
         const baseActions = this.actionMappings[sentimentTag]?.[actionKey] || {};
         
-        // Sistem action suggestions
         const suggestions = {};
         
         if (sentimentTag === 'negative') {
@@ -259,14 +196,10 @@ class NewsSentimentAnalyzer {
         return suggestions;
     }
 
-    /**
-     * Confidence hesaplama
-     */
     calculateConfidence(sentimentScore, reasonAnalysis) {
-        const baseConfidence = Math.abs(sentimentScore); // 0-1 arası
+        const baseConfidence = Math.abs(sentimentScore);
         
         if (reasonAnalysis && reasonAnalysis.matchedWords.length > 0) {
-            // Daha fazla eşleşen kelime = daha yüksek confidence
             const wordBonus = Math.min(0.3, reasonAnalysis.matchedWords.length * 0.1);
             return Math.min(1, baseConfidence + wordBonus);
         }
@@ -274,9 +207,6 @@ class NewsSentimentAnalyzer {
         return baseConfidence;
     }
 
-    /**
-     * Intensity hesaplama
-     */
     calculateIntensity(sentimentScore) {
         const absScore = Math.abs(sentimentScore);
         
@@ -287,9 +217,6 @@ class NewsSentimentAnalyzer {
         return 'minimal';
     }
 
-    /**
-     * Recommendation oluşturma
-     */
     generateRecommendation(sentimentTag, sentimentScore) {
         const intensity = this.calculateIntensity(sentimentScore);
         
@@ -308,80 +235,6 @@ class NewsSentimentAnalyzer {
         }
         
         return 'Nötr haber - Normal monitoring devam etsin';
-    }
-
-    /**
-     * Batch sentiment analysis (çoklu haber)
-     */
-    analyzeBatchSentiment(newsItems) {
-        const results = [];
-        let totalScore = 0;
-        let positiveCount = 0;
-        let negativeCount = 0;
-        let neutralCount = 0;
-        
-        newsItems.forEach(item => {
-            const analysis = this.analyzeSentiment(item.title, item.description);
-            results.push(analysis);
-            
-            totalScore += analysis.sentimentScore;
-            
-            if (analysis.sentimentTag === 'positive') positiveCount++;
-            else if (analysis.sentimentTag === 'negative') negativeCount++;
-            else neutralCount++;
-        });
-        
-        const avgSentiment = newsItems.length > 0 ? totalScore / newsItems.length : 0;
-        
-        return {
-            individual: results,
-            aggregate: {
-                totalItems: newsItems.length,
-                avgSentimentScore: this.roundScore(avgSentiment),
-                overallSentiment: this.classifySentiment(avgSentiment),
-                distribution: {
-                    positive: positiveCount,
-                    negative: negativeCount,
-                    neutral: neutralCount
-                },
-                dominantSentiment: this.getDominantSentiment(positiveCount, negativeCount, neutralCount),
-                marketMood: this.calculateMarketMood(avgSentiment, results)
-            }
-        };
-    }
-
-    // Helper methods
-    getDominantCategory(scoreBreakdown) {
-        const maxScore = Math.max(scoreBreakdown.positive, scoreBreakdown.negative, scoreBreakdown.neutral);
-        
-        if (scoreBreakdown.positive === maxScore) return 'positive';
-        if (scoreBreakdown.negative === maxScore) return 'negative';
-        return 'neutral';
-    }
-
-    getDominantSentiment(positive, negative, neutral) {
-        const max = Math.max(positive, negative, neutral);
-        if (positive === max) return 'positive';
-        if (negative === max) return 'negative';
-        return 'neutral';
-    }
-
-    calculateMarketMood(avgSentiment, results) {
-        const highIntensityNews = results.filter(r => 
-            r.intensity === 'high' || r.intensity === 'very_high'
-        );
-        
-        if (highIntensityNews.length > results.length * 0.3) {
-            return avgSentiment > 0 ? 'euphoric' : 'panic';
-        }
-        
-        if (avgSentiment > 0.3) return 'optimistic';
-        if (avgSentiment < -0.3) return 'pessimistic';
-        return 'neutral';
-    }
-
-    roundScore(score) {
-        return Math.round(score * 100) / 100; // 2 decimal places
     }
 
     updateHistory(result) {
@@ -446,10 +299,8 @@ class NewsSentimentAnalyzer {
     }
 }
 
-// Singleton instance oluşturma
 const newsSentimentAnalyzer = new NewsSentimentAnalyzer();
 
-// Legacy function compatibility
 function analyzeSentiment(title, description) {
     return newsSentimentAnalyzer.analyzeSentiment(title, description);
 }
@@ -459,42 +310,3 @@ module.exports = {
     newsSentimentAnalyzer,
     analyzeSentiment
 };
-
-  for (const { word, score: s } of POSITIVE_WORDS) {
-    if (text.includes(word)) {
-      score += s;
-      reasons.push(word);
-    }
-  }
-  for (const { word, score: s } of NEGATIVE_WORDS) {
-    if (text.includes(word)) {
-      score += s;
-      reasons.push(word);
-    }
-  }
-
-  // Normalize score to -1..1
-  let sentimentScore = Math.max(-1, Math.min(1, score / 4));
-  let sentimentTag = 'neutral';
-  if (sentimentScore > 0.25) sentimentTag = 'positive';
-  else if (sentimentScore < -0.25) sentimentTag = 'negative';
-
-  // Sistem önerileri
-  let actionSuggested = {};
-  if (sentimentTag === 'positive') {
-    actionSuggested = {
-      grafikBeyni: 'sinyal onay',
-      livia: 'engel kaldır'
-    };
-  } else if (sentimentTag === 'negative') {
-    actionSuggested = {
-      livia: 'sinyal baskı',
-      grafikBeyni: 'falseBreakFilter aktif et'
-    };
-  } else {
-    actionSuggested = {
-      denetimAsistani: 'logla'
-    };
-  }
-
-

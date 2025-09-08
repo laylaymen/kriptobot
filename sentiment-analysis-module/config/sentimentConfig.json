@@ -1,0 +1,41 @@
+{
+    "sentimentThresholds": {
+        "positive": 0.25,
+        "negative": -0.25,
+        "neutral": 0.1
+    },
+    "confidenceSettings": {
+        "baseConfidence": 0.5,
+        "wordBonus": 0.1,
+        "maxConfidence": 1.0
+    },
+    "actionMappings": {
+        "positive": {
+            "high": {
+                "grafikBeyni": "volatility spike preparation",
+                "VIVO": "signal confirmation boost"
+            },
+            "moderate": {
+                "grafikBeyni": "pattern validation",
+                "VIVO": "normal signal processing"
+            }
+        },
+        "negative": {
+            "high": {
+                "LIVIA": "sinyal baskı",
+                "grafikBeyni": "falseBreakFilter aktif et",
+                "emergencySystem": "risk monitoring"
+            },
+            "moderate": {
+                "LIVIA": "emotional defense",
+                "grafikBeyni": "cautious analysis"
+            }
+        },
+        "neutral": {
+            "any": {
+                "denetimAsistani": "normal logging",
+                "systems": "continue monitoring"
+            }
+        }
+    }
+}
