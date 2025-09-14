@@ -1,0 +1,4 @@
+enabled: true
+logLevel: warn
+mode: soft_guard
+maxSlipBp: 25

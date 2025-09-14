@@ -1,0 +1,3 @@
+packages:
+  - "packages/*"
+  - "sentiment-analysis-module"

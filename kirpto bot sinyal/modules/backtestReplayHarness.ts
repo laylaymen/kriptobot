@@ -475,7 +475,7 @@ class FaultInjector {
       
       if (currentTime >= outageStart && currentTime <= outageEnd) {
         processedEvents = processedEvents.filter(event => {
-          const matches = outage.topics.some(pattern => {
+          const matches = outage.topics.some((pattern: string) => {
             if (pattern.endsWith('*')) {
               return event.topic.startsWith(pattern.slice(0, -1));
             }

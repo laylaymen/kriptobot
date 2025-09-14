@@ -239,6 +239,7 @@ interface MetricEntry {
 interface SloEntry {
   service: string;
   slo: string;
+  sli?: number;
   window: string;
   target: number;
   values: Array<{ timestamp: Date; value: number; }>;

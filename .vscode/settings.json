@@ -4,5 +4,6 @@
         "markdown": true,
         "plaintext": true
     },
-    "github.copilot.nextEditSuggestions.enabled": true
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "github-actions.disable-validation": true
 }

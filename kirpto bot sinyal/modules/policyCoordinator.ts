@@ -413,7 +413,11 @@ export class PolicyCoordinator extends EventEmitter {
         scope: update.scope,
         patch: update.patch,
         window: update.window,
-        audit: update.audit,
+        audit: {
+          reasonCodes: update.audit?.reasonCodes || [],
+          note: update.audit?.note,
+          changeId: update.audit?.changeId
+        },
         timestamp: update.timestamp
       };
 

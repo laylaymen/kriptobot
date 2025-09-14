@@ -240,7 +240,7 @@ class ExecutionFillEmulator extends EventEmitter {
             // Validate order
             const validation = this.validateOrder(data);
             if (!validation.valid) {
-                await this.emitReject(data.correlationId, validation.reason);
+                await this.emitReject(data.correlationId ?? 'unknown', validation.reason);
                 return;
             }
 
@@ -275,7 +275,8 @@ class ExecutionFillEmulator extends EventEmitter {
 
         } catch (error) {
             this.logger.error('ExecutionFillEmulator order intent error:', error);
-            await this.emitReject(data.correlationId, `Processing error: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            await this.emitReject(data.correlationId ?? 'unknown', `Processing error: ${errorMessage}`);
         }
     }
 
@@ -402,7 +403,8 @@ class ExecutionFillEmulator extends EventEmitter {
             }
         } catch (error) {
             this.logger.error(`ExecutionFillEmulator execution error for ${orderId}:`, error);
-            await this.emitReject(intent.correlationId, `Execution error: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            await this.emitReject(intent.correlationId ?? 'unknown', `Execution error: ${errorMessage}`);
             this.activeOrders.delete(orderId);
         }
     }

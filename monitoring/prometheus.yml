@@ -1,0 +1,39 @@
+# 📊 Prometheus Configuration for Kriptobot Monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Kriptobot application metrics
+  - job_name: 'kriptobot'
+    static_configs:
+      - targets: ['kriptobot:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Node.js application metrics
+  - job_name: 'nodejs'
+    static_configs:
+      - targets: ['kriptobot:3000']
+    metrics_path: '/node-metrics'
+    scrape_interval: 30s
+
+  # Redis metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']

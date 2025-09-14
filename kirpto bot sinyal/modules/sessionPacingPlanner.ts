@@ -86,7 +86,7 @@ export class SessionPacingPlanner extends EventEmitter {
   private last:PacingInput | null = null;
 
   attach(bus: any, logger: any){
-    bus.on<PacingInput>("vivo.pacing.input", (x: any)=> this.safeRun(x, bus, logger));
+    bus.on("vivo.pacing.input", (x: any)=> this.safeRun(x, bus, logger));
     // periyodik tetik (1 dakikada bir yeniden üret)
     bus.on("clock.tick1m", ()=> { if (this.last) this.safeRun(this.last, bus, logger); });
   }
@@ -97,7 +97,7 @@ export class SessionPacingPlanner extends EventEmitter {
       logger.error(res, "VIVO-12 failed");
     } else {
       const plan = res as PacingPlan;
-      bus.emit<PacingPlan>("vivo.pacing.plan", plan);
+      bus.emit("vivo.pacing.plan", plan);
       bus.emit("audit.log", { asOf:plan.asOf, ver:this.ver, src:this.src,
         payload:{ session:plan.sessionId, maxNew:plan.maxNewPositions, childPerMin:plan.maxChildPerMin, reduceOnly:plan.reduceOnly }});
       this.last = x;

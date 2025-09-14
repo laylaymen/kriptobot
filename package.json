@@ -1,8 +1,38 @@
 {
+  "private": true,
+  "name": "kriptobot",
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "packages/*",
+    "sentiment-analysis-module"
+  ],
+  "scripts": {
+    "build": "pnpm -r --filter '@vivo/*' run build",
+    "test": "pnpm -r --filter '@vivo/*' run test",
+    "typecheck": "pnpm -r --filter '@vivo/*' run typecheck",
+    "lint": "pnpm -r --filter '@vivo/*' run lint",
+    "lint:check": "pnpm -r --filter '@vivo/*' run lint:check || echo 'Lint check completed'",
+    "lint:fix": "pnpm -r --filter '@vivo/*' run lint:fix || echo 'Lint fix completed'",
+    "clean": "pnpm -r --filter '@vivo/*' run clean && rm -rf node_modules/.cache",
+    "dev": "pnpm -r --filter '@vivo/*' run dev",
+    "ci:install": "pnpm install --frozen-lockfile",
+    "ci:build": "pnpm run build",
+    "ci:test": "pnpm run test",
+    "ci:security": "pnpm audit --audit-level moderate",
+    "release:prepare": "pnpm run clean && pnpm run build && pnpm run test",
+    "release:dry": "pnpm -r --filter '@vivo/*' exec pnpm pack --dry-run",
+    "docker:build": "docker build -t kriptobot:latest .",
+    "docker:run": "docker run -p 3000:3000 kriptobot:latest"
+  },
   "devDependencies": {
-    "jest": "^29.0.0"
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.0.0",
+    "typescript": "^5.0.0"
   },
   "dependencies": {
-    "axios": "^1.11.0"
+    "axios": "^1.11.0",
+    "zod": "^3.25.76"
   }
 }

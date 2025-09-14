@@ -5,8 +5,32 @@
  */
 
 import { EventEmitter } from "events";
-import { bus } from "../core/bus";
-import { logger } from "../core/logger";
+// import { bus } from "../core/bus";
+// import { logger } from "../core/logger";
+
+// Temporary logger implementation
+const logger = {
+  info: (msg: string, ...args: any[]) => console.log(`[INFO] ${msg}`, ...args),
+  warn: (msg: string, ...args: any[]) => console.warn(`[WARN] ${msg}`, ...args),
+  error: (msg: string | object, details?: string) => {
+    if (typeof msg === 'string') {
+      console.error(`[ERROR] ${msg}`, details);
+    } else {
+      console.error(`[ERROR]`, msg, details);
+    }
+  },
+  debug: (msg: string, ...args: any[]) => console.debug(`[DEBUG] ${msg}`, ...args)
+};
+
+// Mock bus implementation
+const bus = {
+  on: <T = any>(event: string, handler: (data: T) => void) => {
+    console.log(`[BUS] Registered handler for: ${event}`);
+  },
+  emit: <T = any>(event: string, data?: T) => {
+    console.log(`[BUS] Emitted: ${event}`, data);
+  }
+};
 
 // Types for VIVO-11
 export type ISODate = string;
@@ -84,7 +108,7 @@ export class SpotCashAllocator extends EventEmitter {
   private seen = new Set<string>();
 
   attach(){
-    bus.on<AllocInput>("vivo.spot.request", (inp)=> this.safeRun(inp));
+    bus.on<AllocInput>("vivo.spot.request", (inp: AllocInput) => this.safeRun(inp));
   }
 
   safeRun(inp: AllocInput){

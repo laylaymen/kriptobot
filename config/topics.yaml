@@ -1,0 +1,36 @@
+---
+- name: telemetry.metrics
+  direction: out
+  pii: none
+  retention:
+    memorySec: 600
+    persistDays: 7
+  owners: ["observability"]
+  notes: "Module metrics rollups"
+
+- name: telemetry.slo.status
+  direction: out
+  pii: none
+  retention:
+    memorySec: 86400
+    persistDays: 30
+  owners: ["observability"]
+  notes: "SLO status events"
+
+- name: sentry.guard.directive
+  direction: out
+  pii: low
+  retention:
+    memorySec: 600
+    persistDays: 7
+  owners: ["sentry","guard"]
+  notes: "Runtime guard directives"
+
+- name: privacy.data.normalized
+  direction: both
+  pii: basic
+  retention:
+    memorySec: 0
+    persistDays: 90
+  owners: ["privacy"]
+  notes: "PII normalized with expiry"

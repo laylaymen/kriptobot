@@ -1,0 +1,44 @@
+# 🚨 Prometheus Alert Rules for Kriptobot
+
+groups:
+  - name: kriptobot.rules
+    rules:
+      # High memory usage alert
+      - alert: HighMemoryUsage
+        expr: (process_resident_memory_bytes / 1024 / 1024) > 512
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kriptobot high memory usage"
+          description: "Kriptobot is using more than 512MB of memory for 5 minutes"
+
+      # Application down alert
+      - alert: KriptobotDown
+        expr: up{job="kriptobot"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kriptobot application is down"
+          description: "Kriptobot has been down for more than 2 minutes"
+
+      # High error rate alert
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 10% for 3 minutes"
+
+      # Redis connection alert
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been down for more than 1 minute"

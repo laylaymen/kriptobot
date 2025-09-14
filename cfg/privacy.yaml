@@ -1,0 +1,6 @@
+enabled: true
+logLevel: info
+defaults:
+  PII_BASIC: P90D
+  PII_STRICT: P30D
+  SECRET: P0D

@@ -1,0 +1,41 @@
+{
+  "name": "@vivo/security",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./secrets": {
+      "types": "./dist/secretsManager.d.ts",
+      "import": "./dist/secretsManager.js"
+    },
+    "./guards": {
+      "types": "./dist/runtimeGuards.d.ts",
+      "import": "./dist/runtimeGuards.js"
+    },
+    "./permissions": {
+      "types": "./dist/permissionBoundaries.d.ts",
+      "import": "./dist/permissionBoundaries.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --config ./jest.config.cjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.25.76",
+    "@vivo/obs": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  }
+}

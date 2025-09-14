@@ -1,0 +1,47 @@
+{
+  "name": "@vivo/contracts",
+  "version": "1.0.0",
+  "description": "Shared event interfaces and Zod schemas for VIVO system",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./events/*": {
+      "import": "./dist/events/*.js",
+      "types": "./dist/events/*.d.ts"
+    }
+  },
+  "scripts": {
+  "build": "tsup src/index.ts --format esm,cjs --dts --treeshake=safest",
+    "dev": "tsc --watch",
+    "test": "jest --config ./jest.config.cjs",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "tsup": "^7.3.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "sideEffects": true,
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

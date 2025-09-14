@@ -1,0 +1,128 @@
+name: 📦 Release Management
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags (v1.0.0, v2.1.3, etc.)
+      
+permissions:
+  contents: write
+  packages: write
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8'
+
+jobs:
+  create-release:
+    name: 📦 Create Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: 🔧 Setup Node.js & pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          
+      - name: 📦 Install and build
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+          
+      - name: 🧪 Run tests before release
+        run: |
+          pnpm run test
+          
+      - name: 🏷️ Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Releasing version: $VERSION"
+          
+      - name: 📝 Generate changelog
+        id: changelog
+        run: |
+          echo "# 📝 Release Notes for v${{ steps.version.outputs.VERSION }}" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "## 🚀 What's New" >> CHANGELOG.md
+          git log --oneline --pretty=format:"- %s (%h)" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> CHANGELOG.md || echo "- Initial release" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "## 📊 Package Details" >> CHANGELOG.md
+          echo "- Node.js version: ${{ env.NODE_VERSION }}" >> CHANGELOG.md
+          echo "- Build date: $(date)" >> CHANGELOG.md
+          echo "- Commit: ${{ github.sha }}" >> CHANGELOG.md
+          
+      - name: 📦 Create release packages
+        run: |
+          mkdir -p release-packages
+          for pkg in packages/*/; do
+            if [ -d "$pkg/dist" ]; then
+              pkg_name=$(basename "$pkg")
+              echo "📦 Packaging $pkg_name for release..."
+              cd "$pkg"
+              pnpm pack --pack-destination ../../release-packages/
+              cd ../..
+            fi
+          done
+          
+      - name: 🚀 Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: 🎉 Kriptobot v${{ steps.version.outputs.VERSION }}
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+          
+      - name: 📦 Create release archive
+        run: |
+          if [ -d "release-packages" ] && [ "$(ls -A release-packages)" ]; then
+            cd release-packages
+            tar -czf ../kriptobot-packages-v${{ steps.version.outputs.VERSION }}.tar.gz *
+            cd ..
+          else
+            echo "No packages to archive"
+          fi
+          
+      - name: 📤 Upload release assets
+        if: hashFiles('kriptobot-packages-v*.tar.gz') != ''
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./kriptobot-packages-v${{ steps.version.outputs.VERSION }}.tar.gz
+          asset_name: kriptobot-packages-v${{ steps.version.outputs.VERSION }}.tar.gz
+          asset_content_type: application/gzip
+          
+      - name: 📦 Publish to NPM (if configured)
+        if: env.NPM_TOKEN != ''
+        run: |
+          echo "📦 Publishing packages to NPM..."
+          # Only publish public packages
+          pnpm -r --filter '!./kirpto\ bot\ sinyal' publish --access public --no-git-checks
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: 🔔 Release notification
+        run: |
+          echo "🎉 Release v${{ steps.version.outputs.VERSION }} created successfully!"
+          echo "📦 Packages built and uploaded"
+          echo "🚀 Ready for deployment"
