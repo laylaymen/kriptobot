@@ -1,0 +1,641 @@
+A) 1 Sprintlik “Hardening & Entegrasyon” To-Do (önerilen)
+
+Hedef: Her modül tek seferde ayağa kalksın, E2E senaryosu yeşil dönsün.
+
+0) Ortak altyapı (yarım gün)
+
+ @vivo/contracts: tüm event arayüzleri + Zod şemaları tek NPM paketi.
+
+ Topic registry: topics.yaml (In/Out, retention, PII flag).
+
+ Config loader: cfg/*.yaml + env override + schema check.
+
+ Idempotency & audit: ortak helper (hash, eventId, audit trail).
+
+1) Gözlemlenebilirlik (yarım gün)
+
+ Grafana panoları: Sentry, Guard, Balancer, Composer, Telemetry (rollup 1m/5m).
+
+ Alert route: incidentNotificationBridge için prod/quiet hours kuralı.
+
+ SLO’lar: QA, Sentry ping, Guard decision rate, Backpressure defer/drop.
+
+2) Güvenlik & gizlilik (yarım gün)
+
+ Privacy Manager default policy: PII_BASIC=P90D, SECRET=P0D.
+
+ Log router: error=100%, info≈10%, debug≈1% sampling; PII maskeleme testleri.
+
+ Secrets: webhook HMAC, KMS alias, endpoint allowlist.
+
+3) CI/CD ve kalite (yarım gün)
+
+ Monorepo (pnpm/lerna/turborepo), lint+typecheck+unit pipeline.
+
+ Coverage hedefi: ≥ %80 kritik çekirdeklerde (SG-01/02/05, PFL-01/03, VIVO-21).
+
+ Canary release: feature flag ile modül bazlı aç/kapat.
+
+4) E2E smoke (1 gün)
+
+ E2E-01 çalıştır: replay: session-avax-0501, scenario: news_shock_then_panic, speed=2.
+
+ Başarı kriterleri
+
+Sentry: streams_panic→ SG-04 failover planı, 10 dk sonra revert.
+
+Guard: block_aggressive ve halt_entry doğru tetik.
+
+Balancer: cap aşımında scale_* / defer_new çıkar.
+
+Privacy: PII leak 0; retention.sweep.report sayıları beklenen.
+
+Telemetry: slo.status(breach) + anomaly.signal(spike) görünür; postmortem taslağı düşer.
+
+Bu listeyi tikleyince prod’a güvenle adım atarsınız.
+______________________________________________________________________________________________
+0) Ortak Altyapı (Core Infra)
+INF-01 · @vivo/contracts (tipler + Zod şemaları) — Prompt v3
+
+Amaç: Tüm event arayüzlerini ve Zod şemalarını tek pakette toplayıp modüller arası tip uyumu sağlamak.
+
+Yapılacaklar (AI’ye verilecek):
+
+Monorepo içinde packages/contracts oluştur.
+
+Event arayüzleri ve Zod şemaları: *.metrics, sentry.guard.directive, latency_slip.guard.directive, portfolio.balance.directive, bridge.*, telemetry.*, replay.*, e2e.* (önceki sohbetlerde tanımlanan şemalar).
+
+index.ts tek çıkış; ES module; z.object({...}).strict().
+
+npm publish değil; monorepo içi tüketim (pnpm workspaces).
+
+Kabul Kriterleri
+
+Tip-test: 5+ olayı import eden örnek derleniyor.
+
+Şema-test: 10+ örnek olay parse ediliyor; kötü örnekler reddediliyor.
+
+INF-02 · topics.yaml (topic registry) — Prompt v3
+
+Amaç: Her konunun (topic) giriş/çıkış, retention, PII bayrakları.
+
+Yapılacaklar:
+
+Kökte config/topics.yaml oluştur.
+
+Alanlar: name, direction: in|out|both, pii: none|low|basic|strict, retention: {memorySec, persistDays}, owners, notes.
+
+CI’da şema validasyonu (JSON Schema).
+
+Kabul Kriterleri
+
+Tüm modüllerin In/Out topic’leri doldurulmuş.
+
+CI check “topics schema ok”.
+
+INF-03 · configLoader.ts — Prompt v3
+
+Amaç: cfg/*.yaml + env override + şema doğrulama + default’lar.
+
+Yapılacaklar:
+
+packages/config paketi; loadConfig({moduleName}) → Zod ile doğrulama.
+
+Kaynak önceliği: cfg/<module>.yaml < .env < process env.
+
+Immutable config objesi döndür.
+
+Kabul Kriterleri
+
+3 modül için örnek cfg dosyaları; env override unit testleri geçer.
+
+INF-04 · auditIdem.ts (audit & idempotency) — Prompt v3
+
+Amaç: Her publish’te audit alanı ekleme ve idempotency anahtarıyla çift yayını engelleme.
+
+Yapılacaklar:
+
+makeAudit(event, ctx) ve isDuplicate(idemKey, ttlSec) yardımcıları.
+
+Bellek + opsiyonel data/idem.index persist.
+
+Kabul Kriterleri
+
+Aynı runId ile iki kez e2e.run.plan oluşturulamaz.
+
+Audit alanı tüm Out eventlerde mevcut.
+
+1) Gözlemlenebilirlik (Observability)
+OBS-01 · Grafana Panoları — Prompt v3
+
+Amaç: Sentry, Guard, Balancer, Composer, Telemetry için 5 pano.
+
+Yapılacaklar:
+
+Datasource: Prometheus/ClickHouse (mevcut exporter/rollup).
+
+Panolar:
+
+Sentry & Streams (ping p99, gaps, mode timeline)
+
+Latency & Slip (place/firstFill p95, slip p95, guard mode timeline)
+
+Portfolio (risk caps, scale/defer sayacı)
+
+Orderflow Backpressure (inFlight, defer/drop)
+
+SLO & Anomaly (breach/at_risk, anomaly kind dağılımı)
+
+Kabul Kriterleri
+
+5 pano JSON’u repo’da dashboards/*.json.
+
+Prom query’leri örnek metrik isimleriyle çalışıyor.
+
+OBS-02 · Alert Route (Incident Bridge) — Prompt v3
+
+Amaç: VIVO-33 ile prod/quiet hours kuralları.
+
+Yapılacaklar:
+
+bridge.channel.map default kuralları: critical → Telegram+Email, high → Telegram+Discord, medium → Discord only.
+
+bridge.prefs: quietHours 23:30–07:30, soak 60s, dedupe 5m.
+
+Kabul Kriterleri
+
+Test: gece gelen 3 olay → tek batched mesaj.
+
+Dedupe aynı groupId içinde çalışıyor.
+
+OBS-03 · SLO Tanımları — Prompt v3
+
+Amaç: QA, Sentry ping, Guard success, Backpressure drop için SLO.
+
+Yapılacaklar:
+
+cfg/slo.yaml hedefler (availability/latency p99/error budget).
+
+VIVO-32 SloTracker ile eşleştir.
+
+Kabul Kriterleri
+
+4 SLO telemetry.slo.status yayınlıyor; breach → alert(error) görülebiliyor.
+
+2) Güvenlik & Gizlilik
+SEC-01 · Privacy Defaults — Prompt v3
+
+Amaç: Varsayılan politika: PII_BASIC=P90D, PII_STRICT=P30D, SECRET=P0D.
+
+Yapılacaklar:
+
+VIVO-35 privacy.policy.update(version=1)’i cfg’den yükle.
+
+redaction.telemetry: email/ip → hash; alerts’te phone/email → mask.
+
+Kabul Kriterleri
+
+data.ingest → data.normalized’da classification & expiresAt var.
+
+SECRET alanlı kayıtlar drop + privacy.alert(error).
+
+SEC-02 · Log Sampling Kuralları — Prompt v3
+
+Amaç: error=100%, warn≈50%, info≈10%, debug≈1%.
+
+Yapılacaklar:
+
+LT-02 Router rule-set; source=guard/sentry için sink=click ek.
+
+Burst’te backpressure → sampling yükseltme.
+
+Kabul Kriterleri
+
+10k info log → yaklaşık %10 geçer.
+
+Burst senaryosunda log.router.alert(warn) çıkıyor.
+
+SEC-03 · Secrets & Allowlist — Prompt v3
+
+Amaç: Webhook HMAC, endpoint allowlist, KMS alias.
+
+Yapılacaklar:
+
+Bridge/Webhook X-Signature: HMAC zorunlu.
+
+Endpoint’ler cfg/endpoints.yaml’da; orchestrator allowlist uygulasın.
+
+KMS alias: kms:vivo35-rotating.
+
+Kabul Kriterleri
+
+İmzasız inbound → reddedilir.
+
+Allowlist dışı endpoint → switch plan üretilmez.
+
+3) CI/CD & Kalite
+CI-01 · Monorepo İskeleti — Prompt v3
+
+Amaç: pnpm workspaces + tsconfig baz.
+
+Yapılacaklar:
+
+packages/ (contracts, config, common), services/ (vivo, sg, pfl, lt, br, e2e).
+
+tsconfig.base.json, eslint+prettier, vitest|jest.
+
+Node 18+, strictNullChecks on.
+
+Kabul Kriterleri
+
+pnpm -r build ve pnpm -r test yeşil.
+
+CI-02 · Pipeline (GitHub Actions) — Prompt v3
+
+Amaç: lint+typecheck+test+artifact.
+
+Yapılacaklar:
+
+Job’lar: lint, typecheck, test, package (tarball).
+
+Cache pnpm store; coverage threshold ≥ %80 “kritik çekirdekler”.
+
+Kabul Kriterleri
+
+PR’da tüm job’lar geçmeden merge yok.
+
+Coverage raporu 80%+ (SG-01/02/05, PFL-01/03, VIVO-21 için).
+
+CI-03 · Feature Flags / Canary — Prompt v3
+
+Amaç: Modül bazlı aç/kapat + % rollout.
+
+Yapılacaklar:
+
+cfg/flags.yaml: module.enabled, canary.percent.
+
+Orchestrator & services flag okur; log’a not düşer.
+
+Kabul Kriterleri
+
+Canary %10’da modül sadece canary instance’da aktif.
+
+4) E2E “Smoke” Koşusu
+E2E-SMOKE · Çalıştırma Rehberi — Prompt v3
+
+Amaç: session-avax-0501 dataset + news_shock_then_panic senaryosu, hız 2×.
+
+Yapılacaklar:
+
+Kaynak
+
+replay.manifestRef: "session-avax-0501"; DQ Gate açık, autoFix kapalı.
+
+Senaryo
+
+Catalog: std; id: news_shock_then_panic; dangerous=false.
+
+Guard Suite
+
+SG-01..02..05 aktif; BR-05’ten son 30g kalibrasyon.
+
+Toplama
+
+Rollup 1m/5m; anomali algılama; correlator aktif; postmortem açık.
+
+Çıktılar
+
+data/e2e/run-42/ altında report.md, rollups_1m.zip, eval.json, postmortem_*.md.
+
+Kabul Kriterleri (hepsi sağlanmalı)
+
+Sentry streams_panic → SG-04 switch planı; 10 dk stabil → revert planı.
+
+Guard block_aggressive ve en az bir kez halt_entry tetikler.
+
+Balancer cap aşımında scale_* veya defer_new çıkar.
+
+Privacy leak = 0; retention.sweep.report üretir.
+
+e2e.report.ready oluşur; PF ve p95 latency/slip özetleri içerir.
+
+Uygulama Sırası (önerilen)
+
+INF-01..04 → OBS-01..03
+
+SEC-01..03
+
+CI-01..03
+
+E2E-SMOKE
+
+Hazır Kopyala-Yapıştır “Ortak .env örneği”
+TZ=Europe/Istanbul
+BRIDGE_HMAC=changemehex
+SUBJECT_PEPPER=changemesecret
+KMS_ALIAS=kms:vivo35-rotating
+PROM_EXPORTER_PORT=9108
+TSDB_ENDPOINT_PRIMARY=http://tsdb:8086/write
+TSDB_ENDPOINT_SECONDARY=http://tsdb-b:8086/write
+______________________________________________________________________________________________
+Node.js + TypeScript monorepo yapısını, dosyaları, testleri ve kabul kriterlerini tek seferde uygulasın. Her görev net çıktı, kabul koşulu ve dosya yollarıyla yazıldı.
+
+Not: Tüm modüller event-driven I/O (JSON), Zod runtime validasyon, Europe/Istanbul saat dilimi, idempotent yayın, audit/metrics standartlarına uymalı.
+
+======================================================================
+VIVO • HARDENING & ENTEGRASYON — TOPLU PROMPT v3 (AI’ye verilecek)
+======================================================================
+
+GLOBAL-STANDARDS — (tüm görevler için ortak)
+- Dil/Yığın: Node.js 18+, TypeScript, pnpm workspaces, Jest/Vitest.
+- Desen: event-driven; her dosyada `ingest(event, state, cfg) → emissions[]` veya FSM `advance`.
+- Zaman: Europe/Istanbul, ISO-8601 timestamp; gün sonu resetleri yerel güne göre.
+- Validasyon: Zod şemaları; `.strict()`; sayılar `finite()`.
+- Güvenlik: HMAC imza (webhook), KMS alias `kms:vivo35-rotating`; allowlist ile endpoint değişimi.
+- İdempotency: her Out eventte `audit` + `idemKey`; aynı anahtar  TTL içinde tekrar yayınlanmaz.
+- Telemetri: her modül `*.metrics` ve opsiyonel `*.alert` üretir.
+- Dosya düzeni: monorepo `packages/` (contracts, config, common), `services/` (vivo, sg, pfl, lt, br, e2e).
+- Komutlar: `pnpm -r build`, `pnpm -r test`, `pnpm -r lint`.
+
+----------------------------------------------------------------------
+0) ORTAK ALTYAPI (CORE INFRA)
+----------------------------------------------------------------------
+
+INF-01 · @vivo/contracts — (tipler + Zod şemaları)
+Amaç: Tüm event arayüzlerini ve Zod şemalarını tek pakette toplayın.
+İşlemler:
+1) `packages/contracts/` oluşturun.
+2) `src/events/*.ts` altında şu şemaları tanımlayın (örnek başlıklar):
+   - sentry.guard.directive, sentry.failover.recommendation, latency_slip.guard.directive
+   - portfolio.balance.directive, position.size.suggestion, hedge.plan.proposed
+   - stream.integrity.alert, orderflow.pacing.plan, composer.intent.filtered
+   - telemetry.* (metrics, anomaly.signal, slo.status, rollup.batch)
+   - replay.*, sim.*, scenario.*, e2e.* (plan, status, report.ready)
+   - bridge.* (notification.outgoing, telegram/discord/email/webhook.send)
+   - privacy.* (data.ingest, data.normalized, policy.update, scan.result)
+3) `src/index.ts` tüm tip/zod’ları export etsin.
+4) `tsup`/`tsc` ile ES module build.
+Kabul Kriterleri:
+- `services/*` içinde 5+ tüketici tip import edip derlenir.
+- 10+ örnek olay Zod ile parse edilir; hatalı örnekler reddedilir.
+Dosyalar:
+- `packages/contracts/package.json`, `src/events/*.ts`, `src/index.ts`, `tsconfig.json`, `README.md`
+
+INF-02 · topics.yaml — (topic registry)
+Amaç: Tüm topic’lerin yönü, PII seviyesi ve retention’ı tek yerde.
+İşlemler:
+1) Kökte `config/topics.yaml` oluşturun.
+2) Şema: 
+   - `name`, `direction: in|out|both`, `pii: none|low|basic|strict`,
+   - `retention: { memorySec: number, persistDays: number }`,
+   - `owners: string[]`, `notes: string`.
+3) `packages/common/src/topics.ts` ⇒ YAML’ı okuyup şema doğrulayan loader.
+Kabul Kriterleri:
+- Mevcut modüllerin tüm In/Out başlıkları doldurulmuş.
+- CI’da JSON Schema validasyonu yeşil.
+Dosyalar:
+- `config/topics.yaml`, `packages/common/src/topics.ts`, `packages/common/__tests__/topics.test.ts`
+
+INF-03 · configLoader.ts — (cfg/*.yaml + env override)
+Amaç: Modül konfiglerini YAML + env ile yükleyip Zod’la doğrulayın.
+İşlemler:
+1) `packages/config/` paketi yazın; `loadConfig(moduleName): Readonly<Config>`.
+2) Öncelik: `cfg/<module>.yaml` < `.env` < process.env.
+3) Tüm config objeleri immutables (deep freeze).
+Kabul Kriterleri:
+- 3 farklı modül için örnek cfg dosyaları; env override testleri geçer.
+Dosyalar:
+- `packages/config/src/index.ts`, `packages/config/__tests__/loader.test.ts`, `cfg/*.yaml`
+
+INF-04 · auditIdem.ts — (audit + idempotency yardımcıları)
+Amaç: Her Out evente audit alanı ekleyin ve idem kontrolü yapın.
+İşlemler:
+1) `packages/common/src/auditIdem.ts`:
+   - `makeAudit(ctx) → { eventId, producedBy, producedAt }`
+   - `isDuplicate(key, ttlSec) → boolean` (memory + opsiyonel `data/idem.index`).
+2) Tüm yayıncılar bu yardımcıyı kullansın.
+Kabul Kriterleri:
+- Aynı `runId` ile iki kez `e2e.run.plan` üretilemez.
+- Out eventlerde `audit` alanı mevcut.
+Dosyalar:
+- `packages/common/src/auditIdem.ts`, `__tests__/auditIdem.test.ts`
+
+----------------------------------------------------------------------
+1) GÖZLEMLENEBİLİRLİK (OBSERVABILITY)
+----------------------------------------------------------------------
+
+OBS-01 · Grafana Panoları
+Amaç: 5 pano (Sentry, Guard, Portfolio, Orderflow, SLO/Anomaly).
+İşlemler:
+1) Datasource: Prometheus/ClickHouse.
+2) Panolar:
+   - Sentry & Streams: ping p99, gaps, reconnect, mode timeline.
+   - Latency & Slip: place/firstFill p95, slip p95, guard mode timeline.
+   - Portfolio: risk caps, scale/defer sayaçları.
+   - Orderflow: inFlight, queueDepth, defer/drop oranları.
+   - SLO & Anomaly: breach/at_risk, anomaly dağılımı.
+Kabul Kriterleri:
+- `dashboards/*.json` repo’da; sorgular canlı veriyle çalışır.
+Dosyalar:
+- `dashboards/sentry.json`, `dashboards/guard.json`, `dashboards/portfolio.json`, `dashboards/orderflow.json`, `dashboards/slo-anomaly.json`
+
+OBS-02 · Alert Route (Incident Bridge)
+Amaç: Quiet hours, soak, dedupe politikasıyla doğru köprüleme.
+İşlemler:
+1) `bridge.channel.map` kural seti:
+   - critical → Telegram+Email
+   - high → Telegram+Discord
+   - medium → Discord
+2) `bridge.prefs`: `quietHours 23:30–07:30`, `soak.windowSec=60`, `dedupe.windowSec=300`.
+Kabul Kriterleri:
+- Quiet saat içinde 3 olay → tek batched mesaj.
+- Aynı groupId 5 dk içinde tek bildirim (dedupe).
+Dosyalar:
+- `cfg/bridge.channel.map.yaml`, `cfg/bridge.prefs.yaml`
+
+OBS-03 · SLO Tanımları
+Amaç: QA, Sentry ping, Guard success, Backpressure drop SLO’ları.
+İşlemler:
+1) `cfg/slo.yaml` hedefleri yazın (availability, latency p99, error budget).
+2) `services/lt/telemetrySloTracker.ts` bu hedeflere göre `telemetry.slo.status` yayınlasın.
+Kabul Kriterleri:
+- 4 SLO’dan en az biri breach anında `telemetry.alert(error)` tetikler.
+Dosyalar:
+- `cfg/slo.yaml`, `services/lt/telemetrySloTracker.ts`, `__tests__/sloTracker.test.ts`
+
+----------------------------------------------------------------------
+2) GÜVENLİK & GİZLİLİK
+----------------------------------------------------------------------
+
+SEC-01 · Privacy Defaults
+Amaç: Varsayılan politika ve redaksiyonların uygulanması.
+İşlemler:
+1) `privacy.policy.update` (version=1):
+   - retention: PII_BASIC=P90D, PII_STRICT=P30D, SECRET=P0D
+   - redaction.telemetry: email/ip → hash; alerts: phone/email → mask
+2) LT-02 Router `data.ingest`’e sınıflandırma etiketi taşısın.
+Kabul Kriterleri:
+- `data.ingest` → `data.normalized` içinde `classification` & `expiresAt`.
+- SECRET içeren kayıt → drop + `privacy.alert(error)`.
+Dosyalar:
+- `cfg/privacy.policy.v1.json`, `services/lt/logIngestRouter.ts` (policy entegrasyonu için güncelleme)
+
+SEC-02 · Log Sampling Kuralları
+Amaç: error=100%, warn≈50%, info≈10%, debug≈1% ve burst backpressure.
+İşlemler:
+1) LT-02 kuralları:
+   - sampling defaultları (error 100, warn 50, info 10, debug 1).
+   - source=guard/sentry için ek sink: `click`/TSDB.
+2) Burst’te sampling’i otomatik artır, alert ver.
+Kabul Kriterleri:
+- 10k info log → ~%10 geçer.
+- Burst senaryosunda `log.router.alert(warn)` üretilir.
+Dosyalar:
+- `cfg/log.router.rules.yaml`, `services/lt/logIngestRouter.ts`
+
+SEC-03 · Secrets & Allowlist
+Amaç: HMAC zorunlu, endpoint allowlist, KMS alias kullanımı.
+İşlemler:
+1) Bridge inbound komutları: `X-Signature` HMAC doğrulaması zorunlu.
+2) `cfg/endpoints.yaml` allowlist; SG-04 değiştirmeden önce kontrol etsin.
+3) KMS alias `kms:vivo35-rotating` bütün encrypt-at-rest’te.
+Kabul Kriterleri:
+- İmzasız inbound reddedilir.
+- Allowlist dışı endpoint’e switch plan oluşmaz.
+Dosyalar:
+- `cfg/endpoints.yaml`, `services/sg/endpointFailoverOrchestrator.ts` (kontrol ekle)
+
+----------------------------------------------------------------------
+3) CI/CD & KALİTE
+----------------------------------------------------------------------
+
+CI-01 · Monorepo İskeleti
+Amaç: pnpm workspaces, tsconfig base, lint/test.
+İşlemler:
+1) Kök `package.json` (workspaces), `pnpm-workspace.yaml`.
+2) `tsconfig.base.json`, `eslint`, `prettier`.
+3) `packages/` + `services/` dizinlerini aç; boş örnek modüller derlensin.
+Kabul Kriterleri:
+- `pnpm -r build` ve `pnpm -r test` yeşil.
+Dosyalar:
+- `package.json`, `pnpm-workspace.yaml`, `tsconfig.base.json`, `.eslintrc.cjs`, `.prettierrc`
+
+CI-02 · Pipeline (GitHub Actions)
+Amaç: lint + typecheck + test + artifact, coverage ≥ %80 kritik çekirdeklerde.
+İşlemler:
+1) `.github/workflows/ci.yml`: matrix Node 18/20; cache pnpm; jobs: lint/typecheck/test/package.
+2) Coverage minimum: SG-01/02/05, PFL-01/03, VIVO-21 için %80.
+Kabul Kriterleri:
+- PR’lar tüm job’lar geçmeden merge edilemez.
+Dosyalar:
+- `.github/workflows/ci.yml`, `jest.config.ts`/`vitest.config.ts`
+
+CI-03 · Feature Flags / Canary
+Amaç: Modül bazlı enable + % rollout.
+İşlemler:
+1) `cfg/flags.yaml`: `module.enabled`, `canary.percent`.
+2) `packages/common/src/flags.ts` reader; services boot’ta log etsin.
+Kabul Kriterleri:
+- Canary %10’da modül sadece canary instance’da aktif olur.
+Dosyalar:
+- `cfg/flags.yaml`, `packages/common/src/flags.ts`, `__tests__/flags.test.ts`
+
+----------------------------------------------------------------------
+4) E2E “SMOKE” KOŞUSU
+----------------------------------------------------------------------
+
+E2E-SMOKE · scenarioRunOrchestrator ile uçtan uca test
+Amaç: Dataset + senaryo + guard + rapor tek komutla çalışsın.
+
+Komut (event):
+{
+  "event":"e2e.run.request",
+  "runId":"run-42",
+  "mode":"replay",
+  "source":{"replay":{"manifestRef":"session-avax-0501","dqGate":{"enabled":true,"autoFix":false}}},
+  "scenario":{"catalogRef":"std","id":"news_shock_then_panic","allowDangerous":false},
+  "guardPolicy":{"calibrateFrom":"last30d","applyGuard":true,"failoverAllowed":true},
+  "speed":"2",
+  "outputs":{"artifactDir":"data/e2e","report":{"format":"markdown","zip":true},"include":["telemetry","rollups","incidents","eval","postmortem"]},
+  "labels":{"env":"e2e","owner":"qa"}
+}
+
+Başarı Kriterleri (hepsi sağlanmalı):
+- Sentry `streams_panic` sırasında SG-04 `endpoint.switch.plan` yayınlar; 10 dk stabil → `revert` planı.
+- Guard en az bir kez `block_aggressive` ve bir kez `halt_entry` üretir.
+- Balancer cap aşımında `scale_*` veya `defer_new` çıkarır.
+- Privacy leak = 0; `retention.sweep.report` görülür.
+- `e2e.report.ready` oluşur; PF ve p95 latency/slip özetleri içerir.
+Çıktı Dosyaları:
+- `data/e2e/run-42/report.md`
+- `data/e2e/run-42/rollups_1m.zip`
+- `data/e2e/run-42/replay_eval.json`
+- `data/e2e/run-42/postmortem_*.md`
+
+----------------------------------------------------------------------
+EKLER — Hızlı Şablonlar (kısa)
+----------------------------------------------------------------------
+
+ENV (.env örneği)
+TZ=Europe/Istanbul
+BRIDGE_HMAC=changemehex
+SUBJECT_PEPPER=changemesecret
+KMS_ALIAS=kms:vivo35-rotating
+PROM_EXPORTER_PORT=9108
+TSDB_ENDPOINT_PRIMARY=http://tsdb:8086/write
+TSDB_ENDPOINT_SECONDARY=http://tsdb-b:8086/write
+
+cfg/bridge.channel.map.yaml (örnek)
+routes:
+  - match: { event: "risk.incident.*", severity: ">=high" }
+    channels: ["telegram:ops","discord:#incidents","email:oncall@example.com"]
+  - match: { series: "sentry", status: "streams_panic" }
+    channels: ["telegram:ops"]
+rateLimitPerMin: 8
+
+cfg/bridge.prefs.yaml (örnek)
+locale: tr
+quietHours: { start: "23:30", end: "07:30", timezone: "Europe/Istanbul" }
+soak: { windowSec: 60, maxBatch: 5 }
+dedupe: { windowSec: 300 }
+
+cfg/slo.yaml (örnek)
+qa_latency_p99_ms: { target: 1200, window: "1h" }
+sentry_ping_p99_ms: { target: 1500, window: "1h" }
+guard_success_rate: { targetPct: 99.0, window: "24h" }
+backpressure_drop_rate: { maxPct: 1.0, window: "1h" }
+
+cfg/privacy.policy.v1.json (özet)
+{
+  "event":"privacy.policy.update","version":1,
+  "retention":{"PUBLIC":"P365D","SENSITIVE_LOW":"P180D","PII_BASIC":"P90D","PII_STRICT":"P30D","FINANCIAL":"P180D","SECRET":"P0D"},
+  "redaction":{"telemetry":{"fields":["email","ip"],"mode":"hash"},"alerts":{"fields":["email","phone"],"mode":"mask"}},
+  "defaults":{"classification":"SENSITIVE_LOW"},
+  "encryption":{"atRest":true,"keyAlias":"kms:vivo35-rotating","rotateDays":90}
+}
+
+cfg/endpoints.yaml (örnek)
+primary: { id:"exA-pri-1", url:"wss://pri.exchangeA.com/stream" }
+secondary:
+  - { id:"exA-sec-1", url:"wss://sec1.exchangeA.com/stream" }
+  - { id:"exA-sec-2", url:"wss://sec2.exchangeA.com/stream" }
+allow:
+  - "wss://pri.exchangeA.com/stream"
+  - "wss://sec1.exchangeA.com/stream"
+  - "wss://sec2.exchangeA.com/stream"
+
+cfg/log.router.rules.yaml (özet)
+sampling: { errorPct:100, warnPct:50, infoPct:10, debugPct:1 }
+routes:
+  - match: { source:"guard" }
+    action: { sink:["privacy","click"], addTags:["module:guard"] }
+  - match: { level:"debug" }
+    action: { samplePct:1 }
+
+cfg/flags.yaml (örnek)
+modules:
+  sg01: { enabled: true, canary: { percent: 10 } }
+  sg02: { enabled: true }
+  pfl01:{ enabled: true }
+  vivo21:{ enabled: true }
+______________________________________________________________________________________________
