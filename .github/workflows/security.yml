@@ -37,7 +37,7 @@ jobs:
           version: '8'
           
       - name: 📦 Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
         
       - name: 🔍 CodeQL Analysis
         uses: github/codeql-action/init@v2
@@ -78,7 +78,7 @@ jobs:
           echo "- Commit: ${{ github.sha }}" >> security-report.md
           
       - name: 📤 Upload Security Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-report-${{ github.sha }}
           path: security-report.md

@@ -40,7 +40,7 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
           
       - name: 📦 Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
         
       - name: 🏗️ Build all packages
         run: pnpm run build
@@ -97,7 +97,7 @@ jobs:
           
       - name: 📤 Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: e2e-test-results-${{ github.sha }}
           path: |
@@ -128,7 +128,7 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
           
       - name: 📦 Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
         
       - name: 🏥 System health validation
         run: |

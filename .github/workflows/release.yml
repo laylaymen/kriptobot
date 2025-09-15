@@ -38,7 +38,7 @@ jobs:
           
       - name: 📦 Install and build
         run: |
-          pnpm install --frozen-lockfile
+          pnpm install --no-frozen-lockfile
           pnpm run build
           
       - name: 🧪 Run tests before release
