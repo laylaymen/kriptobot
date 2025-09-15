@@ -1,0 +1,38 @@
+name: "Kriptobot CodeQL Configuration"
+
+disable-default-queries: false
+
+queries:
+  - uses: security-and-quality
+  - uses: security-extended
+
+paths:
+  - kirpto bot sinyal/
+  - packages/
+  - sentiment-analysis-module/
+  - "*.js"
+
+paths-ignore:
+  - node_modules/
+  - "**/*.test.js"
+  - "**/*.spec.js"
+  - coverage/
+  - dist/
+  - build/
+  - logs/
+
+# Add custom CodeQL packs for enhanced security scanning
+packs:
+  - codeql/javascript-queries
+  - codeql/javascript-security-queries
+
+# Configure JavaScript/TypeScript scanning
+query-filters:
+  - include:
+      kind: 
+        - problem
+        - path-problem
+      severity:
+        - error
+        - warning
+        - recommendation
