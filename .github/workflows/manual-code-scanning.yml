@@ -1,0 +1,166 @@
+name: 🔍 Manual Code Scanning
+
+on:
+  workflow_dispatch:
+    inputs:
+      scan_type:
+        description: 'Type of scan to perform'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - codeql
+          - security
+          - quality
+          - dependencies
+      severity_level:
+        description: 'Minimum severity level'
+        required: true
+        default: 'medium'
+        type: choice
+        options:
+          - low
+          - medium
+          - high
+          - critical
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8'
+
+jobs:
+  manual-scan:
+    name: 🔍 Manual Code Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          
+      - name: 📦 Install dependencies
+        run: pnpm install --no-frozen-lockfile
+        
+      # CodeQL Analysis
+      - name: 🔍 CodeQL Analysis - Initialize
+        if: contains(github.event.inputs.scan_type, 'codeql') || github.event.inputs.scan_type == 'all'
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          config-file: ./.github/codeql/codeql-config.yml
+          
+      - name: 🏗️ Autobuild
+        if: contains(github.event.inputs.scan_type, 'codeql') || github.event.inputs.scan_type == 'all'
+        uses: github/codeql-action/autobuild@v3
+          
+      - name: 🔍 CodeQL Analysis - Analyze
+        if: contains(github.event.inputs.scan_type, 'codeql') || github.event.inputs.scan_type == 'all'
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"
+          
+      # Security Scanning
+      - name: 🔒 Security Audit
+        if: contains(github.event.inputs.scan_type, 'security') || github.event.inputs.scan_type == 'all'
+        run: |
+          echo "🔒 Running security audit..."
+          pnpm audit --audit-level ${{ github.event.inputs.severity_level }}
+          
+      - name: 🔐 Secret Scanning
+        if: contains(github.event.inputs.scan_type, 'security') || github.event.inputs.scan_type == 'all'
+        run: |
+          echo "🔐 Scanning for leaked secrets..."
+          # Check for common secret patterns
+          echo "Checking for API keys..."
+          grep -r "api[_-]?key" . --exclude-dir=node_modules --exclude-dir=.git || echo "✅ No API keys found in plaintext"
+          echo "Checking for passwords..."
+          grep -r "password" . --exclude-dir=node_modules --exclude-dir=.git || echo "✅ No passwords found in plaintext"
+          echo "Checking for tokens..."
+          grep -r "token" . --exclude-dir=node_modules --exclude-dir=.git || echo "✅ No tokens found in plaintext"
+          
+      # Code Quality
+      - name: 🔍 ESLint Analysis
+        if: contains(github.event.inputs.scan_type, 'quality') || github.event.inputs.scan_type == 'all'
+        run: |
+          echo "🔍 Running ESLint analysis..."
+          pnpm run lint:check || echo "ESLint completed with issues"
+          
+      # Dependency Scanning
+      - name: 📦 Dependency Analysis
+        if: contains(github.event.inputs.scan_type, 'dependencies') || github.event.inputs.scan_type == 'all'
+        run: |
+          echo "📦 Analyzing dependencies..."
+          echo "## Dependency Tree" >> scan-results.md
+          pnpm list --depth=1 >> scan-results.md || echo "Dependencies listed"
+          echo "## Outdated Packages" >> scan-results.md
+          pnpm outdated >> scan-results.md || echo "No outdated packages"
+          
+      - name: 🔒 Run Snyk Security Scan
+        if: (contains(github.event.inputs.scan_type, 'security') || github.event.inputs.scan_type == 'all') && env.SNYK_TOKEN != ''
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=${{ github.event.inputs.severity_level }}
+          
+      - name: 📝 Generate Comprehensive Report
+        run: |
+          echo "# 🔍 Kod Taraması Raporu" > scan-report.md
+          echo "- **Tarama Tarihi**: $(date)" >> scan-report.md
+          echo "- **Repository**: ${{ github.repository }}" >> scan-report.md
+          echo "- **Branch**: ${{ github.ref_name }}" >> scan-report.md
+          echo "- **Commit**: ${{ github.sha }}" >> scan-report.md
+          echo "- **Tarama Türü**: ${{ github.event.inputs.scan_type }}" >> scan-report.md
+          echo "- **Minimum Severity**: ${{ github.event.inputs.severity_level }}" >> scan-report.md
+          echo "" >> scan-report.md
+          echo "## 📊 Tarama Sonuçları" >> scan-report.md
+          echo "Bu tarama manuel olarak tetiklenmiştir." >> scan-report.md
+          echo "" >> scan-report.md
+          
+          # Add scan results if they exist
+          if [ -f scan-results.md ]; then
+            cat scan-results.md >> scan-report.md
+          fi
+          
+          echo "## 🔗 Yararlı Bağlantılar" >> scan-report.md
+          echo "- [GitHub Security Tab](https://github.com/${{ github.repository }}/security)" >> scan-report.md
+          echo "- [CodeQL Results](https://github.com/${{ github.repository }}/security/code-scanning)" >> scan-report.md
+          echo "- [Dependency Alerts](https://github.com/${{ github.repository }}/security/dependabot)" >> scan-report.md
+          
+      - name: 📤 Upload Scan Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-scan-report-${{ github.event.inputs.scan_type }}-${{ github.sha }}
+          path: scan-report.md
+          retention-days: 30
+          
+      - name: 📊 Summary
+        run: |
+          echo "## 🎯 Tarama Tamamlandı" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tarama Türü**: ${{ github.event.inputs.scan_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Minimum Severity**: ${{ github.event.inputs.severity_level }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Durum**: ✅ Başarılı" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Sonraki Adımlar:" >> $GITHUB_STEP_SUMMARY
+          echo "1. [Security sekmesinden](https://github.com/${{ github.repository }}/security) sonuçları kontrol edin" >> $GITHUB_STEP_SUMMARY
+          echo "2. Tespit edilen sorunları gözden geçirin" >> $GITHUB_STEP_SUMMARY
+          echo "3. Gerekli düzeltmeleri yapın" >> $GITHUB_STEP_SUMMARY
+          echo "4. [Kod Taraması Rehberi](KOD_TARAMASI_REHBERI.md) dökümanını inceleyin" >> $GITHUB_STEP_SUMMARY

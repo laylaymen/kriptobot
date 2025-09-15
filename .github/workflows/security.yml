@@ -39,13 +39,19 @@ jobs:
       - name: 📦 Install dependencies
         run: pnpm install --no-frozen-lockfile
         
-      - name: 🔍 CodeQL Analysis
-        uses: github/codeql-action/init@v2
+      - name: 🔍 CodeQL Analysis - Initialize
+        uses: github/codeql-action/init@v3
         with:
           languages: javascript
+          config-file: ./.github/codeql/codeql-config.yml
           
-      - name: 🔍 Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+      - name: 🏗️ Autobuild
+        uses: github/codeql-action/autobuild@v3
+          
+      - name: 🔍 CodeQL Analysis - Analyze
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"
         
       - name: 🔒 Run Snyk Security Scan
         if: env.SNYK_TOKEN != ''
