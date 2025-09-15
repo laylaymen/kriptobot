@@ -5,5 +5,8 @@
         "plaintext": true
     },
     "github.copilot.nextEditSuggestions.enabled": true,
-    "github-actions.disable-validation": true
+    "github-actions.disable-validation": true,
+    "yaml.validate": false,
+    "yaml.schemas": {},
+    "problems.decorations.enabled": false
 }
