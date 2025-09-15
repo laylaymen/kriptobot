@@ -1,0 +1,1 @@
+const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase'); class BearFlagDetector extends GrafikBeyniModuleBase { constructor() { super('bearFlagDetector'); } async performAnalysis(marketData) { return this.formatResult({ flagDetected: false }, 0); } } module.exports = BearFlagDetector;
