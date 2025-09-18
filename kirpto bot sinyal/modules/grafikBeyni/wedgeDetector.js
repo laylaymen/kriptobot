@@ -7,7 +7,7 @@
  * Falling wedges are typically bullish reversal patterns.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class WedgeDetector extends GrafikBeyniModuleBase {
     constructor() {

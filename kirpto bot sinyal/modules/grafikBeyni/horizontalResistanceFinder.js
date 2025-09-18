@@ -1,4 +1,4 @@
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 /**
  * Horizontal Resistance Finder Module

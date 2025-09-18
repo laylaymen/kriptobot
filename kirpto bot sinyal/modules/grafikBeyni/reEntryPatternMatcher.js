@@ -1,4 +1,4 @@
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 /**
  * Re-Entry Pattern Matcher Module

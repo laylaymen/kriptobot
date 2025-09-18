@@ -1,4 +1,4 @@
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 /**
  * Price Anomaly Watcher Module (Ultra Advanced Version)

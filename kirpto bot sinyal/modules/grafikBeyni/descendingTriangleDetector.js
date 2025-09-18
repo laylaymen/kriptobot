@@ -1,4 +1,4 @@
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 /**
  * Descending Triangle Detector Module

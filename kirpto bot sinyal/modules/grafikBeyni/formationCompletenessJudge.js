@@ -6,7 +6,7 @@
  * Acts as a second validation layer against fake breakouts.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class FormationCompletenessJudge extends GrafikBeyniModuleBase {
     constructor() {

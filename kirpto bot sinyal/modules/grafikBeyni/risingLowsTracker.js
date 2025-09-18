@@ -1,4 +1,4 @@
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 /**
  * Rising Lows Tracker Module

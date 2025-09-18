@@ -6,7 +6,7 @@
  * weak signals from reaching the trading system.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class ConfirmationSignalBridge extends GrafikBeyniModuleBase {
     constructor() {

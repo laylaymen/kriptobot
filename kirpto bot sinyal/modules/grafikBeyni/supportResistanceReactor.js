@@ -6,7 +6,7 @@
  * Provides strategic guidance for positioning around key levels.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class SupportResistanceReactor extends GrafikBeyniModuleBase {
     constructor() {

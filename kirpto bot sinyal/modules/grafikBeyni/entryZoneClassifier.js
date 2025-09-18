@@ -6,7 +6,7 @@
  * and support/resistance distances. Provides zone-based entry guidance.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class EntryZoneClassifier extends GrafikBeyniModuleBase {
     constructor() {

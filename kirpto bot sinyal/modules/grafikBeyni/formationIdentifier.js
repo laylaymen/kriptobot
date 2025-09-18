@@ -6,7 +6,7 @@
  * Filters out inconsistent formations and provides clear formation identity to the system.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class FormationIdentifier extends GrafikBeyniModuleBase {
     constructor() {

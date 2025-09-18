@@ -6,7 +6,7 @@
  * This is the mirror image of the classic head and shoulders pattern.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class InverseHeadAndShouldersDetector extends GrafikBeyniModuleBase {
     constructor() {

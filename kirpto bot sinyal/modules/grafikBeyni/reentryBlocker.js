@@ -6,7 +6,7 @@
  * especially after stop losses or in low volatility conditions.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class ReentryBlocker extends GrafikBeyniModuleBase {
     constructor() {

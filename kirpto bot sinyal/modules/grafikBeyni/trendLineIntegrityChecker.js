@@ -6,7 +6,7 @@
  * Prevents the system from acting on fake breakouts.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class TrendLineIntegrityChecker extends GrafikBeyniModuleBase {
     constructor() {

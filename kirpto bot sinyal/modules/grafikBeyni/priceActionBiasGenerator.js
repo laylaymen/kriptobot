@@ -6,7 +6,7 @@
  * Provides directional framework for VIVO and signal modules.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class PriceActionBiasGenerator extends GrafikBeyniModuleBase {
     constructor() {

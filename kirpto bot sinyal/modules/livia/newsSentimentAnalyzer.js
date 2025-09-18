@@ -460,41 +460,4 @@ module.exports = {
     analyzeSentiment
 };
 
-  for (const { word, score: s } of POSITIVE_WORDS) {
-    if (text.includes(word)) {
-      score += s;
-      reasons.push(word);
-    }
-  }
-  for (const { word, score: s } of NEGATIVE_WORDS) {
-    if (text.includes(word)) {
-      score += s;
-      reasons.push(word);
-    }
-  }
-
-  // Normalize score to -1..1
-  let sentimentScore = Math.max(-1, Math.min(1, score / 4));
-  let sentimentTag = 'neutral';
-  if (sentimentScore > 0.25) sentimentTag = 'positive';
-  else if (sentimentScore < -0.25) sentimentTag = 'negative';
-
-  // Sistem önerileri
-  let actionSuggested = {};
-  if (sentimentTag === 'positive') {
-    actionSuggested = {
-      grafikBeyni: 'sinyal onay',
-      livia: 'engel kaldır'
-    };
-  } else if (sentimentTag === 'negative') {
-    actionSuggested = {
-      livia: 'sinyal baskı',
-      grafikBeyni: 'falseBreakFilter aktif et'
-    };
-  } else {
-    actionSuggested = {
-      denetimAsistani: 'logla'
-    };
-  }
-
 

@@ -422,72 +422,9 @@ async function getIndicators(symbol, interval) {
     return await technicalIndicatorsEngine.getIndicators(symbol, interval);
 }
 
-    // Bollinger Bands hesapla
-    const bollingerArr = technicalindicators.BollingerBands.calculate({
-      period: 20,
-      stdDev: 2,
-      values: closes
-    });
-    const lastBollinger = bollingerArr.length ? bollingerArr[bollingerArr.length - 1] : { upper: 0, middle: 0, lower: 0 };
-
-    // ATR hesapla
-    const highs = ohlcv.map(c => parseFloat(c[2]));
-    const lows = ohlcv.map(c => parseFloat(c[3]));
-    const atr14 = technicalindicators.ATR.calculate({
-      period: 14,
-      high: highs,
-      low: lows,
-      close: closes
-    });
-
-    // VWAP hesapla (günlük)
-    function calcVWAP(ohlcv) {
-      let cumulativeTPV = 0;
-      let cumulativeVolume = 0;
-      for (const c of ohlcv) {
-        const typicalPrice = (parseFloat(c[2]) + parseFloat(c[3]) + parseFloat(c[4])) / 3;
-        const volume = parseFloat(c[5]);
-        cumulativeTPV += typicalPrice * volume;
-        cumulativeVolume += volume;
-      }
-      return cumulativeVolume ? cumulativeTPV / cumulativeVolume : 0.0;
-    }
-    const vwap = calcVWAP(ohlcv);
-
-    // Son EMA değerlerini al (en güncel veri)
-    const last = arr => arr.length ? arr[arr.length - 1] : 0.0;
-
-    // Örnek çıktı
-    const result = {
-      symbol,
-      interval,
-      timestamp: now,
-      indicators: {
-        ema9: last(ema9),
-        ema21: last(ema21),
-        ema50: last(ema50),
-        ema200: last(ema200),
-        rsi14: last(rsi14),
-        macd: {
-          line: lastMacd.MACD || 0,
-          signal: lastMacd.signal || 0,
-          histogram: lastMacd.histogram || 0
-        },
-        bollinger: {
-          upper: lastBollinger.upper || 0,
-          middle: lastBollinger.middle || 0,
-          lower: lastBollinger.lower || 0
-        },
-        atr14: last(atr14),
-        vwap: vwap
-      }
-    };
-
 module.exports = { 
     TechnicalIndicatorsEngine,
     getIndicators,
     // Legacy exports
     technicalIndicatorsEngine
-};
-
-module.exports = { getIndicators }; 
+}; 

@@ -6,7 +6,7 @@
  * This pattern indicates a potential upward breakout when the handle resistance is broken.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class CupAndHandleDetector extends GrafikBeyniModuleBase {
     constructor() {

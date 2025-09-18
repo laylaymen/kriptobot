@@ -6,7 +6,7 @@
  * Protects the system from traps like "price going up but no volume support".
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class VolumePressureAnalyzer extends GrafikBeyniModuleBase {
     constructor() {

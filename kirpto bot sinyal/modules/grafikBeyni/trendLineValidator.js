@@ -6,7 +6,7 @@
  * and breakout characteristics to determine if a trend line is valid.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class TrendLineValidator extends GrafikBeyniModuleBase {
     constructor() {

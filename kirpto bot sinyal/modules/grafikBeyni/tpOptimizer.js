@@ -3,7 +3,7 @@
  * 🎯 Kademeli kâr alma stratejisi oluşturur
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class TPOptimizer extends GrafikBeyniModuleBase {
     constructor(config = {}) {

@@ -6,7 +6,7 @@
  * Helps maintain disciplined entries by avoiding FOMO situations.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class PriceDeviationScanner extends GrafikBeyniModuleBase {
     constructor() {

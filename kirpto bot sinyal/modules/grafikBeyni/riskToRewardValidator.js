@@ -6,7 +6,7 @@
  * Only allows trades with favorable profit potential relative to stop-loss risk.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class RiskToRewardValidator extends GrafikBeyniModuleBase {
     constructor() {

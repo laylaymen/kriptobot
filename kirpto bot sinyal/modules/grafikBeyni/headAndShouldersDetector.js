@@ -6,7 +6,7 @@
  * Includes neckline analysis and breakout validation.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class HeadAndShouldersDetector extends GrafikBeyniModuleBase {
     constructor() {

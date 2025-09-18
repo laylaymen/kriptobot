@@ -6,7 +6,7 @@
  * Decides whether to enter/exit trades based on momentum quality.
  */
 
-const GrafikBeyniModuleBase = require('./grafikBeyniModuleBase');
+const GrafikBeyniModuleBase = require('../grafikBeyniModuleBase');
 
 class MomentumValidator extends GrafikBeyniModuleBase {
     constructor() {
