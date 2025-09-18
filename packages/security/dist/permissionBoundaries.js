@@ -1,4 +1,4 @@
-import { RuntimeSecurityGuards } from './runtimeGuards';
+import { RuntimeSecurityGuards } from './runtimeGuards.js';
 /**
  * Permission boundary enforcer that controls resource access across modules.
  * Implements defense-in-depth security by creating isolated execution contexts.

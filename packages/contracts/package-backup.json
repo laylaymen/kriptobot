@@ -14,9 +14,24 @@
       "import": "./dist/events/*.js",
       "types": "./dist/events/*.d.ts"
     }
+  },o/contracts",
+  "version": "1.0.0",
+  "description": "Shared event interfaces and Zod schemas for VIVO system",
+  "type": "module",
+  "main": "dist/index-debug.js",
+  "types": "dist/index-debug.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index-debug.js",
+      "types": "./dist/index-debug.d.ts"
+    },
+    "./events/*": {
+      "import": "./dist/events/*.js",
+      "types": "./dist/events/*.d.ts"
+    }
   },
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+  "build": "tsup",
     "dev": "tsc --watch",
     "test": "jest --config ./jest.config.cjs",
     "lint": "eslint src/**/*.ts",

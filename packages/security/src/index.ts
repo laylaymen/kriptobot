@@ -1,14 +1,14 @@
 // Export all security components
-export { SecretsManager } from './secretsManager';
-export { RuntimeSecurityGuards } from './runtimeGuards';
-export { PermissionBoundaryEnforcer, type ModuleExecutionContext } from './permissionBoundaries';
+export { SecretsManager } from './secretsManager.js';
+export { RuntimeSecurityGuards } from './runtimeGuards.js';
+export { PermissionBoundaryEnforcer, type ModuleExecutionContext } from './permissionBoundaries.js';
 
 // Export types
 export type {
   Secret,
   SecretsConfig,
   SecretAccessLog
-} from './secretsTypes';
+} from './secretsTypes.js';
 
 export type {
   SecurityGuardConfig,
@@ -16,7 +16,7 @@ export type {
   SecurityViolationLevel,
   ModulePermission,
   PermissionLevel
-} from './securityTypes';
+} from './securityTypes.js';
 
 // Re-export for convenience
 export * from './secretsTypes';

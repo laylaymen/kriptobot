@@ -1,2 +1,2 @@
-export * from './topics';
-export * from './auditIdem';
+export * from './topics.js';
+export * from './auditIdem.js';

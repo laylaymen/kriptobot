@@ -1,5 +1,5 @@
-import { ModulePermission, SecurityGuardConfig } from './securityTypes';
-import { RuntimeSecurityGuards } from './runtimeGuards';
+import type { ModulePermission, SecurityGuardConfig } from './securityTypes.js';
+import { RuntimeSecurityGuards } from './runtimeGuards.js';
 
 /**
  * Permission boundary enforcer that controls resource access across modules.

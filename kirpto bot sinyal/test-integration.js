@@ -36,7 +36,7 @@ async function runIntegrationTests() {
 
     // 📜 Test Contracts Integration
     console.log('📜 Testing Contracts Integration...');
-    const { AllSchemas, validateEvent } = await import('../packages/contracts/dist/index.js');
+    const { AllSchemas, validateEvent } = await import('../packages/contracts/dist/index-simple.js');
     
     const testEvent = {
       id: 'test-123',
@@ -53,7 +53,7 @@ async function runIntegrationTests() {
 
     // 🔧 Test Config Integration
     console.log('🔧 Testing Config Integration...');
-    const { loadTopics } = await import('../packages/common/dist/topicsLoader.js');
+    const { loadTopics } = await import('../packages/common/dist/index.js');
     
     try {
       const topics = await loadTopics();

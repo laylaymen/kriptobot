@@ -1,5 +1,5 @@
 import * as crypto from 'node:crypto';
-import { Secret, SecretsConfig, SecretAccessLog } from './secretsTypes';
+import type { Secret, SecretsConfig, SecretAccessLog } from './secretsTypes.js';
 
 const ALGORITHM = 'aes-256-cbc';
 const IV_LENGTH = 16;

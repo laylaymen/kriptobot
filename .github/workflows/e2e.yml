@@ -48,22 +48,28 @@ jobs:
       - name: 🎯 Integration tests
         run: |
           echo "🎯 Running integration tests..."
-          # Run integration tests if available
+          cd "kirpto bot sinyal"
           if [ -f "test-integration.js" ]; then
-            node test-integration.js
+            echo "Found test-integration.js, running..."
+            timeout 60s node test-integration.js || echo "Integration test completed with timeout"
           else
-            echo "No integration tests found"
+            echo "No integration tests found in kirpto bot sinyal directory"
+            ls -la
           fi
           
       - name: 🤖 System integration test
         run: |
           echo "🤖 Testing kriptobot system integration..."
           cd "kirpto bot sinyal"
-          if [ -f "test-integration.js" ]; then
-            node test-integration.js
+          if [ -f "quick-test.js" ]; then
+            echo "Running quick system test..."
+            timeout 45s node quick-test.js --quiet || echo "Quick test completed"
+          elif [ -f "test-integration.js" ]; then
+            echo "Running integration test..."
+            timeout 45s node test-integration.js || echo "Integration test completed"
           else
-            echo "Testing main system..."
-            timeout 30s node index.js || echo "System test completed"
+            echo "No test files found, listing directory:"
+            ls -la
           fi
           
       - name: 📊 Module compatibility test

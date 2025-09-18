@@ -83,14 +83,14 @@ export declare const StreamIntegrityAlertSchema: z.ZodObject<{
 }, "strict", z.ZodTypeAny, {
     event: "stream.integrity.alert";
     timestamp: string;
-    severity: "low" | "medium" | "high" | "critical";
     kind: "gap" | "stale" | "duplicate" | "out_of_order";
+    severity: "low" | "medium" | "high" | "critical";
     details?: Record<string, any> | undefined;
 }, {
     event: "stream.integrity.alert";
     timestamp: string;
-    severity: "low" | "medium" | "high" | "critical";
     kind: "gap" | "stale" | "duplicate" | "out_of_order";
+    severity: "low" | "medium" | "high" | "critical";
     details?: Record<string, any> | undefined;
 }>;
 export declare const OrderflowPacingPlanSchema: z.ZodObject<{

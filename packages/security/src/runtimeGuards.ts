@@ -1,4 +1,4 @@
-import { SecurityGuardConfig, SecurityViolation, ModulePermission, PermissionLevel } from './securityTypes';
+import type { SecurityGuardConfig, SecurityViolation, ModulePermission, PermissionLevel } from './securityTypes.js';
 
 /**
  * Runtime security guards to prevent dangerous operations and privilege escalation.

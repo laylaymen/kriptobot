@@ -10,8 +10,10 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node", "jest"],
+    "lib": ["ES2022"]
   },
   "include": ["src/**/*"],
-  "exclude": ["dist", "node_modules", "**/*.test.ts"]
+  "exclude": ["dist", "node_modules"]
 }

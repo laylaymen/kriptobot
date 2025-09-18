@@ -121,7 +121,7 @@ export declare const BridgeNotificationOutgoingSchema: z.ZodObject<{
     event: "bridge.notification.outgoing";
     timestamp: string;
     severity: "low" | "medium" | "high" | "critical";
-    channel: "telegram" | "discord" | "email" | "webhook";
+    channel: "email" | "telegram" | "discord" | "webhook";
     subject: string;
     body: string;
     groupId?: string | undefined;
@@ -129,7 +129,7 @@ export declare const BridgeNotificationOutgoingSchema: z.ZodObject<{
     event: "bridge.notification.outgoing";
     timestamp: string;
     severity: "low" | "medium" | "high" | "critical";
-    channel: "telegram" | "discord" | "email" | "webhook";
+    channel: "email" | "telegram" | "discord" | "webhook";
     subject: string;
     body: string;
     groupId?: string | undefined;
@@ -143,14 +143,14 @@ export declare const BridgeWebhookSendSchema: z.ZodObject<{
 }, "strict", z.ZodTypeAny, {
     event: "bridge.webhook.send";
     timestamp: string;
-    payload: Record<string, any>;
     url: string;
+    payload: Record<string, any>;
     signature: string;
 }, {
     event: "bridge.webhook.send";
     timestamp: string;
-    payload: Record<string, any>;
     url: string;
+    payload: Record<string, any>;
     signature: string;
 }>;
 export type PrivacyDataIngest = z.infer<typeof PrivacyDataIngestSchema>;
