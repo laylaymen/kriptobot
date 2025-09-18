@@ -112,7 +112,7 @@ jobs:
           asset_content_type: application/gzip
           
       - name: 📦 Publish to NPM (if configured)
-        if: env.NPM_TOKEN != ''
+        continue-on-error: true
         run: |
           echo "📦 Publishing packages to NPM..."
           # Only publish public packages

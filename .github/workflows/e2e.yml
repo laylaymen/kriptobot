@@ -51,7 +51,7 @@ jobs:
           cd "kirpto bot sinyal"
           if [ -f "test-integration.js" ]; then
             echo "Found test-integration.js, running..."
-            timeout 60s node test-integration.js || echo "Integration test completed with timeout"
+            timeout 60s node --experimental-modules test-integration.js || echo "Integration test completed with timeout"
           else
             echo "No integration tests found in kirpto bot sinyal directory"
             ls -la
@@ -63,10 +63,10 @@ jobs:
           cd "kirpto bot sinyal"
           if [ -f "quick-test.js" ]; then
             echo "Running quick system test..."
-            timeout 45s node quick-test.js --quiet || echo "Quick test completed"
+            timeout 45s node --experimental-modules quick-test.js --quiet || echo "Quick test completed"
           elif [ -f "test-integration.js" ]; then
             echo "Running integration test..."
-            timeout 45s node test-integration.js || echo "Integration test completed"
+            timeout 45s node --experimental-modules test-integration.js || echo "Integration test completed"
           else
             echo "No test files found, listing directory:"
             ls -la
