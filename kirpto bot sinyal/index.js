@@ -4,6 +4,7 @@ const path = require('path');
 const { logError, logEvent } = require('./logs/logger');
 const readline = require('readline');
 const { decrypt } = require('./modules/envSecure');
+const EnvManager = require('./modules/envManager');
 
 async function loadDecryptedEnv() {
   const rl = readline.createInterface({
@@ -11,8 +12,26 @@ async function loadDecryptedEnv() {
     output: process.stdout,
   });
   const ask = (q) => new Promise((res) => rl.question(q, res));
-  const key = await ask('Şifre çözme anahtarını girin (hex): ');
+  
+  // Yeni ENV Manager kullan
+  const envManager = new EnvManager();
+  
+  let key = process.env.ENCRYPTION_KEY;
+  if (!key) {
+    key = await ask('Şifre çözme anahtarını girin (hex): ');
+  }
+  
   rl.close();
+  
+  // ENV Manager ile yükle
+  try {
+    envManager.setEncryptionKey(key);
+    envManager.loadEncryptedEnv();
+    console.log('✅ Şifreli ENV değişkenleri yüklendi');
+  } catch (error) {
+    console.error('❌ ENV yükleme hatası:', error.message);
+    process.exit(1);
+  }
 
   if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_BOT_TOKEN.startsWith('enc:')) {
     process.env.TELEGRAM_BOT_TOKEN = decrypt(process.env.TELEGRAM_BOT_TOKEN.slice(4), key);
