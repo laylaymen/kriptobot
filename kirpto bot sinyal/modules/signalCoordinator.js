@@ -132,6 +132,25 @@ class SignalCoordinator extends EventEmitter {
             throw new Error(`Module ${name} must have analyze() method`);
         }
         
+        // Logger injection - modüle logger fonksiyonları inject et
+        if (!moduleInstance.logError) {
+            moduleInstance.logError = (message, error) => {
+                console.error(`[${name}] ${message}:`, error);
+            };
+        }
+        
+        if (!moduleInstance.logInfo) {
+            moduleInstance.logInfo = (message, data) => {
+                console.log(`[${name}] ${message}`, data || '');
+            };
+        }
+        
+        if (!moduleInstance.logEvent) {
+            moduleInstance.logEvent = (event, data) => {
+                console.log(`[${name}] Event: ${event}`, data || '');
+            };
+        }
+        
         this.modules.set(name, {
             instance: moduleInstance,
             enabled: true,

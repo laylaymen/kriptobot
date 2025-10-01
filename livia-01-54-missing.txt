@@ -1,0 +1,90 @@
+LIVIA-01 to LIVIA-54 EKSIKLIK ANALIZI
+=====================================
+
+BEKLENEN MODÜLLER (1-54):
+==========================
+✓ LIVIA-01: operatorDialogOrchestrator.js (MEVCUT)
+✓ LIVIA-02: guardQuestionEngine.js (MEVCUT)  
+✓ LIVIA-03: biasAwarenessMonitor.js (MEVCUT)
+✓ LIVIA-04: confirmationBounds.js (MEVCUT)
+✓ LIVIA-05: actionApprovalGateway.js (MEVCUT)
+✓ LIVIA-06: operatorUIBridge.js (MEVCUT)
+✓ LIVIA-07: knowledgeRouter.js (MEVCUT)
+❌ LIVIA-08: policyExplainer.js (EKSIK)
+✓ LIVIA-09: decisionRationaleWriter.js (MEVCUT)
+✓ LIVIA-10: sessionMemory.js (MEVCUT)
+✓ LIVIA-11: operatorNoteTaker.js (MEVCUT)
+✓ LIVIA-12: promptTemplateRegistry.js (MEVCUT)
+✓ LIVIA-13: i18nSwitch.js (MEVCUT)
+✓ LIVIA-14: telemetryDailyDigest.js (MEVCUT)
+✓ LIVIA-15: incidentPostmortemWriter.js (MEVCUT)
+✓ LIVIA-16: empathyDrivenCooldownPlanner.js (MEVCUT)
+✓ LIVIA-17: reactiveDefenseGate.js (MEVCUT)
+❌ LIVIA-18: behavioralAnchorReset.js (EKSIK)
+✓ LIVIA-19: emotionalRecoveryMonitor.js (MEVCUT)
+✓ LIVIA-20: operatorFatigueSentinel.js (MEVCUT)
+✓ LIVIA-21: piiGuardAndRedactor.js (MEVCUT)
+✓ LIVIA-22: opsDigestDistributor.js (MEVCUT)
+✓ LIVIA-23: policyUpdateOrchestrator.js (MEVCUT)
+✓ LIVIA-24: knowledgeRouterBridge.js (MEVCUT)
+❌ LIVIA-25: riskScenarioSimulator.js (EKSIK)
+❌ LIVIA-26: ethicsAndComplianceGate.js (EKSIK)
+❌ LIVIA-27: secretsLeakScanner.js (EKSIK)
+✓ LIVIA-28: runbookAutoPilot.js (MEVCUT)
+✓ LIVIA-29: chaosTelemetryFuzzer.js (MEVCUT)
+✓ LIVIA-30: contextAwareMoralLimiter.js (MEVCUT)
+✓ LIVIA-31: runMetricsHousekeeper.js (MEVCUT)
+❌ LIVIA-32: realtimeUptimeSLOGuard.js (EKSIK)
+❌ LIVIA-33: incidentDrillScheduler.js (EKSIK)
+❌ LIVIA-34: realtimeCostGuard.js (EKSIK)
+❌ LIVIA-35: featureFlagOrchestrator.js (EKSIK)
+❌ LIVIA-36: experimentAnalyzer.js (EKSIK)
+❌ LIVIA-37: guardrailBanditAllocator.js (EKSIK)
+❌ LIVIA-38: provenanceChainLogger.js (EKSIK)
+❌ LIVIA-39: dataLineageIndexer.js (EKSIK)
+❌ LIVIA-40: privacyRiskScorer.js (EKSIK)
+❌ LIVIA-41: dataQualitySentinel.js (EKSIK)
+❌ LIVIA-42: schemaChangeAutoMitigator.js (EKSIK)
+❌ LIVIA-43: modelDriftWatcher.js (EKSIK)
+❌ LIVIA-44: autoRetrainOrchestrator.js (EKSIK)
+❌ LIVIA-45: canaryAutoPromoter.js (EKSIK - Prompt txt'de YOK)
+✓ LIVIA-46: featureStoreSync.js (MEVCUT)
+✓ LIVIA-47: kbIndexAutotuner.js (MEVCUT)
+✓ LIVIA-48: complianceAuditExporter.js (MEVCUT)
+✓ LIVIA-49: multiRegionFailoverCoordinator.js (MEVCUT)
+✓ LIVIA-50: disasterRecoveryDrills.js (MEVCUT)
+✓ LIVIA-51: releaseFreezeController.js (MEVCUT)
+✓ LIVIA-52: chaosExperimentDesigner.js (MEVCUT)
+✓ LIVIA-53: costAnomalyGuard.js (MEVCUT)
+✓ LIVIA-54: trafficShaper.js (MEVCUT)
+
+DURUM ÖZETİ:
+============
+Beklenen: 54 modül (1-54 arası)
+Mevcut: 35 modül  
+Eksik: 19 modül
+
+EKSIK OLAN MODÜLLER (1-54 arası):
+==================================
+1. LIVIA-08: policyExplainer.js
+2. LIVIA-18: behavioralAnchorReset.js  
+3. LIVIA-25: riskScenarioSimulator.js
+4. LIVIA-26: ethicsAndComplianceGate.js
+5. LIVIA-27: secretsLeakScanner.js
+6. LIVIA-32: realtimeUptimeSLOGuard.js
+7. LIVIA-33: incidentDrillScheduler.js
+8. LIVIA-34: realtimeCostGuard.js
+9. LIVIA-35: featureFlagOrchestrator.js
+10. LIVIA-36: experimentAnalyzer.js
+11. LIVIA-37: guardrailBanditAllocator.js
+12. LIVIA-38: provenanceChainLogger.js
+13. LIVIA-39: dataLineageIndexer.js
+14. LIVIA-40: privacyRiskScorer.js
+15. LIVIA-41: dataQualitySentinel.js
+16. LIVIA-42: schemaChangeAutoMitigator.js
+17. LIVIA-43: modelDriftWatcher.js
+18. LIVIA-44: autoRetrainOrchestrator.js
+19. LIVIA-45: canaryAutoPromoter.js (prompt txt'de yok)
+
+NOT: LIVIA-45 için lıvıa.txt'de prompt tanımı yok, sadece referanslar var.
+Bu 19 modülü kodlamak gerekiyor.

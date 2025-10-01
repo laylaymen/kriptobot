@@ -231,6 +231,10 @@ class GrafikBeyniModuleBase {
         return null;
     }
     
+    cacheResult(marketData, result) {
+        this.setCachedResult(marketData, result);
+    }
+
     setCachedResult(marketData, result) {
         if (!this.config.cacheEnabled) return;
         
@@ -247,6 +251,56 @@ class GrafikBeyniModuleBase {
         }
     }
     
+    /**
+     * Performance tracking helper
+     */
+    trackPerformance(startTime) {
+        const executionTime = Date.now() - startTime;
+        this.updatePerformance(executionTime);
+    }
+    
+    /**
+     * Error handling helper  
+     */
+    handleError(operation, error) {
+        const errorMsg = `${this.name} ${operation} failed: ${error.message}`;
+        if (this.logError) {
+            this.logError(errorMsg, error);
+        } else {
+            console.error(errorMsg, error);
+        }
+        
+        return this.createErrorOutput(error.message);
+    }
+    
+    /**
+     * Result formatting helper
+     */
+    formatResult(analysisResult, signals = []) {
+        return {
+            success: true,
+            analysis: analysisResult,
+            signals,
+            timestamp: Date.now(),
+            sourceModule: this.name,
+            executionTime: Date.now() - (this.lastAnalysis?.startTime || Date.now())
+        };
+    }
+    
+    /**
+     * Error output helper
+     */
+    createErrorOutput(errorMessage) {
+        return {
+            success: false,
+            error: errorMessage,
+            analysis: null,
+            signals: [],
+            timestamp: Date.now(),
+            sourceModule: this.name
+        };
+    }
+
     generateCacheKey(marketData) {
         // Basit cache key generation
         return `${marketData.symbol || 'unknown'}_${Math.floor(Date.now() / this.config.cacheDuration)}`;
